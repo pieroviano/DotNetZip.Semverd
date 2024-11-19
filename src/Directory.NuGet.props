@@ -4,7 +4,7 @@
         <NuGetPackageRoot Condition="'$(NuGetPackageRoot)'=='' and '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))' != 'true'">~/.nuget/packages/</NuGetPackageRoot>
         <VersionBuildSuffix Condition="'$(Configuration)'!='Release'">*</VersionBuildSuffix>
         <VersionBuildSuffix Condition="'$(Configuration)'=='Release'">*</VersionBuildSuffix>
-        <NuGetUtilityVersion Condition="'$(NuGetUtilityVersion)' == ''">2.1.0</NuGetUtilityVersion>
+        <NuGetUtilityVersion Condition="'$(NuGetUtilityVersion)' == ''">2.5.0</NuGetUtilityVersion>
         <DirectoryNuGet>true</DirectoryNuGet>
         <ImmatricolazioniWsLibrariesVersion>1.1.0</ImmatricolazioniWsLibrariesVersion>
         <FatturaElettronicaVersion>3.2.1</FatturaElettronicaVersion>
@@ -139,7 +139,7 @@
         <SeleniumLibraryVersion>1.1.0</SeleniumLibraryVersion>
         <CodiceFiscaleVersion>1.1.0</CodiceFiscaleVersion>
         <SystemDrawingCommon8Version>8.0.0</SystemDrawingCommon8Version>
-        <Net4xBuffersVersion>1.0.0</Net4xBuffersVersion>
+        <Net4xBuffersVersion>1.2.0</Net4xBuffersVersion>
         <Net35TypeInfoVersion>1.5.0</Net35TypeInfoVersion>
         <PackAsLibraryVersion>1.2.0</PackAsLibraryVersion>
         <TitaniumWebProxyNet40Version>2.0.0</TitaniumWebProxyNet40Version>
