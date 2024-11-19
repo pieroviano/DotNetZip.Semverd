@@ -32,7 +32,7 @@ Namespace My
         
         <Global.System.Diagnostics.DebuggerStepThroughAttribute()>  _
         Protected Overrides Sub OnCreateMainForm()
-            Me.MainForm = Global.WinForms_Unzip.Form1
+            Me.MainForm = Global.WinForms_Unzip.UnzipForm
         End Sub
     End Class
 End Namespace

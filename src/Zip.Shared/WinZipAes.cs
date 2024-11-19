@@ -836,7 +836,11 @@ namespace Ionic.Zip
             _s.Close();
 
             _xform.Dispose();
+#if NET35
+            _aesCipher.Clear();
+#else
             _aesCipher.Dispose();
+#endif
 
 #if WANT_TRACE
             untransformed.Close();

@@ -161,9 +161,9 @@ namespace Ionic.Zip.Tests.Extended
 
             // Get the unzip.exe tool:
             string dnzDir = CurrentDir;
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 4; i++)
                 dnzDir = Path.GetDirectoryName(dnzDir);
-            string unzip = Path.Combine(dnzDir, "Tools\\Unzip\\bin\\debug\\Unzip.exe");
+            string unzip = Path.Combine(dnzDir, "Tools\\Unzip\\bin\\Debug\\net40\\Unzip.exe");
             Assert.IsTrue(File.Exists(unzip),
                           "The unzip.exe tool is not available.");
 
@@ -1403,17 +1403,17 @@ namespace Ionic.Zip.Tests.Extended
         {
             string zipFileToCreate = Path.Combine(TopLevelDir, "Extract_ExistingFile.zip");
             string sourceDir = CurrentDir;
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 4; i++)
                 sourceDir = Path.GetDirectoryName(sourceDir);
 
             Directory.SetCurrentDirectory(TopLevelDir);
 
             string[] filenames =
                 {
-                    Path.Combine(sourceDir, "Tools\\Zipit\\bin\\Debug\\Zipit.exe"),
-                    Path.Combine(sourceDir, "Zip\\bin\\Debug\\DotNetZip.dll"),
-                    Path.Combine(sourceDir, "Zip\\bin\\Debug\\DotNetZip.pdb"),
-                    Path.Combine(sourceDir, "Zip\\bin\\Debug\\DotNetZip.xml"),
+                    Path.Combine(sourceDir, "Tools\\Zipit\\bin\\Debug\\net40\\Zipit.exe"),
+                    Path.Combine(sourceDir, "Zip\\bin\\Debug\\net40\\DotNetZip.dll"),
+                    Path.Combine(sourceDir, "Zip\\bin\\Debug\\net40\\DotNetZip.pdb"),
+                    Path.Combine(sourceDir, "Zip\\bin\\Debug\\net40\\DotNetZip.xml"),
                     //Path.Combine(SourceDir, "AppNote.txt")
                 };
 

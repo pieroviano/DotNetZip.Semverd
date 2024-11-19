@@ -63,7 +63,7 @@ using System.Reflection;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
-
+using Microsoft.CSharp;
 
 namespace Ionic.Zip
 {
@@ -773,7 +773,7 @@ namespace Ionic.Zip
                     providerOptions.Add("CompilerVersion", options.CompilerVersion);
                 }
 
-                using (var csharp = new Microsoft.CSharp.CSharpCodeProvider(providerOptions))
+                using (var csharp = new CSharpCodeProvider(providerOptions))
                 {
                     ExtractorSettings settings =
                         (from x in SettingsList

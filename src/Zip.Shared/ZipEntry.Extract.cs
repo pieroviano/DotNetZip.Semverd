@@ -1390,6 +1390,15 @@ namespace Ionic.Zip
             // workitem 10639
             outFileName = outFileName.Replace('/', Path.DirectorySeparatorChar);
 
+            // Resolve any directory traversal sequence and compare the result with the intended base directory
+            // where the file or folder will be created.
+            var canonicalOutPath = Path.GetFullPath(outFileName);
+            var canonicalBaseDir = Path.GetFullPath(baseDir);
+            if (!canonicalOutPath.StartsWith(canonicalBaseDir, StringComparison.OrdinalIgnoreCase))
+            {
+                throw new IOException(string.Format("Extracting {0} would write to {1}, outside of {2}; rejecting.", outFileName, canonicalOutPath, canonicalBaseDir));
+            }            
+            
             // check if it is a directory
             if (IsDirectory || FileName.EndsWith("/"))
             {

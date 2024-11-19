@@ -147,7 +147,7 @@ namespace Ionic.Zlib.Tests
         private static string GetTestDependentDir(string startingPoint, string subdir)
         {
             var location = startingPoint;
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 4; i++)
                 location = Path.GetDirectoryName(location);
 
             location = Path.Combine(location, subdir);
@@ -156,7 +156,7 @@ namespace Ionic.Zlib.Tests
 
         private static string GetTestBinDir(string startingPoint)
         {
-            return GetTestDependentDir(startingPoint, "Zlib Tests\\bin\\Debug");
+            return GetTestDependentDir(startingPoint, "Zlib Tests\\bin\\Debug\\net40");
         }
 
         private string GetContentFile(string fileName)
@@ -376,13 +376,10 @@ namespace Ionic.Zlib.Tests
         [TestMethod]
         public void GZ_Utility()
         {
-            var gzbin = GetTestDependentDir(CurrentDir, "Tools\\GZip\\bin\\Debug");
+            var gzbin = GetTestDependentDir(CurrentDir, "Tools\\GZip\\bin\\Debug\\net40");
             var dnzGzipexe = Path.Combine(gzbin, "gzip.exe");
             Assert.IsTrue(File.Exists(dnzGzipexe), "Gzip.exe is missing {0}",
                           dnzGzipexe);
-            var unxGzipexe = "\\bin\\gzip.exe";
-            Assert.IsTrue(File.Exists(unxGzipexe), "Gzip.exe is missing {0}",
-                          unxGzipexe);
 
             foreach (var key in TestStrings.Keys)
             {
@@ -414,9 +411,9 @@ namespace Ionic.Zlib.Tests
 
                 System.Threading.Thread.Sleep(1200);
 
-                args = "-dfv "+ gzfile;
+                args = gzfile;
                 TestContext.WriteLine("Exec: gzip {0}", args);
-                gzout = this.Exec(unxGzipexe, args);
+                gzout = this.Exec(dnzGzipexe, args);
                 Assert.IsTrue(File.Exists(fname), "File is missing. {0}",
                               fname);
 

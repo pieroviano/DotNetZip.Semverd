@@ -410,8 +410,7 @@ namespace Ionic.Zip.Tests.WinZipAes
                 // get a set of files to zip up
                 string subdir = Path.Combine(TopLevelDir, "files" + m);
                 string[] filesToZip;
-                Dictionary<string, byte[]> checksums;
-                Compatibility.CreateFilesAndChecksums(subdir, out filesToZip, out checksums);
+                Compatibility.CreateFilesAndChecksums(subdir, out filesToZip, out _);
                 string password = TestUtilities.GenerateRandomPassword();
                 string[] dirsToZip = new string[]
                     {
@@ -885,11 +884,11 @@ namespace Ionic.Zip.Tests.WinZipAes
             string password = "C-XPSQ5-BRT5302-";
 
             string sourceDir = CurrentDir;
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 4; i++)
                 sourceDir = Path.GetDirectoryName(sourceDir);
 
             string fqFileName = Path.Combine(Path.Combine(sourceDir,
-                                                          "Zip Tests\\bin\\Debug\\zips"),
+                                                          "Zip Tests\\bin\\Debug\\net40\\zips"),
                                              baseFileName);
 
             TestContext.WriteLine("Reading zip file: '{0}'", fqFileName);

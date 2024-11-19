@@ -2939,13 +2939,11 @@ namespace Ionic.Zip
         /// </summary>
         Deflate64 = 9,
 
-#if BZIP
         /// <summary>
         ///   BZip2 compression, a compression algorithm developed by Julian Seward.
         ///   For COM environments, the value is 12.
         /// </summary>
         BZip2 = 12,
-#endif
     }
 
 

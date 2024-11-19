@@ -176,7 +176,7 @@ namespace Ionic.BZip2.Tests
         private static string GetTestDependentDir(string startingPoint, string subdir)
         {
             var location = startingPoint;
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 4; i++)
                 location = Path.GetDirectoryName(location);
 
             location = Path.Combine(location, subdir);
@@ -185,7 +185,7 @@ namespace Ionic.BZip2.Tests
 
         private static string GetTestBinDir(string startingPoint)
         {
-            return GetTestDependentDir(startingPoint, "BZip2 Tests\\bin\\Debug");
+            return GetTestDependentDir(startingPoint, "BZip2 Tests\\bin\\Debug\\net40");
         }
 
         private string GetContentFile(string fileName)
@@ -448,7 +448,7 @@ namespace Ionic.BZip2.Tests
         [ExpectedException(typeof(IOException))]
         public void BZ_Error_1()
         {
-            var bzbin = GetTestDependentDir(CurrentDir, "Tools\\BZip2\\bin\\Debug");
+            var bzbin = GetTestDependentDir(CurrentDir, "Tools\\BZip2\\bin\\Debug\\net40");
             var dnzBzip2exe = Path.Combine(bzbin, "bzip2.exe");
             string decompressedFname = "ThisWillNotWork.txt";
             using (Stream input = File.OpenRead(dnzBzip2exe),
@@ -472,13 +472,10 @@ namespace Ionic.BZip2.Tests
         [TestMethod]
         public void BZ_Utility()
         {
-            var bzbin = GetTestDependentDir(CurrentDir, "Tools\\BZip2\\bin\\Debug");
+            var bzbin = GetTestDependentDir(CurrentDir, "Tools\\BZip2\\bin\\Debug\\net40");
             var dnzBzip2exe = Path.Combine(bzbin, "bzip2.exe");
             Assert.IsTrue(File.Exists(dnzBzip2exe), "Bzip2.exe is missing {0}",
                           dnzBzip2exe);
-            var unxBzip2exe = "\\bin\\bzip2.exe";
-            Assert.IsTrue(File.Exists(unxBzip2exe), "Bzip2.exe is missing {0}",
-                          unxBzip2exe);
 
             foreach (var key in TestStrings.Keys)
             {
@@ -510,9 +507,9 @@ namespace Ionic.BZip2.Tests
 
                 System.Threading.Thread.Sleep(1200);
 
-                args = "-dfk "+ bzfile;
+                args = Path.GetFullPath(bzfile);
                 TestContext.WriteLine("Exec: bzip2 {0}", args);
-                bzout = this.Exec(unxBzip2exe, args);
+                bzout = this.Exec(dnzBzip2exe, args);
                 Assert.IsTrue(File.Exists(fname), "File is missing. {0}",
                               fname);
 

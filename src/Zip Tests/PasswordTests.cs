@@ -128,9 +128,8 @@ namespace Ionic.Zip.Tests.Password
                                    "_" };
 
             string dirToZip = Path.Combine(TopLevelDir, "zipthis");
-            int subdirCount;
             int entries = TestUtilities.GenerateFilesOneLevelDeep
-                (TestContext, "wi13664", dirToZip, null, out subdirCount);
+                (TestContext, "wi13664", dirToZip, null, out _);
             string[] filesToZip = Directory.GetFiles("zipthis", "*.*", SearchOption.AllDirectories);
 
             Assert.AreEqual<int>(filesToZip.Length, entries,
@@ -274,13 +273,13 @@ namespace Ionic.Zip.Tests.Password
         private string _GetNameForZipContentFile(string shortFileName)
         {
             string SourceDir = CurrentDir;
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 4; i++)
                 SourceDir = Path.GetDirectoryName(SourceDir);
 
             TestContext.WriteLine("Current Dir: {0}", CurrentDir);
 
             return  Path.Combine(SourceDir,
-                                 "Zip Tests\\bin\\Debug\\zips\\" + shortFileName);
+                                 "Zip Tests\\bin\\Debug\\net40\\zips\\" + shortFileName);
         }
 
 
@@ -291,15 +290,15 @@ namespace Ionic.Zip.Tests.Password
             Assert.IsFalse(File.Exists(ZipFileToCreate), "The temporary zip file '{0}' already exists.", ZipFileToCreate);
 
             string SourceDir = CurrentDir;
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 4; i++)
                 SourceDir = Path.GetDirectoryName(SourceDir);
 
             Directory.SetCurrentDirectory(TopLevelDir);
 
             string[] filenames =
             {
-                Path.Combine(SourceDir, "Tools\\Zipit\\bin\\Debug\\Zipit.exe"),
-                Path.Combine(SourceDir, "Zip\\bin\\Debug\\DotNetZip.xml"),
+                Path.Combine(SourceDir, "Tools\\Zipit\\bin\\Debug\\net40\\Zipit.exe"),
+                Path.Combine(SourceDir, "Zip\\bin\\Debug\\net40\\DotNetZip.xml"),
             };
 
             string[] checksums =
@@ -349,15 +348,15 @@ namespace Ionic.Zip.Tests.Password
             Assert.IsFalse(File.Exists(ZipFileToCreate), "The temporary zip file '{0}' already exists.", ZipFileToCreate);
 
             string SourceDir = CurrentDir;
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 4; i++)
                 SourceDir = Path.GetDirectoryName(SourceDir);
 
             Directory.SetCurrentDirectory(TopLevelDir);
 
             string[] filenames =
             {
-                Path.Combine(SourceDir, "Tools\\Zipit\\bin\\Debug\\Zipit.exe"),
-                Path.Combine(SourceDir, "Zip\\bin\\Debug\\DotNetZip.xml"),
+                Path.Combine(SourceDir, "Tools\\Zipit\\bin\\Debug\\net40\\Zipit.exe"),
+                Path.Combine(SourceDir, "Zip\\bin\\Debug\\net40\\DotNetZip.xml"),
             };
 
             string[] passwords =
@@ -391,13 +390,13 @@ namespace Ionic.Zip.Tests.Password
         {
             string zipFileToCreate = "AddEntryWithPasswordToExistingZip.zip";
             string dnzDir = CurrentDir;
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 4; i++)
                 dnzDir = Path.GetDirectoryName(dnzDir);
 
             string[] filenames =
             {
-                Path.Combine(dnzDir, "Tools\\Zipit\\bin\\Debug\\Zipit.exe"),
-                Path.Combine(dnzDir, "Zip\\bin\\Debug\\DotNetZip.xml"),
+                Path.Combine(dnzDir, "Tools\\Zipit\\bin\\Debug\\net40\\Zipit.exe"),
+                Path.Combine(dnzDir, "Zip\\bin\\Debug\\net40\\DotNetZip.xml"),
             };
 
             string[] checksums =
@@ -417,7 +416,7 @@ namespace Ionic.Zip.Tests.Password
             Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate), 2,
                     "wrong number of entries.");
 
-            string fileX = Path.Combine(dnzDir, "Tools\\Unzip\\bin\\debug\\unzip.exe");
+            string fileX = Path.Combine(dnzDir, "Tools\\Unzip\\bin\\Debug\\net40\\unzip.exe");
             string checksumX = TestUtilities.GetCheckSumString(fileX);
             string password = TestUtilities.GenerateRandomPassword() + "!";
             using (ZipFile zip = new ZipFile(zipFileToCreate))

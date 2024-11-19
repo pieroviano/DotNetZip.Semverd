@@ -25,6 +25,8 @@
 
 using System;
 using System.IO;
+using System.Security.Permissions;
+using System.Text;
 
 namespace Ionic.Zip
 {
@@ -208,7 +210,7 @@ namespace Ionic.Zip
             {
                 try
                 {
-                    ibm437 = System.Text.CodePagesEncodingProvider.Instance.GetEncoding(1252);
+                    ibm437 = CodePagesEncodingProvider.Instance.GetEncoding(1252);
                 }
                 catch (Exception /*e*/)
                 {
@@ -591,7 +593,7 @@ namespace Ionic.Zip
                 {
                     // Check if we can call GetHRForException,
                     // which makes unmanaged code calls.
-                    var p = new System.Security.Permissions.SecurityPermission(
+                    var p = new SecurityPermission(
                         System.Security.Permissions.SecurityPermissionFlag.UnmanagedCode);
                     if (p.IsUnrestricted())
                     {

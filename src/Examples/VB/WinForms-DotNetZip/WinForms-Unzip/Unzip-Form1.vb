@@ -3,7 +3,7 @@ Imports System.IO
 Imports Ionic.Zip
 Imports System.ComponentModel
 
-Public Class Form1
+Public Class UnzipForm
 
     Private _backgroundWorker1 As System.ComponentModel.BackgroundWorker
     Private _operationCanceled As Boolean

@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class Form1
+Partial Class UnzipForm
     Inherits System.Windows.Forms.Form
 
     'Form overrides dispose to clean up the component list.
@@ -150,7 +150,7 @@ Partial Class Form1
         Me.Controls.Add(Me.btnZipBrowse)
         Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.tbZipToOpen)
-        Me.Name = "Form1"
+        Me.Name = "UnzipForm"
         Me.Text = "DotNetZip Simple Unzip"
         Me.ResumeLayout(False)
         Me.PerformLayout()

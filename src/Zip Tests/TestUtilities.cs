@@ -702,7 +702,7 @@ namespace Ionic.Zip.Tests.Utilities
 
         internal static string GetTestBinDir(string startingPoint)
         {
-            return GetTestDependentDir(startingPoint, "Zip Tests\\bin\\Debug");
+            return GetTestDependentDir(startingPoint, "Zip Tests\\bin\\Debug\\net40");
         }
 
         internal static string GetTestSrcDir(string startingPoint)
@@ -713,7 +713,7 @@ namespace Ionic.Zip.Tests.Utilities
         private static string GetTestDependentDir(string startingPoint, string subdir)
         {
             var location = startingPoint;
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 4; i++)
                 location = Path.GetDirectoryName(location);
 
             location = Path.Combine(location, subdir);
@@ -731,9 +731,8 @@ namespace Ionic.Zip.Tests.Utilities
             Assert.IsTrue(File.Exists(requiredDll), "required DLL does not exist ({0})",  requiredDll);
 
             // start the progress monitor
-            string ignored;
             //this.Exec(progressMonitorTool, String.Format("-channel {0}", progressChannel), false);
-            TestUtilities.Exec_NoContext(progressMonitorTool, String.Format("-channel {0}", progressChannel), false, out ignored);
+            TestUtilities.Exec_NoContext(progressMonitorTool, String.Format("-channel {0}", progressChannel), false, out _);
 
             var txrx = new Ionic.CopyData.Transceiver();
             System.Threading.Thread.Sleep(1000);

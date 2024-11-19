@@ -32,6 +32,7 @@ using RE = System.Text.RegularExpressions;
 using Ionic.Zip;
 using Ionic.Zip.Tests.Utilities;
 using System.IO;
+using System.Reflection;
 
 namespace Ionic.Zip.Tests.Basic
 {
@@ -293,8 +294,7 @@ namespace Ionic.Zip.Tests.Basic
             string dirToZip = "zipthis";
 
             // create a bunch of files
-            int subdirCount;
-            int entries = TestUtilities.GenerateFilesOneLevelDeep(TestContext, "PreserveDirHierarchy", dirToZip, null, out subdirCount);
+            int entries = TestUtilities.GenerateFilesOneLevelDeep(TestContext, "PreserveDirHierarchy", dirToZip, null, out _);
 
             string[] filesToZip = Directory.GetFiles(".", "*.*", SearchOption.AllDirectories);
 
@@ -1339,12 +1339,12 @@ namespace Ionic.Zip.Tests.Basic
             string fileName = "wi11056.dwf";
             string entryName = @"com.autodesk.dwf.ePlot_5VFMLy3OdEetAPFe7uWXYg\descriptor.xml";
             string SourceDir = CurrentDir;
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 4; i++)
                 SourceDir = Path.GetDirectoryName(SourceDir);
 
             TestContext.WriteLine("Current Dir: {0}", CurrentDir);
 
-            string filename = Path.Combine(SourceDir, "Zip Tests\\bin\\Debug\\zips\\" + fileName);
+            string filename = Path.Combine(SourceDir, "Zip Tests\\bin\\Debug\\net40\\zips\\" + fileName);
 
             TestContext.WriteLine("Reading zip file: '{0}'", filename);
             using (ZipFile zip = ZipFile.Read(filename))
@@ -2205,15 +2205,18 @@ Maecenas in venenatis justo. Pellentesque lobortis lorem a augue volutpat, aliqu
             using (var zip = new ZipFile())
             {
                 zip.AddFile(filename, "");
-                Directory.SetCurrentDirectory("\\");
-                zip.AddFile("dev\\codeplex\\DotNetZip\\Zip Tests\\BasicTests.cs", "");
+                var path = GetSourcePath();
+                Directory.SetCurrentDirectory(path);
+                zip.AddFile(@"Zip Tests\BasicTests.cs", "");
                 Directory.SetCurrentDirectory(cwd);
                 zip.Save(zipFileToCreate);
             }
         }
 
-
-
+        private static string GetSourcePath()
+        {
+            return Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)??"","..\\..\\..\\..\\"));
+        }
 
         private void VerifyEntries(string zipFile,
                                    Variance variance,

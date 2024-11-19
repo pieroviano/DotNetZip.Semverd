@@ -286,11 +286,11 @@ namespace Ionic.Zip.Tests.Utilities
                 if (_ZipitIsPresent == null)
                 {
                     string sourceDir = CurrentDir;
-                    for (int i = 0; i < 3; i++)
+                    for (int i = 0; i < 4; i++)
                         sourceDir = Path.GetDirectoryName(sourceDir);
 
                     _zipit =
-                        Path.Combine(sourceDir, "Tools\\Zipit\\bin\\Debug\\Zipit.exe");
+                        Path.Combine(sourceDir, "Tools\\Zipit\\bin\\Debug\\net40\\Zipit.exe");
 
                     _ZipitIsPresent = new Nullable<bool>(File.Exists(_zipit));
                 }

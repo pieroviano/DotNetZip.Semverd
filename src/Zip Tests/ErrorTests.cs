@@ -271,14 +271,14 @@ namespace Ionic.Zip.Tests.Error
         private void CreateSmallZip(string zipFileToCreate)
         {
             string sourceDir = CurrentDir;
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 4; i++)
                 sourceDir = Path.GetDirectoryName(sourceDir);
 
             // the list of filenames to add to the zip
             string[] fileNames =
                 {
-                    Path.Combine(sourceDir, "Tools\\Zipit\\bin\\Debug\\Zipit.exe"),
-                    Path.Combine(sourceDir, "Zip\\bin\\Debug\\DotNetZip.xml"),
+                    Path.Combine(sourceDir, "Tools\\Zipit\\bin\\Debug\\net40\\Zipit.exe"),
+                    Path.Combine(sourceDir, "Zip\\bin\\Debug\\net40\\DotNetZip.xml"),
                     Path.Combine(sourceDir, "Tools\\WinFormsApp\\Icon2.res"),
                 };
 
@@ -611,7 +611,7 @@ namespace Ionic.Zip.Tests.Error
         {
             string zipFileToCreate = Path.Combine(TopLevelDir, "Read_CorruptedZipFile_Passwords.zip");
             string sourceDir = CurrentDir;
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 4; i++)
                 sourceDir = Path.GetDirectoryName(sourceDir);
 
             Directory.SetCurrentDirectory(TopLevelDir);
@@ -619,8 +619,8 @@ namespace Ionic.Zip.Tests.Error
             // the list of filenames to add to the zip
             string[] filenames =
             {
-                Path.Combine(sourceDir, "Tools\\Zipit\\bin\\Debug\\Zipit.exe"),
-                Path.Combine(sourceDir, "Zip\\bin\\Debug\\DotNetZip.xml"),
+                Path.Combine(sourceDir, "Tools\\Zipit\\bin\\Debug\\net40\\Zipit.exe"),
+                Path.Combine(sourceDir, "Zip\\bin\\Debug\\net40\\DotNetZip.xml"),
                 Path.Combine(sourceDir, "Tools\\WinFormsApp\\Icon2.res"),
             };
 
@@ -673,7 +673,7 @@ namespace Ionic.Zip.Tests.Error
             string zipFileToCreate = Path.Combine(TopLevelDir, "Read_CorruptedZipFile.zip");
 
             string sourceDir = CurrentDir;
-            for (i = 0; i < 3; i++)
+            for (i = 0; i < 4; i++)
                 sourceDir = Path.GetDirectoryName(sourceDir);
 
             Directory.SetCurrentDirectory(TopLevelDir);
@@ -681,9 +681,9 @@ namespace Ionic.Zip.Tests.Error
             // the list of filenames to add to the zip
             string[] filenames =
             {
-                Path.Combine(sourceDir, "Tools\\Zipit\\bin\\Debug\\Zipit.exe"),
-                Path.Combine(sourceDir, "Tools\\Unzip\\bin\\Debug\\Unzip.exe"),
-                Path.Combine(sourceDir, "Zip\\bin\\Debug\\DotNetZip.xml"),
+                Path.Combine(sourceDir, "Tools\\Zipit\\bin\\Debug\\net40\\Zipit.exe"),
+                Path.Combine(sourceDir, "Tools\\Unzip\\bin\\Debug\\net40\\Unzip.exe"),
+                Path.Combine(sourceDir, "Zip\\bin\\Debug\\net40\\DotNetZip.xml"),
                 Path.Combine(sourceDir, "Tools\\WinFormsApp\\Icon2.res"),
             };
 

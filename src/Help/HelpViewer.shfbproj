@@ -1,4 +1,4 @@
-﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="14.0">
   <PropertyGroup>
     <!-- The configuration and platform will be used to determine which
          assemblies to include from solution and project documentation
@@ -7,7 +7,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{f0d56889-aa19-4331-b4f0-2bfe3e970a4f}</ProjectGuid>
-    <SHFBSchemaVersion>1.9.0.0</SHFBSchemaVersion>
+    <SHFBSchemaVersion>2017.9.26.0</SHFBSchemaVersion>
     <!-- AssemblyName, Name, and RootNamespace are not used by SHFB but Visual
          Studio adds them anyway -->
     <AssemblyName>Documentation</AssemblyName>
@@ -18,7 +18,7 @@
     <HtmlHelpName>DotNetZipLib-v1.9.1.6</HtmlHelpName>
     <ProjectSummary>DotNetZip is a small, easy-to-use class library for manipulating .zip files. It can enable .NET applications written in VB.NET, C#, any .NET language, to easily create, read, and update zip files.  DotNetZip is donationware:  http://cheeso.members.winisp.net/DotNetZipDonate.aspx</ProjectSummary>
     <MissingTags>Summary, Parameter, Returns, AutoDocumentCtors, Namespace, TypeParameter</MissingTags>
-    <VisibleItems>InheritedMembers, InheritedFrameworkMembers, Protected, SealedProtected</VisibleItems>
+    <VisibleItems>InheritedMembers, InheritedFrameworkMembers, Protected, SealedProtected, EditorBrowsableNever, NonBrowsable</VisibleItems>
     <HtmlHelp1xCompilerPath>
     </HtmlHelp1xCompilerPath>
     <HtmlHelp2xCompilerPath>c:\Program Files (x86)\Common Files\microsoft shared\Help 2.0 Compiler\</HtmlHelp2xCompilerPath>
@@ -26,13 +26,13 @@
     </SandcastlePath>
     <WorkingPath>
     </WorkingPath>
-    <FrameworkVersion>3.0</FrameworkVersion>
+    <FrameworkVersion>.NET Framework 4.7.2</FrameworkVersion>
     <HelpTitle>Ionic Zip Library v1.9.1.6</HelpTitle>
     <FeedbackEMailAddress>dpchiesa%40hotmail.com</FeedbackEMailAddress>
-    <PresentationStyle>Prototype</PresentationStyle>
+    <PresentationStyle>Default2022</PresentationStyle>
     <DocumentationSources>
-      <DocumentationSource sourceFile="..\Zip\bin\Debug\Ionic.Zip.dll" xmlns="" />
-      <DocumentationSource sourceFile="..\Zip\bin\Debug\Ionic.Zip.xml" xmlns="" />
+      <DocumentationSource sourceFile="..\DotNetZip.xml" xmlns="" />
+      <DocumentationSource sourceFile="..\Zip\bin\Debug\net40\DotNetZip.dll" />
     </DocumentationSources>
     <NamespaceSummaries>
       <NamespaceSummaryItem name="(global)" isDocumented="False" xmlns="" />
@@ -50,7 +50,14 @@ DotNetZip is donationware.  Please donate. Proceeds go to the Boys &amp;amp; Gir
     <CopyrightText>Copyright 2009-2011, Dino Chiesa</CopyrightText>
     <RootNamespaceContainer>True</RootNamespaceContainer>
     <RootNamespaceTitle>Reference</RootNamespaceTitle>
-    <HelpFileFormat>MSHelpViewer</HelpFileFormat>
+    <HelpFileFormat>Website</HelpFileFormat>
+    <SyntaxFilters>Standard</SyntaxFilters>
+    <CleanIntermediates>True</CleanIntermediates>
+    <KeepLogFile>True</KeepLogFile>
+    <DisableCodeBlockComponent>False</DisableCodeBlockComponent>
+    <IndentHtml>False</IndentHtml>
+    <BuildAssemblerVerbosity>OnlyWarningsAndErrors</BuildAssemblerVerbosity>
+    <SaveComponentCacheCapacity>100</SaveComponentCacheCapacity>
   </PropertyGroup>
   <!-- There are no properties for these two groups but they need to appear in
        order for Visual Studio to perform the build. -->
@@ -81,6 +88,7 @@ DotNetZip is donationware.  Please donate. Proceeds go to the Boys &amp;amp; Gir
   <ItemGroup>
     <Folder Include="Introduction\" />
     <Folder Include="Code Examples\" />
+    <Folder Include="Tools and Utilities\" />
     <Folder Include="Zip Tools\" />
   </ItemGroup>
   <!-- Import the SHFB build targets -->

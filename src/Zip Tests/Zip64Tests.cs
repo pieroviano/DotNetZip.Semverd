@@ -415,7 +415,6 @@ namespace Ionic.Zip.Tests.Zip64
             Assert.IsTrue(Directory.Exists(w), "%windir% does not exist ({0})", w);
             var fsutil = Path.Combine(Path.Combine(w, "system32"), "fsutil.exe");
             Assert.IsTrue(File.Exists(fsutil), "fsutil.exe does not exist ({0})", fsutil);
-            string ignored;
             Int64 totalLength = 0;
             int cycle = 0;
             const Int64 threshold = (long)(11L * 1024 * 1024 * 1024);
@@ -431,7 +430,7 @@ namespace Ionic.Zip.Tests.Zip64
                                                Path.Combine(fodderDir,fi.Name));
                     TestContext.WriteLine("Command: fsutil {0}", cmd);
                     _txrx.Send("status " + cmd);
-                    TestUtilities.Exec_NoContext(fsutil, cmd, out ignored);
+                    TestUtilities.Exec_NoContext(fsutil, cmd, out _);
                     totalLength += fi.Length;
                     if (totalLength > threshold)
                         break; // enough
