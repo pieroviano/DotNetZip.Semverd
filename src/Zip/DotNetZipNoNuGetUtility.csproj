@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+    <Import Condition="Exists('$(NuGetPackageRoot)nugetutility/$(NuGetUtilityVersion)/build/NuGet.Utility.props')" Project="$(NuGetPackageRoot)nugetutility/$(NuGetUtilityVersion)/build/NuGet.Utility.props" />
+    <PropertyGroup>
+        <PackageOutputPath>$(SolutionDir)Packages/</PackageOutputPath>
+        <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+        <RootNamespace>Ionic.Zip</RootNamespace>
+        <AssemblyName>DotNetZip</AssemblyName>
+        <SignAssembly>true</SignAssembly>
+        <AssemblyOriginatorKeyFile>..\Ionic.snk</AssemblyOriginatorKeyFile>
+        <TargetFrameworks>net35;net40;netstandard2.0</TargetFrameworks>
+        <Version>$(VersionPrefix).$(VersionSuffix)</Version>
+        <PackageId>Net4x.$(AssemblyName)</PackageId>
+        <DefineConstants>$(DefineConstants);AESCRYPTO;BZIP</DefineConstants>
+        <GenerateDocumentationFile>True</GenerateDocumentationFile>
+        <DocumentationFile></DocumentationFile>
+    </PropertyGroup>
+    <Import Label="Shared" Project="..\Zip.Shared\Zip.Shared.projitems" />
+    <Import Label="Shared" Project="..\Zlib.Shared\Zlib.Shared.projitems" />
+    <ItemGroup>
+        <PackageReference Include="NuGetUtility" PrivateAssets="All" Version="$(NuGetUtilityVersion)" />
+    </ItemGroup>
+    <ItemGroup>
+        <Reference Include="System.Security" Condition="'$(TargetFramework)'=='net35' or '$(TargetFramework)'=='net40'" />
+    </ItemGroup>
+    <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
+        <Compile Include="..\BZip2\BitWriter.cs" Link="BZip2\BitWriter.cs" />
+        <Compile Include="..\BZip2\BZip2Compressor.cs" Link="BZip2\BZip2Compressor.cs" />
+        <Compile Include="..\BZip2\BZip2InputStream.cs" Link="BZip2\BZip2InputStream.cs" />
+        <Compile Include="..\BZip2\BZip2OutputStream.cs" Link="BZip2\BZip2OutputStream.cs" />
+        <Compile Include="..\BZip2\ParallelBZip2OutputStream.cs" Link="BZip2\ParallelBZip2OutputStream.cs" />
+        <Compile Include="..\BZip2\Rand.cs" Link="BZip2\Rand.cs" />
+    </ItemGroup>
+    <ItemGroup Condition="'$(TargetFramework)'=='net35' or '$(TargetFramework)'=='net40'">
+        <Compile Include="..\BZip2\*.cs">
+            <Link>BZip2\%(FileName)</Link>
+        </Compile>
+    </ItemGroup>
+    <ItemGroup Condition="'$(TargetFramework)'=='net35' or '$(TargetFramework)'=='net40'">
+        <None Include="Resources\CommandLineSelfExtractorStub.cs" />
+        <None Include="Resources\PasswordDialog.cs" />
+        <None Include="Resources\PasswordDialog.designer.cs">
+            <DependentUpon>PasswordDialog.cs</DependentUpon>
+        </None>
+        <None Include="Resources\WinFormsSelfExtractorStub.cs" />
+        <None Include="Resources\WinFormsSelfExtractorStub.designer.cs">
+            <DependentUpon>WinFormsSelfExtractorStub.cs</DependentUpon>
+        </None>
+        <None Include="Resources\ZipContentsDialog.cs" />
+        <None Include="Resources\ZipContentsDialog.designer.cs">
+            <DependentUpon>ZipContentsDialog.cs</DependentUpon>
+        </None>
+        <None Include="Resources\FolderBrowserDialogEx.cs" />
+        <None Include="Resources\zippedFile.ico" />
+    </ItemGroup>
+    <ItemGroup Condition="'$(TargetFramework)'=='net35' or '$(TargetFramework)'=='net40'">
+        <EmbeddedResource Update="Resources\PasswordDialog.resx">
+            <DependentUpon>PasswordDialog.cs</DependentUpon>
+        </EmbeddedResource>
+        <EmbeddedResource Update="Resources\WinFormsSelfExtractorStub.resx">
+            <DependentUpon>WinFormsSelfExtractorStub.cs</DependentUpon>
+        </EmbeddedResource>
+        <EmbeddedResource Update="Resources\ZipContentsDialog.resx">
+            <DependentUpon>ZipContentsDialog.cs</DependentUpon>
+        </EmbeddedResource>
+        <EmbeddedResource Include="Resources\ZippedResources.zip" />
+    </ItemGroup>
+    <ItemGroup>
+        <Compile Remove="Resources\CommandLineSelfExtractorStub.cs" />
+        <Compile Remove="Resources\PasswordDialog.cs" />
+        <Compile Remove="Resources\PasswordDialog.designer.cs" />
+        <Compile Remove="Resources\WinFormsSelfExtractorStub.cs" />
+        <Compile Remove="Resources\WinFormsSelfExtractorStub.designer.cs" />
+        <Compile Remove="Resources\ZipContentsDialog.cs" />
+        <Compile Remove="Resources\ZipContentsDialog.designer.cs" />
+        <Compile Remove="Resources\FolderBrowserDialogEx.cs" />
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="System.CodeDom" Condition="'$(TargetFramework)' == 'netstandard2.0'" Version="9.0.0" />
+        <PackageReference Include="System.Security.Permissions" Condition="'$(TargetFramework)' == 'netstandard2.0'" Version="9.0.0" />
+        <PackageReference Include="System.Text.Encoding.CodePages" Condition="'$(TargetFramework)' == 'netstandard2.0'" Version="9.0.0" />
+    </ItemGroup>
+    <Import Condition="Exists('$(NuGetPackageRoot)nugetutility/$(NuGetUtilityVersion)/build/NuGet.Utility.targets')" Project="$(NuGetPackageRoot)nugetutility/$(NuGetUtilityVersion)/build/NuGet.Utility.targets" />
+</Project>
