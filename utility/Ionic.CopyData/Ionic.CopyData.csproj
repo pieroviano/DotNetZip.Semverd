@@ -1,21 +1,21 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net48</TargetFramework>
-    <LangVersion>latest</LangVersion>
-    <AssemblyName>Ionic.CopyData</AssemblyName>
-    <RootNamespace>Ionic.CopyData</RootNamespace>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net48</TargetFramework>
+		<LangVersion>latest</LangVersion>
+		<AssemblyName>Ionic.CopyData</AssemblyName>
+		<RootNamespace>Ionic.CopyData</RootNamespace>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+	</PropertyGroup>
 
-  <!-- Backup\ holds an older copy of every source file in this project. -->
-  <ItemGroup>
-    <Compile Remove="Backup\**" />
-    <None Remove="Backup\**" />
-  </ItemGroup>
+	<!-- Backup\ holds an older copy of every source file in this project. -->
+	<ItemGroup>
+		<Compile Remove="Backup\**" />
+		<None Remove="Backup\**" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="System.Windows.Forms" />
-  </ItemGroup>
+	<ItemGroup>
+		<Reference Include="System.Windows.Forms" />
+	</ItemGroup>
 
 </Project>

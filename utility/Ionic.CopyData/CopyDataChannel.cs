@@ -5,131 +5,152 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
 using System.Windows.Forms;
 
-#nullable disable
 namespace Ionic.CopyData;
 
 public class CopyDataChannel : IDisposable
 {
     private const int WM_COPYDATA = 74;
-    private string channelName = "";
-    private bool disposed = false;
-    private NativeWindow owner = (NativeWindow)null;
-    private bool recreateChannel = false;
+    private static readonly TimeSpan threshold = new(0, 0, 0, 0, 85);
+    private bool disposed;
     private DateTime lastSend;
-    private static TimeSpan threshold = new TimeSpan(0, 0, 0, 0, 85);
+    private readonly NativeWindow owner = null;
+    private bool recreateChannel;
 
     internal CopyDataChannel(NativeWindow owner, string channelName)
     {
         this.owner = owner;
-        this.channelName = channelName;
-        this.addChannel();
-        this.lastSend = DateTime.FromFileTimeUtc(0L);
+        this.ChannelName = channelName;
+        addChannel();
+        lastSend = DateTime.FromFileTimeUtc(0L);
     }
 
-    private void addChannel()
-    {
-        CopyDataChannel.SetProp(this.owner.Handle, this.channelName, (int)this.owner.Handle);
-    }
+    public string ChannelName { get; private set; } = "";
 
     public void Dispose()
     {
-        if (this.disposed)
+        if (disposed)
+        {
             return;
-        if (this.channelName.Length > 0)
-            this.removeChannel();
-        this.channelName = "";
-        this.disposed = true;
-        GC.SuppressFinalize((object)this);
-    }
+        }
 
-    ~CopyDataChannel() => this.Dispose();
+        if (ChannelName.Length > 0)
+        {
+            removeChannel();
+        }
+
+        ChannelName = "";
+        disposed = true;
+        GC.SuppressFinalize(this);
+    }
 
     public override bool Equals(object obj)
     {
-        return obj != null && this.GetType() == obj.GetType() && this.Equals((CopyDataChannel)obj);
+        return obj != null && GetType() == obj.GetType() && Equals((CopyDataChannel)obj);
     }
 
     public bool Equals(CopyDataChannel cdc)
     {
-        return cdc != null && this.owner.Handle == cdc.owner.Handle && this.channelName.Equals(cdc.channelName);
+        return cdc != null && owner.Handle == cdc.owner.Handle && ChannelName.Equals(cdc.ChannelName);
     }
 
     public override int GetHashCode()
     {
-        return (int)((long)(uint)(int)this.owner.Handle ^ (long)this.channelName.GetHashCode());
+        return (int)((uint)(int)owner.Handle ^ ChannelName.GetHashCode());
     }
 
     public void OnHandleChange()
     {
-        this.removeChannel();
-        this.recreateChannel = true;
+        removeChannel();
+        recreateChannel = true;
     }
-
-    private void removeChannel() => CopyDataChannel.RemoveProp(this.owner.Handle, this.channelName);
 
     public int Send(object obj)
     {
-        int num1 = 0;
-        if (this.disposed)
+        var num1 = 0;
+        if (disposed)
+        {
             throw new InvalidOperationException("Object has been disposed");
-        if (this.recreateChannel)
-            this.addChannel();
-        CopyDataObjectData graph = new CopyDataObjectData(obj, this.channelName);
-        BinaryFormatter binaryFormatter = new BinaryFormatter();
-        MemoryStream serializationStream = new MemoryStream();
-        binaryFormatter.Serialize((Stream)serializationStream, (object)graph);
+        }
+
+        if (recreateChannel)
+        {
+            addChannel();
+        }
+
+        var graph = new CopyDataObjectData(obj, ChannelName);
+        var binaryFormatter = new BinaryFormatter();
+        var serializationStream = new MemoryStream();
+        binaryFormatter.Serialize(serializationStream, graph);
         serializationStream.Flush();
         DateTime utcNow;
-        for (utcNow = DateTime.UtcNow; utcNow - this.lastSend < CopyDataChannel.threshold; utcNow = DateTime.UtcNow)
+        for (utcNow = DateTime.UtcNow; utcNow - lastSend < threshold; utcNow = DateTime.UtcNow)
+        {
             Thread.Sleep(15);
-        this.lastSend = utcNow;
-        int length = (int)serializationStream.Length;
+        }
+
+        lastSend = utcNow;
+        var length = (int)serializationStream.Length;
         if (length > 0)
         {
-            byte[] numArray = new byte[length];
+            var numArray = new byte[length];
             serializationStream.Seek(0L, SeekOrigin.Begin);
             serializationStream.Read(numArray, 0, length);
-            IntPtr num2 = Marshal.AllocCoTaskMem(length);
+            var num2 = Marshal.AllocCoTaskMem(length);
             Marshal.Copy(numArray, 0, num2, length);
-            EnumWindows enumWindows = new EnumWindows();
+            var enumWindows = new EnumWindows();
             enumWindows.GetWindows();
-            foreach (EnumWindowsItem enumWindowsItem in enumWindows.Items)
+            foreach (var enumWindowsItem in enumWindows.Items)
             {
-                if (!enumWindowsItem.Handle.Equals((object)this.owner.Handle) && CopyDataChannel.GetProp(enumWindowsItem.Handle, this.channelName) != 0)
+                if (!enumWindowsItem.Handle.Equals(owner.Handle) && GetProp(enumWindowsItem.Handle, ChannelName) != 0)
                 {
-                    var t = new CopyDataChannel.COPYDATASTRUCT()
+                    var t = new COPYDATASTRUCT
                     {
                         cbData = length,
                         dwData = IntPtr.Zero,
                         lpData = num2
                     };
-                    CopyDataChannel.SendMessage(enumWindowsItem.Handle, 74, (int)this.owner.Handle, ref t);
+                    SendMessage(enumWindowsItem.Handle, 74, (int)owner.Handle, ref t);
                     num1 += Marshal.GetLastWin32Error() == 0 ? 1 : 0;
                 }
             }
+
             Marshal.FreeCoTaskMem(num2);
         }
+
         serializationStream.Close();
         return num1;
     }
 
-    [DllImport("user32", CharSet = CharSet.Auto)]
-    private static extern int SendMessage(
-      IntPtr hwnd,
-      int wMsg,
-      int wParam,
-      ref CopyDataChannel.COPYDATASTRUCT lParam);
-
-    [DllImport("user32", CharSet = CharSet.Auto)]
-    private static extern int SetProp(IntPtr hwnd, string lpString, int hData);
+    private void addChannel()
+    {
+        SetProp(owner.Handle, ChannelName, (int)owner.Handle);
+    }
 
     [DllImport("user32", CharSet = CharSet.Auto)]
     private static extern int GetProp(IntPtr hwnd, string lpString);
 
+    private void removeChannel()
+    {
+        RemoveProp(owner.Handle, ChannelName);
+    }
+
     [DllImport("user32", CharSet = CharSet.Auto)]
     private static extern int RemoveProp(IntPtr hwnd, string lpString);
 
-    public string ChannelName => this.channelName;
+    [DllImport("user32", CharSet = CharSet.Auto)]
+    private static extern int SendMessage(
+        IntPtr hwnd,
+        int wMsg,
+        int wParam,
+        ref COPYDATASTRUCT lParam);
+
+    [DllImport("user32", CharSet = CharSet.Auto)]
+    private static extern int SetProp(IntPtr hwnd, string lpString, int hData);
+
+    ~CopyDataChannel()
+    {
+        Dispose();
+    }
 
     private struct COPYDATASTRUCT
     {

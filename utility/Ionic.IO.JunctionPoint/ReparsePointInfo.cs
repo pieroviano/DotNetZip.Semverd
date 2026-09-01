@@ -1,22 +1,24 @@
-﻿#nullable disable
-namespace Ionic.IO;
+﻿namespace Ionic.IO;
 
 public class ReparsePointInfo
 {
-  private string _printName;
-  public string Source;
-  public string Target;
-  public ReparsePointFlavor Flavor;
+    private string _printName;
+    public ReparsePointFlavor Flavor;
+    public string Source;
+    public string Target;
 
-  private ReparsePointInfo()
-  {
-  }
+    private ReparsePointInfo()
+    {
+    }
 
-  public ReparsePointInfo(string source) => this.Source = source;
+    public ReparsePointInfo(string source)
+    {
+        Source = source;
+    }
 
-  public string PrintName
-  {
-    get => string.IsNullOrEmpty(this._printName) ? this.Target : this._printName;
-    set => this._printName = value;
-  }
+    public string PrintName
+    {
+        get => string.IsNullOrEmpty(_printName) ? Target : _printName;
+        set => _printName = value;
+    }
 }

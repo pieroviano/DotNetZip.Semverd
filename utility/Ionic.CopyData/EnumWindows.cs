@@ -3,46 +3,48 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Runtime.InteropServices;
 
-#nullable disable
 namespace Ionic.CopyData;
 
 public class EnumWindows
 {
-  private List<EnumWindowsItem> items;
+    private List<EnumWindowsItem> items;
 
-  public void GetWindows()
-  {
-    this.items = new List<EnumWindowsItem>();
-    EnumWindows.NativeMethods.EnumWindows(new EnumWindows.EnumWindowsProc(this.WindowEnum), 0);
-  }
+    public ReadOnlyCollection<EnumWindowsItem> Items => items.AsReadOnly();
 
-  public void GetWindows(IntPtr hWndParent)
-  {
-    this.items = new List<EnumWindowsItem>();
-    EnumWindows.NativeMethods.EnumChildWindows(hWndParent, new EnumWindows.EnumWindowsProc(this.WindowEnum), 0);
-  }
+    public void GetWindows()
+    {
+        items = new List<EnumWindowsItem>();
+        NativeMethods.EnumWindows(WindowEnum, 0);
+    }
 
-  protected virtual bool OnWindowEnum(IntPtr hWnd)
-  {
-    this.items.Add(new EnumWindowsItem(hWnd));
-    return true;
-  }
+    public void GetWindows(IntPtr hWndParent)
+    {
+        items = new List<EnumWindowsItem>();
+        NativeMethods.EnumChildWindows(hWndParent, WindowEnum, 0);
+    }
 
-  private int WindowEnum(IntPtr hWnd, int lParam) => this.OnWindowEnum(hWnd) ? 1 : 0;
+    protected virtual bool OnWindowEnum(IntPtr hWnd)
+    {
+        items.Add(new EnumWindowsItem(hWnd));
+        return true;
+    }
 
-  public ReadOnlyCollection<EnumWindowsItem> Items => this.items.AsReadOnly();
+    private int WindowEnum(IntPtr hWnd, int lParam)
+    {
+        return OnWindowEnum(hWnd) ? 1 : 0;
+    }
 
-  private delegate int EnumWindowsProc(IntPtr hwnd, int lParam);
+    private delegate int EnumWindowsProc(IntPtr hwnd, int lParam);
 
-  private class NativeMethods
-  {
-    [DllImport("user32")]
-    public static extern int EnumChildWindows(
-      IntPtr hWndParent,
-      EnumWindows.EnumWindowsProc lpEnumFunc,
-      int lParam);
+    private class NativeMethods
+    {
+        [DllImport("user32")]
+        public static extern int EnumChildWindows(
+            IntPtr hWndParent,
+            EnumWindowsProc lpEnumFunc,
+            int lParam);
 
-    [DllImport("user32")]
-    public static extern int EnumWindows(EnumWindows.EnumWindowsProc lpEnumFunc, int lParam);
-  }
+        [DllImport("user32")]
+        public static extern int EnumWindows(EnumWindowsProc lpEnumFunc, int lParam);
+    }
 }

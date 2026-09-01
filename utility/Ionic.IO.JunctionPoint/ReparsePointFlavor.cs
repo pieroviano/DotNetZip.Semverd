@@ -1,10 +1,9 @@
-﻿#nullable disable
-namespace Ionic.IO;
+﻿namespace Ionic.IO;
 
 public enum ReparsePointFlavor
 {
-  NotaReparsePoint,
-  MountPoint,
-  SymbolicLink,
-  JunctionPoint,
+    NotaReparsePoint,
+    MountPoint,
+    SymbolicLink,
+    JunctionPoint
 }
