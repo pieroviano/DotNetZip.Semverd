@@ -47,9 +47,17 @@ namespace Ionic.Zip.Tests
 
         // was [OneTimeSetUp]. Everything it sets is static, so a static
         // constructor gives the same "once, before the first test" guarantee.
+        //
+        // It no longer captures CurrentDir, though. [OneTimeSetUp] ran at a
+        // defined moment -- fixture start, with the current directory at its
+        // baseline -- whereas a static constructor runs whenever the type is
+        // first touched, which can be in the middle of another test that has
+        // moved the process into its own temp directory. CurrentDir is static
+        // and shared by every fixture, so capturing a temp path into it would
+        // send every later test home to a deleted directory. IonicTestClass's
+        // constructor establishes it correctly already.
         static Selector()
         {
-            CurrentDir = Directory.GetCurrentDirectory();
             twentyDaysAgo = DateTime.Now - new TimeSpan(20, 0, 0, 0);
             todayAtMidnight = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
             tomorrow = todayAtMidnight + new TimeSpan(1, 0, 0, 0);

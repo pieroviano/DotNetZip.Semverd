@@ -29,5 +29,9 @@
 	<ItemGroup>
 		<!-- assembly-level attributes have to be compiled into each test assembly -->
 		<Compile Include="..\TestCommon\TestAssemblyInfo.cs" Link="TestCommon\TestAssemblyInfo.cs" />
+		<!-- runner settings; see the file for why shadow copying is off -->
+		<Content Include="..\TestCommon\xunit.runner.json" Link="xunit.runner.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
 	</ItemGroup>
 </Project>

@@ -1,0 +1,10 @@
+{
+  "$schema": "https://xunit.net/schema/current/xunit.runner.schema.json",
+
+  "//": "The DotNetZip tests locate their own source tree and fixture files by",
+  "//": "walking up from the test assembly's location. xUnit's desktop runner",
+  "//": "shadow-copies the assembly into %TEMP%\\<guid>\\<guid>\\ by default, which",
+  "//": "makes that walk land nowhere -- NUnit's adapter did not shadow-copy, so",
+  "//": "the tests were written against a real bin directory. Keep it that way.",
+  "shadowCopy": false
+}

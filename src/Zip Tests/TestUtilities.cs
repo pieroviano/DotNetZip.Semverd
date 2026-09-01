@@ -467,7 +467,14 @@ namespace Ionic.Zip.Tests.Utilities
                 string Name = String.Format("{0}-{1}-{2}.{3}",
                                             AppName, System.DateTime.Now.ToString("yyyyMMMdd-HHmmss"), index, extension);
                 candidate = Path.Combine(parentDir, Name);
-            } while (File.Exists(candidate));
+                // The name is only unique to the second, and every caller here
+                // creates a *directory* at it. Testing File.Exists alone never
+                // sees those, so every test starting within the same second was
+                // handed the same path -- and Directory.CreateDirectory accepts
+                // an existing directory silently. Two tests then shared one
+                // directory, and whichever finished first deleted the other's
+                // files out from under it.
+            } while (File.Exists(candidate) || Directory.Exists(candidate));
 
             // this file/path does not exist.  It can now be created, as
             // file or directory.
