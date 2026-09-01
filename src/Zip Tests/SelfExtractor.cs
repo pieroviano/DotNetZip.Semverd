@@ -29,7 +29,8 @@ using System;
 using System.Text;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
+using Ionic.Tests;
 
 using Ionic.Zip;
 using Ionic.Zip.Tests.Utilities;
@@ -41,13 +42,13 @@ namespace Ionic.Zip.Tests
     /// <summary>
     /// Summary description for Self extracting archives (SFX)
     /// </summary>
-    [TestClass]
+    [TestFixture]
     public class SelfExtractor : IonicTestClass
     {
         public SelfExtractor() : base() { }
 
 
-        [TestMethod]
+        [Test]
         public void SFX_CanRead()
         {
             SelfExtractorFlavor[] flavors =
@@ -104,11 +105,11 @@ namespace Ionic.Zip.Tests
                             {
                                 filename = Path.Combine(unpackDir, e.FileName);
                                 string actualCheckString = TestUtilities.CheckSumToString(TestUtilities.ComputeChecksum(filename));
-                                Assert.AreEqual<string>(checksums[e.FileName], actualCheckString, "In trial {0}, Checksums for ({1}) do not match.", k, e.FileName);
+                                Assert.AreEqual(checksums[e.FileName], actualCheckString, "In trial {0}, Checksums for ({1}) do not match.", k, e.FileName);
                             }
                             else
                             {
-                                Assert.AreEqual<string>("Readme.txt", e.FileName, String.Format("trial {0}", k));
+                                Assert.AreEqual("Readme.txt", e.FileName, String.Format("trial {0}", k));
                             }
                         }
                     }
@@ -118,13 +119,13 @@ namespace Ionic.Zip.Tests
 
 
 
-        [TestMethod]
+        [Test]
         public void SFX_Update_Console()
         {
             SFX_Update(SelfExtractorFlavor.ConsoleApplication);
         }
 
-        [TestMethod]
+        [Test]
         public void SFX_Update_Winforms()
         {
             SFX_Update(SelfExtractorFlavor.WinFormsApplication);
@@ -168,7 +169,7 @@ namespace Ionic.Zip.Tests
             }
 
             // verify count
-            Assert.AreEqual<int>(TestUtilities.CountEntries(sfxFileToCreate), 2, "The Zip file has the wrong number of entries.");
+            Assert.AreEqual(TestUtilities.CountEntries(sfxFileToCreate), 2, "The Zip file has the wrong number of entries.");
 
             // create another file
             filename = Path.Combine(Subdir, "file2.txt");
@@ -194,7 +195,7 @@ namespace Ionic.Zip.Tests
             }
 
             // verify count
-            Assert.AreEqual<int>(TestUtilities.CountEntries(sfxFileToCreate), 3, "The Zip file has the wrong number of entries.");
+            Assert.AreEqual(TestUtilities.CountEntries(sfxFileToCreate), 3, "The Zip file has the wrong number of entries.");
 
 
             // read the SFX
@@ -213,12 +214,12 @@ namespace Ionic.Zip.Tests
                         {
                             filename = Path.Combine(unpackDir, e.FileName);
                             string actualCheckString = TestUtilities.CheckSumToString(TestUtilities.ComputeChecksum(filename));
-                            Assert.AreEqual<string>(checksums[e.FileName], actualCheckString, "Checksums for ({1}) do not match.", e.FileName);
+                            Assert.AreEqual(checksums[e.FileName], actualCheckString, "Checksums for ({1}) do not match.", e.FileName);
                             //TestContext.WriteLine("     Checksums match ({0}).\n", actualCheckString);
                         }
                         else
                         {
-                            Assert.AreEqual<string>("Readme.txt", e.FileName);
+                            Assert.AreEqual("Readme.txt", e.FileName);
                         }
                     }
                 }
@@ -247,11 +248,11 @@ namespace Ionic.Zip.Tests
 
                 if (j == 0)
                 {
-                    Assert.AreEqual<Int32>(0, rc, "The exit code from the SFX was nonzero ({0}).", rc);
+                    Assert.AreEqual(0, rc, "The exit code from the SFX was nonzero ({0}).", rc);
                 }
                 else
                 {
-                    Assert.AreNotEqual<Int32>(0, rc, "The exit code from the SFX was zero ({0}).");
+                    Assert.AreNotEqual(0, rc, "The exit code from the SFX was zero ({0}).");
                 }
             }
 
@@ -260,7 +261,7 @@ namespace Ionic.Zip.Tests
 
 
 
-        [TestMethod]
+        [Test]
         public void SFX_Console()
         {
             string exeFileToCreate = Path.Combine(TopLevelDir, "SFX_Console.exe");
@@ -315,16 +316,16 @@ namespace Ionic.Zip.Tests
                 {
                     string expectedCheckString = checksums[originalName];
                     string actualCheckString = TestUtilities.CheckSumToString(TestUtilities.ComputeChecksum(fname));
-                    Assert.AreEqual<String>(expectedCheckString, actualCheckString, "Unexpected checksum on extracted filesystem file ({0}).", fname);
+                    Assert.AreEqual(expectedCheckString, actualCheckString, "Unexpected checksum on extracted filesystem file ({0}).", fname);
                 }
                 else
-                    Assert.AreEqual<string>("Readme.txt", originalName);
+                    Assert.AreEqual("Readme.txt", originalName);
 
             }
         }
 
 
-        [TestMethod]
+        [Test]
         public void SFX_WinForms()
         {
             string[] Passwords = { null, "12345" };
@@ -377,13 +378,13 @@ namespace Ionic.Zip.Tests
                 string DirToCheck = Path.Combine(DesiredunpackDir, String.Format("A{0}", k));
                 // verify the checksum of each file matches with its brother
                 var fileList = Directory.GetFiles(DirToCheck);
-                Assert.AreEqual<Int32>(checksums.Keys.Count, fileList.Length, "Trial {0}: Inconsistent results.", k);
+                Assert.AreEqual(checksums.Keys.Count, fileList.Length, "Trial {0}: Inconsistent results.", k);
 
                 foreach (string fname in fileList)
                 {
                     string expectedCheckString = checksums[fname.Replace(String.Format("\\unpack{0}", k), "")];
                     string actualCheckString = TestUtilities.CheckSumToString(TestUtilities.ComputeChecksum(fname));
-                    Assert.AreEqual<String>(expectedCheckString, actualCheckString, "Trial {0}: Unexpected checksum on extracted filesystem file ({1}).", k, fname);
+                    Assert.AreEqual(expectedCheckString, actualCheckString, "Trial {0}: Unexpected checksum on extracted filesystem file ({1}).", k, fname);
                 }
             }
         }
@@ -443,7 +444,7 @@ namespace Ionic.Zip.Tests
         //  - whether to append args or not
         //  - force noninteractive or not (only for Winforms flavor, to allow automated tests)
 
-        [TestMethod]
+        [Test]
         public void SFX_RunOnExit_Console()
         {
             _Internal_SelfExtractor_Command("post-extract-run-on-exit-{0:D4}.exe",
@@ -454,7 +455,7 @@ namespace Ionic.Zip.Tests
                                             false); // wantArgs
         }
 
-        [TestMethod]
+        [Test]
         public void SFX_RunOnExit_Console_Args()
         {
             _Internal_SelfExtractor_Command("post-extract-run-on-exit-{0:D4}.exe",
@@ -465,7 +466,7 @@ namespace Ionic.Zip.Tests
                                             true); // wantArgs
         }
 
-        [TestMethod]
+        [Test]
         public void SFX_RunOnExit_WinForms()
         {
             _Internal_SelfExtractor_Command("post-extract-run-on-exit-{0:D4}.exe",
@@ -476,7 +477,7 @@ namespace Ionic.Zip.Tests
                                             false); // wantArgs
         }
 
-        [TestMethod]
+        [Test]
         public void SFX_RunOnExit_WinForms_DontRun()
         {
             // This test case just tests the generation (compilation) of
@@ -490,7 +491,7 @@ namespace Ionic.Zip.Tests
                                             false); // wantArgs
         }
 
-        [TestMethod]
+        [Test]
         public void SFX_RunOnExit_WinForms_Interactive()
         {
             _Internal_SelfExtractor_Command("post-extract-run-on-exit-{0:D4}.exe",
@@ -501,7 +502,7 @@ namespace Ionic.Zip.Tests
                                             false); // wantArgs
         }
 
-        [TestMethod]
+        [Test]
         public void SFX_RunOnExit_WinForms_NonInteractive()
         {
             _Internal_SelfExtractor_Command("post-extract-run-on-exit-{0:D4}.exe",
@@ -512,7 +513,7 @@ namespace Ionic.Zip.Tests
                                             false); // wantArgs
         }
 
-        [TestMethod]
+        [Test]
         public void SFX_RunOnExit_WinForms_NonInteractive_Args()
         {
             _Internal_SelfExtractor_Command("post-extract-run-on-exit-{0:D4}.exe",
@@ -525,7 +526,7 @@ namespace Ionic.Zip.Tests
 
         // ------------------------------------------------------------------ //
 
-        [TestMethod]
+        [Test]
         public void SFX_RunOnExit_Console_withSpaces()
         {
             _Internal_SelfExtractor_Command("post extract run on exit {0:D4}.exe",
@@ -537,7 +538,7 @@ namespace Ionic.Zip.Tests
         }
 
 
-        [TestMethod]
+        [Test]
         public void SFX_RunOnExit_Console_withSpaces_Args()
         {
             _Internal_SelfExtractor_Command("post extract run on exit {0:D4}.exe",
@@ -548,7 +549,7 @@ namespace Ionic.Zip.Tests
                                             true);  // wantArgs
         }
 
-        [TestMethod]
+        [Test]
         public void SFX_RunOnExit_WinForms_withSpaces()
         {
             _Internal_SelfExtractor_Command("post extract run on exit {0:D4}.exe",
@@ -559,7 +560,7 @@ namespace Ionic.Zip.Tests
                                             false); // wantArgs
         }
 
-        [TestMethod]
+        [Test]
         public void SFX_RunOnExit_WinForms_withSpaces_DontRun()
         {
             // This test case just tests the generation (compilation) of
@@ -573,7 +574,7 @@ namespace Ionic.Zip.Tests
                                             false); // wantArgs
         }
 
-        [TestMethod]
+        [Test]
         public void SFX_RunOnExit_WinForms_withSpaces_Interactive()
         {
             _Internal_SelfExtractor_Command("post extract run on exit {0:D4}.exe",
@@ -584,7 +585,7 @@ namespace Ionic.Zip.Tests
                                             false); // wantArgs
         }
 
-        [TestMethod]
+        [Test]
         public void SFX_RunOnExit_WinForms_withSpaces_NonInteractive()
         {
             _Internal_SelfExtractor_Command("post extract run on exit {0:D4}.exe",
@@ -595,7 +596,7 @@ namespace Ionic.Zip.Tests
                                             false); // wantArgs
         }
 
-        [TestMethod]
+        [Test]
         public void SFX_RunOnExit_WinForms_withSpaces_NonInteractive_Args()
         {
             _Internal_SelfExtractor_Command("post extract run on exit {0:D4}.exe",
@@ -653,14 +654,14 @@ namespace Ionic.Zip.Tests
                 {
                     zip.StatusMessageTextWriter = sw;
                     zip.AddDirectory(subdir, subdir); // Path.GetFileName(subdir));
-                    zip.Comment = String.Format("Trial options: fl({0})  cmd ({3})\r\n"+
-                                                "actuallyRun({1})\r\nquiet({2})\r\n"+
+                    zip.Comment = String.Format("Trial options: fl({0})  cmd ({3})\r\n" +
+                                                "actuallyRun({1})\r\nquiet({2})\r\n" +
                                                 "exists? {4}\r\nexpected rc={5}",
                                                 flavor,
                                                 runSfx,
                                                 quiet,
                                                 postExtractExe,
-                                                k!=0,
+                                                k != 0,
                                                 expectedReturnCode
                                                 );
                     var ms1 = new MemoryStream(Encoding.UTF8.GetBytes(readmeString));
@@ -682,9 +683,9 @@ namespace Ionic.Zip.Tests
                     // In the case of k==0, this exe does not exist.  It will result in
                     // a return code of 5.  In k == 1, the exe exists and will succeed.
                     if (postExtractExe.Contains(' '))
-                        sfxOptions.PostExtractCommandLine= "\"" + postExtractExe + "\"";
+                        sfxOptions.PostExtractCommandLine = "\"" + postExtractExe + "\"";
                     else
-                        sfxOptions.PostExtractCommandLine= postExtractExe;
+                        sfxOptions.PostExtractCommandLine = postExtractExe;
 
                     if (wantArgs)
                         sfxOptions.PostExtractCommandLine += " arg1 arg2";
@@ -724,19 +725,19 @@ namespace Ionic.Zip.Tests
                         if (k == 0)
                         {
                             // The file to execute should not have been found, hence rc==5.
-                            Assert.AreEqual<Int32>
+                            Assert.AreEqual
                                 (5, rc, "In trial {0}, the exit code was unexpected.", k);
                         }
                         else
                         {
                             // The file to execute should have returned a specific code.
-                            Assert.AreEqual<Int32>
+                            Assert.AreEqual
                                 (expectedReturnCode, rc,
                                  "In trial {0}, the exit code did not match.", k);
                         }
                     }
                     else
-                        Assert.AreEqual<Int32>(0, rc, "In trial {0}, the exit code did not match.", k);
+                        Assert.AreEqual(0, rc, "In trial {0}, the exit code did not match.", k);
 
                     VerifyChecksums(Path.Combine(unpackDir, "A"),
                                     filesToZip, checksums);
@@ -746,7 +747,7 @@ namespace Ionic.Zip.Tests
 
 
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(Ionic.Zip.BadStateException))]
         public void SFX_Save_Zip_As_EXE()
         {
@@ -781,7 +782,7 @@ namespace Ionic.Zip.Tests
 
 
 
-        [TestMethod]
+        [Test]
         public void SFX_RemoveFilesAfterUnpack_wi10682()
         {
             string subdir = "files";
@@ -797,46 +798,46 @@ namespace Ionic.Zip.Tests
             // pass 2 to run SFX and verify that it deletes files after extracting.
 
             // 2 passes: one for no cmd line overload, one with overload of -r+/-r-
-            for (int j=0; j < 2; j++)
+            for (int j = 0; j < 2; j++)
             {
                 // 2 passes: with RemoveUnpackedFiles set or unset
-                for (int k=0; k < 2; k++)
+                for (int k = 0; k < 2; k++)
                 {
                     string sfxFileToCreate =
-                        String.Format("SFX_RemoveFilesAfterUnpack.{0}.{1}.exe",j,k);
+                        String.Format("SFX_RemoveFilesAfterUnpack.{0}.{1}.exe", j, k);
                     using (ZipFile zip = new ZipFile())
                     {
-                        zip.Password  = password;
+                        zip.Password = password;
                         zip.Encryption = Ionic.Zip.EncryptionAlgorithm.WinZipAes256;
-                        Array.ForEach(filesToZip, x => { zip.AddFile(x, "files");});
+                        Array.ForEach(filesToZip, x => { zip.AddFile(x, "files"); });
                         zip.AddFile(postExtractExe, "files");
                         var sfxOptions = new SelfExtractorSaveOptions
                         {
                             Flavor = SelfExtractorFlavor.ConsoleApplication,
                             Quiet = true,
-                            PostExtractCommandLine = Path.Combine("files",postExtractExe)
+                            PostExtractCommandLine = Path.Combine("files", postExtractExe)
                         };
 
-                        if (k==1)
+                        if (k == 1)
                             sfxOptions.RemoveUnpackedFilesAfterExecute = true;
 
                         zip.SaveSelfExtractor(sfxFileToCreate, sfxOptions);
                     }
 
-                    string extractDir = String.Format("extract.{0}.{1}",j,k);
+                    string extractDir = String.Format("extract.{0}.{1}", j, k);
                     string sfxCmdLineArgs =
                         String.Format("-p {0} -d {1}", password, extractDir);
 
-                    if (j==1)
+                    if (j == 1)
                     {
                         // override the option set at time of zip.SaveSfx()
-                        sfxCmdLineArgs += (k==0) ? " -r+" : " -r-";
+                        sfxCmdLineArgs += (k == 0) ? " -r+" : " -r-";
                     }
 
                     // invoke the SFX
                     this.Exec(sfxFileToCreate, sfxCmdLineArgs, true, true);
 
-                    if (k==j)
+                    if (k == j)
                     {
                         // verify that the files are extracted, and match
                         VerifyChecksums(Path.Combine(extractDir, "files"),

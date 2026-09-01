@@ -31,11 +31,11 @@ using System.Net;
 using System.Linq;
 using System.IO;
 using Ionic.Zip;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace Ionic.Zip.Tests.Utilities
 {
-    [TestClass]
+    [TestFixture]
     public class IonicTestClass
     {
         protected System.Random _rnd;
@@ -63,24 +63,6 @@ namespace Ionic.Zip.Tests.Utilities
         }
 
         #region Context
-        private TestContext testContextInstance;
-
-        /// <summary>
-        ///Gets or sets the test context which provides
-        ///information about and functionality for the current test run.
-        ///</summary>
-        public TestContext TestContext
-        {
-            get
-            {
-                return testContextInstance;
-            }
-            set
-            {
-                testContextInstance = value;
-            }
-        }
-
         #endregion
 
 
@@ -90,11 +72,11 @@ namespace Ionic.Zip.Tests.Utilities
         // You can use the following additional attributes as you write your tests:
         //
         // Use ClassInitialize to run code before running the first test in the class
-        [ClassInitialize]
-        public static void BaseClassInitialize(TestContext testContext)
+        [OneTimeSetUp]
+        public static void BaseClassInitialize()
         {
             CurrentDir = Directory.GetCurrentDirectory();
-            Assert.AreNotEqual<string>(Path.GetFileName(CurrentDir), "Temp", "at startup");
+            Assert.AreNotEqual(Path.GetFileName(CurrentDir), "Temp", "at startup");
         }
 
         //
@@ -105,7 +87,7 @@ namespace Ionic.Zip.Tests.Utilities
 
 
         // Use TestInitialize to run code before running each test
-        [TestInitialize()]
+        [SetUp]
         public void MyTestInitialize()
         {
             if (CurrentDir == null) CurrentDir = Directory.GetCurrentDirectory();
@@ -115,13 +97,13 @@ namespace Ionic.Zip.Tests.Utilities
         }
 
         // Use TestCleanup to run code after each test has run
-        [TestCleanup()]
+        [TearDown]
         public void MyTestCleanup()
         {
             // The CWD of the monitoring process is the CurrentDir,
             // therefore this test must shut down the monitoring process
             // FIRST, to allow the deletion of the directory.
-            if (_txrx!=null)
+            if (_txrx != null)
             {
                 try
                 {
@@ -157,7 +139,7 @@ namespace Ionic.Zip.Tests.Utilities
                 throw new ArgumentException("args");
 
             // Microsoft.VisualStudio.TestTools.UnitTesting
-            this.TestContext.WriteLine("running command: {0} {1}", program, args);
+            TestContext.WriteLine("running command: {0} {1}", program, args);
 
             string output;
             int rc = TestUtilities.Exec_NoContext(program, args, waitForExit, out output);
@@ -166,9 +148,9 @@ namespace Ionic.Zip.Tests.Utilities
                 throw new Exception(String.Format("Non-zero RC {0}: {1}", program, output));
 
             if (emitOutput)
-                this.TestContext.WriteLine("output: {0}", output);
+                TestContext.WriteLine("output: {0}", output);
             else
-                this.TestContext.WriteLine("A-OK. (output suppressed)");
+                TestContext.WriteLine("A-OK. (output suppressed)");
 
             return output;
         }
@@ -177,7 +159,7 @@ namespace Ionic.Zip.Tests.Utilities
         public class AsyncReadState
         {
             public System.IO.Stream s;
-            public byte[] buf= new byte[1024];
+            public byte[] buf = new byte[1024];
         }
 
 
@@ -189,7 +171,7 @@ namespace Ionic.Zip.Tests.Utilities
             if (args == null)
                 throw new ArgumentException("args");
 
-            this.TestContext.WriteLine("running command: {0} {1}", program, args);
+            TestContext.WriteLine("running command: {0} {1}", program, args);
 
             Stream fs = File.Create(outFile);
             try
@@ -213,19 +195,20 @@ namespace Ionic.Zip.Tests.Utilities
                 var stdout = p.StandardOutput.BaseStream;
                 var rs = new AsyncReadState { s = stdout };
                 Action<System.IAsyncResult> readAsync1 = null;
-                var readAsync = new Action<System.IAsyncResult>( (ar) => {
-                        AsyncReadState state = (AsyncReadState) ar.AsyncState;
-                        int n = state.s.EndRead(ar);
-                        if (n > 0)
-                        {
-                            fs.Write(state.buf, 0, n);
-                            state.s.BeginRead(state.buf,
-                                              0,
-                                              state.buf.Length,
-                                              new System.AsyncCallback(readAsync1),
-                                              state);
-                        }
-                    });
+                var readAsync = new Action<System.IAsyncResult>((ar) =>
+                {
+                    AsyncReadState state = (AsyncReadState)ar.AsyncState;
+                    int n = state.s.EndRead(ar);
+                    if (n > 0)
+                    {
+                        fs.Write(state.buf, 0, n);
+                        state.s.BeginRead(state.buf,
+                                          0,
+                                          state.buf.Length,
+                                          new System.AsyncCallback(readAsync1),
+                                          state);
+                    }
+                });
                 readAsync1 = readAsync; // ??
 
                 // kickoff
@@ -237,7 +220,7 @@ namespace Ionic.Zip.Tests.Utilities
 
                 p.WaitForExit();
 
-                this.TestContext.WriteLine("Process exited, rc={0}", p.ExitCode);
+                TestContext.WriteLine("Process exited, rc={0}", p.ExitCode);
 
                 return p.ExitCode;
             }
@@ -418,7 +401,7 @@ namespace Ionic.Zip.Tests.Utilities
                 }
                 // emit output, as desired
                 if (emitOutput)
-                    TestContext.WriteLine("{0}",options.StatusMessageWriter.ToString());
+                    TestContext.WriteLine("{0}", options.StatusMessageWriter.ToString());
 
                 return extractDir;
             }
@@ -467,9 +450,9 @@ namespace Ionic.Zip.Tests.Utilities
         protected static void CreateLargeFilesWithChecksums
             (string subdir,
              int numFiles,
-             Action<int,int,Int64> update,
+             Action<int, int, Int64> update,
              out string[] filesToZip,
-             out Dictionary<string,byte[]> checksums)
+             out Dictionary<string, byte[]> checksums)
         {
             var rnd = new System.Random();
             // create a bunch of files
@@ -480,12 +463,12 @@ namespace Ionic.Zip.Tests.Utilities
                                                          update);
 
             var dates = new DateTime[rnd.Next(6) + 7];
-             // midnight
+            // midnight
             dates[0] = new DateTime(DateTime.Now.Year,
                                     DateTime.Now.Month,
                                     DateTime.Now.Day);
 
-            for (int i=1; i < dates.Length; i++)
+            for (int i = 1; i < dates.Length; i++)
             {
                 dates[i] = DateTime.Now -
                     new TimeSpan(rnd.Next(300),
@@ -521,7 +504,7 @@ namespace Ionic.Zip.Tests.Utilities
                 var extractedFile = Path.Combine(extractDir, f);
                 Assert.IsTrue(File.Exists(extractedFile), "File does not exist ({0})", extractedFile);
                 var chk = TestUtilities.ComputeChecksum(extractedFile);
-                Assert.AreEqual<String>(TestUtilities.CheckSumToString(checksums[f]),
+                Assert.AreEqual(TestUtilities.CheckSumToString(checksums[f]),
                                         TestUtilities.CheckSumToString(chk),
                                         String.Format("Checksums for file {0} do not match.", f));
                 count++;
@@ -550,7 +533,7 @@ namespace Ionic.Zip.Tests.Utilities
             }
 
 
-            Assert.AreEqual<Int32>(checksums.Count, count, "There's a mismatch between the checksums and the filesToCheck.");
+            Assert.AreEqual(checksums.Count, count, "There's a mismatch between the checksums and the filesToCheck.");
         }
     }
 

@@ -31,7 +31,7 @@ using System.Text.RegularExpressions;
 using System.Net;
 using System.IO;
 using Ionic.Zip;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using System.Threading;
 
 namespace Ionic.Zip.Tests.Utilities
@@ -73,16 +73,17 @@ namespace Ionic.Zip.Tests.Utilities
             System.Random rnd = new System.Random();
             string seedText = null;
             int cycles = 0;
-            do {
+            do
+            {
                 try
                 {
-                    string uri= uris[rnd.Next(uris.Length)];
+                    string uri = uris[rnd.Next(uris.Length)];
                     seedText = GetPageMarkup(uri);
                 }
                 catch (System.Net.WebException)
                 {
                     cycles++;
-                    if (cycles>8) throw;
+                    if (cycles > 8) throw;
                     seedText = null;
                 }
             } while (seedText == null);
@@ -359,9 +360,9 @@ namespace Ionic.Zip.Tests.Utilities
             }
         }
 
-        new public void  Dispose()
+        new public void Dispose()
         {
-             Dispose(true);
+            Dispose(true);
         }
 
         /// <summary>The Dispose method</summary>
@@ -373,7 +374,7 @@ namespace Ionic.Zip.Tests.Utilities
         {
             _gnt++;
             int nowServing = _rnd.Next(_chunks);
-            if (_randomText[nowServing]==null)
+            if (_randomText[nowServing] == null)
                 _randomText[nowServing] = _encoding.GetBytes(_rtg.Generate(_chunkSize));
             return _randomText[nowServing];
         }

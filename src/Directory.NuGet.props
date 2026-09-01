@@ -7,6 +7,7 @@
         <DirectoryNuGet>true</DirectoryNuGet>
         <VersionBuildSuffix Condition="'$(VersionBuildSuffix)'==''">*</VersionBuildSuffix>
         <NuGetUtilityVersion Condition="'$(NuGetUtilityVersion)'==''">1.0.13</NuGetUtilityVersion>
+        <NuGetUtilityVersion Condition="'$(NuGetUtilityVersion)' == ''">1.0.6</NuGetUtilityVersion>
         <DotNetZipVersion>2.0.0</DotNetZipVersion>
         <NuGetUtilityVersion>1.0.13</NuGetUtilityVersion>
         <ObfuscarVersion>2.2.37</ObfuscarVersion>

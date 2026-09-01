@@ -2134,37 +2134,64 @@ namespace Ionic.Zip
 
             if (!_addOperationCanceled)
             {
-
-                String[] filenames = Directory.GetFiles(directoryName);
-
-                if (recurse)
+                try
                 {
-                    // add the files:
-                    foreach (String filename in filenames)
-                    {
-                        if (_addOperationCanceled) break;
-                        if (action == AddOrUpdateAction.AddOnly)
-                            AddFile(filename, dirForEntries);
-                        else
-                            UpdateFile(filename, dirForEntries);
-                    }
+                    String[] filenames = Directory.GetFiles(directoryName);
 
-                    if (!_addOperationCanceled)
+                    if (recurse)
                     {
-                        // add the subdirectories:
-                        String[] dirnames = Directory.GetDirectories(directoryName);
-                        foreach (String dir in dirnames)
+                        // add the files:
+                        foreach (String filename in filenames)
                         {
-                            // workitem 8617: Optionally traverse reparse points
-                            FileAttributes fileAttrs = System.IO.File.GetAttributes(dir);
-                            if (this.AddDirectoryWillTraverseReparsePoints
-                                || ((fileAttrs & FileAttributes.ReparsePoint) == 0)
-                                )
-                                AddOrUpdateDirectoryImpl(dir, rootDirectoryPathInArchive, action, recurse, level + 1);
-
+                            if (_addOperationCanceled) break;
+                            if (action == AddOrUpdateAction.AddOnly)
+                                AddFile(filename, dirForEntries);
+                            else
+                                UpdateFile(filename, dirForEntries);
                         }
 
+                        if (!_addOperationCanceled)
+                        {
+                            // add the subdirectories:
+                            String[] dirnames = Directory.GetDirectories(directoryName);
+                            foreach (String dir in dirnames)
+                            {
+                                // workitem 8617: Optionally traverse reparse points
+                                FileAttributes fileAttrs = System.IO.File.GetAttributes(dir);
+                                if (this.AddDirectoryWillTraverseReparsePoints
+                                    || ((fileAttrs & FileAttributes.ReparsePoint) == 0)
+                                    )
+                                    AddOrUpdateDirectoryImpl(dir, rootDirectoryPathInArchive, action, recurse, level + 1);
+
+                            }
+
+                        }
                     }
+                }
+                catch (System.IO.IOException ioe)
+                {
+                    // workitem 8617: a directory tree may be impossible to walk to
+                    // the end: a reparse point that cycles back onto one of its own
+                    // ancestors makes the tree effectively infinite, and the walk
+                    // above is halted only when the platform refuses to resolve the
+                    // path any further. Which error that is varies -- path too long,
+                    // too many reparse points in the path, path not found -- and it
+                    // depends on how long the caller's own starting path happens to
+                    // be and on whether the host has long paths enabled. Report all
+                    // of them as one ZipException so that "this tree cannot be
+                    // walked" has a single, documented shape for callers, keeping
+                    // the platform error as the InnerException.
+                    //
+                    // A failure on the directory the caller named is not ours to
+                    // reinterpret, so at the top of the walk the error propagates
+                    // unchanged; only failures we discovered by recursing are
+                    // rewritten. (cf. workitem 14035, which does the same for the
+                    // path-too-long case in ZipEntry.Create.)
+                    if (level == 0) throw;
+
+                    throw new ZipException(String.Format("Cannot read the contents of directory '{0}'.",
+                                                         directoryName),
+                                           ioe);
                 }
             }
 

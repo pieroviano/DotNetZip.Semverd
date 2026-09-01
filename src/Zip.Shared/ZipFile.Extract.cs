@@ -275,9 +275,12 @@ namespace Ionic.Zip
                         // check if it is a directory
                         if ((e.IsDirectory) || (e.FileName.EndsWith("/")))
                         {
-                            string outputFile = (e.FileName.StartsWith("/"))
-                                ? Path.Combine(path, e.FileName.Substring(1))
-                                : Path.Combine(path, e.FileName);
+                            // The entry name is untrusted, so map it through the same
+                            // sanitizing/containment check used when extracting, rather
+                            // than joining it onto the base directory as-is; otherwise a
+                            // crafted name would let the archive set times on a directory
+                            // outside of the extraction directory.
+                            string outputFile = e.GetOutputPathInBaseDir(path);
 
                             e._SetTimes(outputFile, false);
                         }

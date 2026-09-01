@@ -1363,10 +1363,18 @@ namespace Ionic.Zip
 
 
         /// <summary>
-        /// Validates that the args are consistent; returning whether the caller can return
-        /// because it's done, or not (caller should continue)
+        /// Maps this entry's name onto a path below <paramref name="baseDir"/>, and verifies
+        /// that the result really does stay below it.
         /// </summary>
-        bool IsDoneWithOutputToBaseDir(string baseDir, out string outFileName)
+        /// <remarks>
+        /// The entry name comes from the archive and is therefore untrusted: it can be
+        /// absolute, rooted, UNC, or contain traversal segments. It is normalized and
+        /// sanitized here, and the resulting path is then checked against the base directory
+        /// so that a crafted name cannot cause a write outside of it.
+        /// </remarks>
+        /// <param name="baseDir">the directory the entry is being extracted into.</param>
+        /// <returns>the path to extract this entry to.</returns>
+        internal string GetOutputPathInBaseDir(string baseDir)
         {
             if (baseDir == null) throw new ArgumentNullException("baseDir");
             // Sometimes the name on the entry starts with a slash.
@@ -1374,31 +1382,51 @@ namespace Ionic.Zip
             // drop the slash and unpack to the specified base directory.
             var f = FileName.Replace(Path.DirectorySeparatorChar, '/');
 
+            // On non-Windows platforms the backslash is not a directory separator, but a
+            // Windows-produced archive can still use it as one, and the extracted name may
+            // later be interpreted on Windows. Treat it as a separator here as well, so
+            // that "..\..\evil.txt" is sanitized rather than kept as a single file name.
+            f = f.Replace('\\', '/');
+
             // workitem 11772: remove drive letter with separator
             if (f.IndexOf(':') == 1)
                 f = f.Substring(2);
 
-            if (f.StartsWith("/"))
+            // Drop every leading slash, not just the first one: a name like "//server/share/x"
+            // would otherwise stay rooted (a UNC path) and escape the base directory.
+            while (f.StartsWith("/"))
                 f = f.Substring(1);
 
             f = SharedUtilities.SanitizePath(f);
 
-            outFileName = _container.ZipFile.FlattenFoldersOnExtract
+            var outFileName = _container.ZipFile.FlattenFoldersOnExtract
                 ? Path.Combine(baseDir, f.Contains("/") ? Path.GetFileName(f) : f)
                 : Path.Combine(baseDir, f);
 
             // workitem 10639
             outFileName = outFileName.Replace('/', Path.DirectorySeparatorChar);
 
-            // Resolve any directory traversal sequence and compare the result with the intended base directory
-            // where the file or folder will be created.
-            var canonicalOutPath = Path.GetFullPath(outFileName);
-            var canonicalBaseDir = Path.GetFullPath(baseDir);
-            if (!canonicalOutPath.StartsWith(canonicalBaseDir, StringComparison.OrdinalIgnoreCase))
+            // Resolve any remaining directory traversal sequence and confirm the result is
+            // still inside the intended base directory where the file or folder is created.
+            if (!SharedUtilities.PathIsWithinDirectory(baseDir, outFileName))
             {
-                throw new IOException(string.Format("Extracting {0} would write to {1}, outside of {2}; rejecting.", outFileName, canonicalOutPath, canonicalBaseDir));
-            }            
-            
+                throw new IOException(string.Format("Extracting {0} would write to {1}, outside of {2}; rejecting.",
+                                                    FileName,
+                                                    Path.GetFullPath(outFileName),
+                                                    Path.GetFullPath(baseDir)));
+            }
+
+            return outFileName;
+        }
+
+        /// <summary>
+        /// Validates that the args are consistent; returning whether the caller can return
+        /// because it's done, or not (caller should continue)
+        /// </summary>
+        bool IsDoneWithOutputToBaseDir(string baseDir, out string outFileName)
+        {
+            outFileName = GetOutputPathInBaseDir(baseDir);
+
             // check if it is a directory
             if (IsDirectory || FileName.EndsWith("/"))
             {

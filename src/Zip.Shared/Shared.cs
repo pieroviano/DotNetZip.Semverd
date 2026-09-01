@@ -186,6 +186,62 @@ namespace Ionic.Zip
         }
 
 
+        /// <summary>
+        /// The <see cref="StringComparison"/> to use when comparing two paths on the current
+        /// platform. Windows paths are case-insensitive; everywhere else the file system is
+        /// assumed to be case-sensitive, which is the conservative choice for a security check.
+        /// </summary>
+        private static readonly StringComparison PathComparison =
+            (Path.DirectorySeparatorChar == '\\')
+                ? StringComparison.OrdinalIgnoreCase
+                : StringComparison.Ordinal;
+
+        /// <summary>
+        /// Determines whether <paramref name="candidatePath"/> denotes the directory
+        /// <paramref name="baseDirectory"/> itself or something contained within it.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Both paths are canonicalized (resolving any remaining relative segments, and any
+        /// rooted or UNC path) before being compared, and the comparison is done on whole
+        /// path segments: "C:\output" is <em>not</em> considered to be inside "C:\out",
+        /// even though the one string is a prefix of the other.
+        /// </para>
+        /// <para>
+        /// This is the containment check used when extracting an entry to a directory, to
+        /// make sure a crafted entry name cannot cause a write outside that directory.
+        /// </para>
+        /// </remarks>
+        /// <param name="baseDirectory">the directory the path must stay within.</param>
+        /// <param name="candidatePath">the path to check.</param>
+        /// <returns>true if the candidate path is the base directory or lies within it.</returns>
+        public static bool PathIsWithinDirectory(string baseDirectory, string candidatePath)
+        {
+            if (baseDirectory == null) throw new ArgumentNullException("baseDirectory");
+            if (candidatePath == null) throw new ArgumentNullException("candidatePath");
+
+            var canonicalBase = Path.GetFullPath(baseDirectory);
+            var canonicalCandidate = Path.GetFullPath(candidatePath);
+
+            if (canonicalBase.Length == 0) return false;
+
+            // Anchor the comparison on a directory separator so that a base directory of
+            // "C:\out" does not match a candidate of "C:\output\evil.txt".
+            var baseWithSeparator =
+                (canonicalBase[canonicalBase.Length - 1] == Path.DirectorySeparatorChar)
+                    ? canonicalBase
+                    : canonicalBase + Path.DirectorySeparatorChar;
+
+            // The candidate may also be the base directory itself (an entry naming the root
+            // of the archive), which is the base-with-separator minus that separator.
+            if (canonicalCandidate.Length == baseWithSeparator.Length - 1 &&
+                baseWithSeparator.StartsWith(canonicalCandidate, PathComparison))
+                return true;
+
+            return canonicalCandidate.StartsWith(baseWithSeparator, PathComparison);
+        }
+
+
         //static System.Text.Encoding ibm437 = System.Text.Encoding.GetEncoding("IBM437");
         static System.Text.Encoding utf8 = System.Text.Encoding.GetEncoding("UTF-8");
 

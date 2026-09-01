@@ -1,127 +1,111 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <RootNamespace>Ionic.Zip.Tests</RootNamespace>
-    <AssemblyName>Ionic.Zip.Tests</AssemblyName>
-    <AssemblyOriginatorKeyFile>..\Ionic.snk</AssemblyOriginatorKeyFile>
-    <TargetFramework>net40</TargetFramework>
-    <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <AssemblyTitle>Zip Tests</AssemblyTitle>
-    <Description>Tests for DotNetZip</Description>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="Ionic.CopyData, Version=1.0.1.0, Culture=neutral, PublicKeyToken=edbe51ad942a3f5c, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\..\vsp\UnitTestProgressMonitor\CopyDataChannel\bin\Debug\Ionic.CopyData.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
-    </Reference>
-    <Reference Include="Ionic.IO.JunctionPoint, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.XML" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Resources\AspNetHost.exe">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\AspNetHost.pdb">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\GenerateZip-Cs.aspx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\VbsCreateZip-ShellApp.vbs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\VbsUnZip-ShellApp.vbs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\VbsCreateZip-DotNetZip.vbs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\VbsUnZip-DotNetZip.vbs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\CreateZip.pl">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\TestStrings.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Ionic.CopyData.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <None Include="Resources\Ionic.IO.JunctionPoint.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <Content Include="Resources\wi8647.tif">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\TestCheckZip.js">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\TestCheckZipPassword.js">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\UnitTestProgressMonitor.exe">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="zips\fireone.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="zips\wizzquiz.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="zips\relative-paths-in-subdir.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="zips\relative-paths-outside.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="zips\relative-paths-in-subdir-outside.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="zips\winzip-sfx.exe">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="zips\Vanishing Oatmeal Cookies.docx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="zips\plot.dwf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="zips\wi11056.dwf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="zips\wi13668-bad-pwd-472713.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="zips\wi10330-badzip.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="zips\wi13892.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="zips\appnote-iz-latest.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="zips\Book1.xlsx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="zips\Calendar.apk">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Zip\DotNetZip.csproj" />
-    <ProjectReference Include="..\Tools\UnZip\UnZip.csproj" />
-    <ProjectReference Include="..\Tools\ZipIt\ZipIt.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\Ionic.snk">
-      <Link>Ionic.snk</Link>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Net4x.MsTests" Version="1.5.0" />
-  </ItemGroup>
+	<PropertyGroup>
+		<RootNamespace>Ionic.Zip.Tests</RootNamespace>
+		<AssemblyName>Ionic.Zip.Tests</AssemblyName>
+		<AssemblyOriginatorKeyFile>..\Ionic.snk</AssemblyOriginatorKeyFile>
+		<TargetFramework>net48</TargetFramework>
+		<ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+		<AssemblyTitle>Zip Tests</AssemblyTitle>
+		<Description>Tests for DotNetZip</Description>
+		<UseWindowsForms>true</UseWindowsForms>
+	</PropertyGroup>
+	<ItemGroup>
+		<Content Include="Resources\GenerateZip-Cs.aspx">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Resources\VbsCreateZip-ShellApp.vbs">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Resources\VbsUnZip-ShellApp.vbs">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Resources\VbsCreateZip-DotNetZip.vbs">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Resources\VbsUnZip-DotNetZip.vbs">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Resources\CreateZip.pl">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Resources\TestStrings.txt">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Resources\wi8647.tif">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Resources\TestCheckZip.js">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Resources\TestCheckZipPassword.js">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Include="zips\fireone.zip">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Include="zips\wizzquiz.zip">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Include="zips\relative-paths-in-subdir.zip">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Include="zips\relative-paths-outside.zip">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Include="zips\relative-paths-in-subdir-outside.zip">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+	<ItemGroup>
+		<Content Include="zips\winzip-sfx.exe">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Include="zips\Vanishing Oatmeal Cookies.docx">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Include="zips\plot.dwf">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Include="zips\wi11056.dwf">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Include="zips\wi13668-bad-pwd-472713.zip">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Include="zips\wi10330-badzip.zip">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Include="zips\wi13892.zip">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Include="zips\appnote-iz-latest.zip">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Include="zips\Book1.xlsx">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Include="zips\Calendar.apk">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\utility\Ionic.CopyData\Ionic.CopyData.csproj" />
+		<ProjectReference Include="..\..\utility\Ionic.IO.JunctionPoint\Ionic.IO.JunctionPoint.csproj" />
+		<ProjectReference Include="..\Zip\DotNetZip.csproj" />
+		<ProjectReference Include="..\Tools\UnZip\UnZip.csproj" />
+		<ProjectReference Include="..\Tools\ZipIt\ZipIt.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+		<None Include="..\Ionic.snk">
+			<Link>Ionic.snk</Link>
+		</None>
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Net4x.NUnitTests" Version="1.5.0.*" />
+		<PackageReference Include="Net4x.NuGetUtility" PrivateAssets="All" Version="$(NuGetUtilityVersion)" />
+	</ItemGroup>
+	<ItemGroup>
+		<Compile Include="..\TestCommon\ExpectedExceptionAttribute.cs" Link="TestCommon\ExpectedExceptionAttribute.cs" />
+		<Compile Include="..\TestCommon\TestAssemblyInfo.cs" Link="TestCommon\TestAssemblyInfo.cs" />
+	</ItemGroup>
 </Project>

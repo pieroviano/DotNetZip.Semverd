@@ -38,7 +38,8 @@ using System;
 using System.Text;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
+using Ionic.Tests;
 
 using Ionic.Zip;
 using Ionic.Zip.Tests.Utilities;
@@ -50,7 +51,7 @@ namespace Ionic.Zip.Tests
     /// <summary>
     /// Summary description for Compatibility
     /// </summary>
-    [TestClass]
+    [TestFixture]
     public class Compatibility : IonicTestClass
     {
         EncryptionAlgorithm[] crypto =
@@ -70,8 +71,8 @@ namespace Ionic.Zip.Tests
             };
 
 
-        [ClassInitialize()]
-        public static void MyClassInitialize(TestContext testContext)
+        [OneTimeSetUp]
+        public static void MyClassInitialize()
         {
             // get the path to the DotNetZip DLL
             string SourceDir = System.IO.Directory.GetCurrentDirectory();
@@ -81,6 +82,16 @@ namespace Ionic.Zip.Tests
             IonicZipDll = Path.Combine(SourceDir, "Zip\\bin\\Debug\\net40\\DotNetZip.dll");
 
             Assert.IsTrue(File.Exists(IonicZipDll), "DLL ({0}) does not exist", IonicZipDll);
+            Assert.IsTrue(File.Exists(RegAsm), "RegAsm ({0}) does not exist", RegAsm);
+
+            // Every test here drives DotNetZip through COM, so the fixture starts by
+            // registering the DLL. RegAsm /codebase writes to HKEY_CLASSES_ROOT, which
+            // only an elevated process may do; unelevated, all of these would fail on a
+            // RegAsm error that says nothing about what the runner has to do
+            // differently. Say it once, here, and skip instead.
+            if (!IsProcessElevated())
+                Assert.Ignore("These tests register DotNetZip for COM interop with RegAsm, "
+                              + "which requires an elevated process. Run the test host as administrator.");
 
             // register it for COM interop
             string output;
@@ -91,12 +102,18 @@ namespace Ionic.Zip.Tests
                 string cmd = String.Format("{0} \"{1}\" /codebase /verbose", RegAsm, IonicZipDll);
                 throw new Exception(String.Format("Failed to register DotNetZip with COM rc({0}) cmd({1}) out({2})", rc, cmd, output));
             }
+
+            _comRegistered = true;
         }
 
 
-        [ClassCleanup()]
+        [OneTimeTearDown]
         public static void MyClassCleanup()
         {
+            // nothing was registered, so there is nothing to undo
+            if (!_comRegistered) return;
+            _comRegistered = false;
+
             string output;
             // unregister the DLL for COM interop
             int rc = TestUtilities.Exec_NoContext(RegAsm, String.Format("\"{0}\" /unregister /verbose", IonicZipDll), out output);
@@ -105,8 +122,30 @@ namespace Ionic.Zip.Tests
         }
 
 
+        private static bool IsProcessElevated()
+        {
+            using (var identity = System.Security.Principal.WindowsIdentity.GetCurrent())
+            {
+                return new System.Security.Principal.WindowsPrincipal(identity)
+                    .IsInRole(System.Security.Principal.WindowsBuiltInRole.Administrator);
+            }
+        }
+
+
+        private static bool _comRegistered;
+
+
         private static string IonicZipDll;
-        private static string RegAsm = "c:\\windows\\Microsoft.NET\\Framework\\v2.0.50727\\regasm.exe";
+
+        // RegAsm has to come from the same CLR version and bitness as the process
+        // running these tests. The v2.0 RegAsm cannot even load an assembly built
+        // against v4 ("not a valid .NET assembly"), and a 32-bit RegAsm registers
+        // into the WOW6432Node view of the registry rather than the view the
+        // cscript.exe resolved below would read. RuntimeEnvironment names the
+        // directory of the CLR actually hosting this process, which settles both.
+        private static string RegAsm =
+            Path.Combine(System.Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory(),
+                         "RegAsm.exe");
 
 
 
@@ -219,7 +258,7 @@ namespace Ionic.Zip.Tests
                 TimeSpan delta = (t1 > t2) ? t1 - t2 : t2 - t1;
                 if (checkNtfsTimes)
                 {
-                    Assert.AreEqual<DateTime>(t1, t2, "LastWriteTime delta actual({0}) expected({1})", delta.ToString(), threshold.ToString());
+                    Assert.AreEqual(t1, t2, "LastWriteTime delta actual({0}) expected({1})", delta.ToString(), threshold.ToString());
                     t1 = File.GetCreationTimeUtc(fqPath);
                     t2 = File.GetCreationTimeUtc(extractedFile);
                     delta = (t1 > t2) ? t1 - t2 : t2 - t1;
@@ -272,7 +311,7 @@ namespace Ionic.Zip.Tests
         }
 
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(Ionic.Zip.ZipException))]
         public void Error_ZipFile_Initialize_Error()
         {
@@ -289,7 +328,7 @@ namespace Ionic.Zip.Tests
 
 
 
-        [TestMethod]
+        [Test]
         public void ShellApplication_Unzip()
         {
             // get a set of files to zip up
@@ -319,7 +358,7 @@ namespace Ionic.Zip.Tests
                 }
 
                 // Verify the number of files in the zip
-                Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate), filesToZip.Length,
+                Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), filesToZip.Length,
                                      "Incorrect number of entries in the zip file.");
 
                 // run the unzip script
@@ -336,7 +375,7 @@ namespace Ionic.Zip.Tests
         }
 
 
-        [TestMethod]
+        [Test]
         public void ShellApplication_Unzip_NonSeekableOutput()
         {
             // get a set of files to zip up
@@ -374,7 +413,7 @@ namespace Ionic.Zip.Tests
                 }
 
                 // Verify the number of files in the zip
-                Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate), filesToZip.Length,
+                Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), filesToZip.Length,
                                      "Incorrect number of entries in the zip file.");
 
                 // run the unzip script
@@ -395,7 +434,7 @@ namespace Ionic.Zip.Tests
 
 #if SHELLAPP_UNZIP_SFX
 
-        [TestMethod]
+        [Test]
         public void ShellApplication_Unzip_SFX()
         {
             // get a set of files to zip up
@@ -424,7 +463,7 @@ namespace Ionic.Zip.Tests
                 }
 
                 // Verify the number of files in the zip
-                Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate), filesToZip.Length,
+                Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), filesToZip.Length,
                                      "Incorrect number of entries in the zip file.");
 
                 // run the unzip script
@@ -443,7 +482,7 @@ namespace Ionic.Zip.Tests
 
 
 
-        [TestMethod]
+        [Test]
         public void ShellApplication_Unzip_2()
         {
             string zipFileToCreate = Path.Combine(TopLevelDir, "ShellApplication_Unzip-2.zip");
@@ -460,7 +499,7 @@ namespace Ionic.Zip.Tests
             }
 
             // Verify the number of files in the zip
-            Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate), filesToZip.Count,
+            Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), filesToZip.Count,
                                  "Incorrect number of entries in the zip file.");
 
             // run the unzip script
@@ -484,7 +523,7 @@ namespace Ionic.Zip.Tests
 
 
 
-        [TestMethod]
+        [Test]
         public void ShellApplication_SelectedFiles_Unzip()
         {
             string zipFileToCreate = Path.Combine(TopLevelDir, "ShellApplication_SelectedFiles_Unzip.zip");
@@ -540,7 +579,7 @@ namespace Ionic.Zip.Tests
 
 
             // Verify the number of files in the zip
-            Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate), numFilesAdded,
+            Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), numFilesAdded,
                                  "Incorrect number of entries in the zip file.");
 
             // run the unzip script
@@ -556,19 +595,19 @@ namespace Ionic.Zip.Tests
                 var extractedFile = fqPath.Replace("files", "extract");
                 Assert.IsTrue(File.Exists(extractedFile), "File does not exist ({0})", extractedFile);
                 var chk = TestUtilities.ComputeChecksum(extractedFile);
-                Assert.AreEqual<String>(TestUtilities.CheckSumToString(checksums[f]),
+                Assert.AreEqual(TestUtilities.CheckSumToString(checksums[f]),
                                         TestUtilities.CheckSumToString(chk),
                                         String.Format("Checksums for file {0} do not match.", f));
                 checksums.Remove(f);
             }
 
-            Assert.AreEqual<Int32>(0, checksums.Count, "Not all of the expected files were found in the extract directory.");
+            Assert.AreEqual(0, checksums.Count, "Not all of the expected files were found in the extract directory.");
         }
 
 
 
 
-        [TestMethod]
+        [Test]
         public void ShellApplication_Zip()
         {
             string zipFileToCreate = Path.Combine(TopLevelDir, "ShellApplication_Zip.zip");
@@ -588,7 +627,7 @@ namespace Ionic.Zip.Tests
                       String.Format("\"{0}\" {1} {2}", script, zipFileToCreate, subdir));
 
             // Verify the number of files in the zip
-            Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate), filesToZip.Length,
+            Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), filesToZip.Length,
                                  "Incorrect number of entries in the zip file.");
 
             // unzip
@@ -604,7 +643,7 @@ namespace Ionic.Zip.Tests
         }
 
 
-        [TestMethod]
+        [Test]
         public void ShellApplication_Zip_2()
         {
             string zipFileToCreate = "ShellApplication_Zip.zip";
@@ -698,7 +737,7 @@ namespace Ionic.Zip.Tests
             // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
             // Verify the number of files in the zip
-            Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate), filesToZip.Count,
+            Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), filesToZip.Count,
                                  "Incorrect number of entries in the zip file.");
 
             // unzip
@@ -715,7 +754,7 @@ namespace Ionic.Zip.Tests
 
 
 #if Microsoft_VisualStudio_Zip
-        [TestMethod]
+        [Test]
         public void VStudio_Zip()
         {
             string zipFileToCreate = Path.Combine(TopLevelDir, "VStudio_Zip.zip");
@@ -732,7 +771,7 @@ namespace Ionic.Zip.Tests
             Microsoft.VisualStudio.Zip.ZipFileCompressor zfc = new Microsoft.VisualStudio.Zip.ZipFileCompressor(zipFileToCreate, "files", a, true);
 
             // Verify the number of files in the zip
-            Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate), filesToZip.Length,
+            Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), filesToZip.Length,
                                  "Incorrect number of entries in the zip file.");
 
             // unzip
@@ -750,7 +789,7 @@ namespace Ionic.Zip.Tests
 #endif
 
 
-        [TestMethod]
+        [Test]
         [Timeout(3 * 60 * 1000)]  // timeout in ms.
         public void VStudio_UnZip()
         {
@@ -773,7 +812,7 @@ namespace Ionic.Zip.Tests
             }
 
             // Verify the number of files in the zip
-            Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate), filesToZip.Length,
+            Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), filesToZip.Length,
                                  "Incorrect number of entries in the zip file.");
 
 #if Microsoft_VisualStudio_Zip
@@ -791,7 +830,7 @@ namespace Ionic.Zip.Tests
 
 
 
-        [TestMethod]
+        [Test]
         public void COM_Zip()
         {
             string zipFileToCreate = Path.Combine(TopLevelDir, "COM_Zip.zip");
@@ -810,7 +849,7 @@ namespace Ionic.Zip.Tests
                       String.Format("\"{0}\" {1} {2}", script, zipFileToCreate, subdir));
 
             // Verify the number of files in the zip
-            Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate), filesToZip.Length,
+            Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), filesToZip.Length,
                                  "Incorrect number of entries in the zip file.");
 
             // unzip
@@ -828,7 +867,7 @@ namespace Ionic.Zip.Tests
 
 
 
-        [TestMethod]
+        [Test]
         public void COM_Unzip()
         {
             string zipFileToCreate = Path.Combine(TopLevelDir, "COM_Unzip.zip");
@@ -853,7 +892,7 @@ namespace Ionic.Zip.Tests
             }
 
             // Verify the number of files in the zip
-            Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate), filesToZip.Length,
+            Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), filesToZip.Length,
                                  "Incorrect number of entries in the zip file.");
 
 
@@ -869,7 +908,7 @@ namespace Ionic.Zip.Tests
         }
 
 
-        [TestMethod]
+        [Test]
         public void COM_Check()
         {
             string zipFileToCreate = Path.Combine(TopLevelDir, "COM_Check.zip");
@@ -889,7 +928,7 @@ namespace Ionic.Zip.Tests
             }
 
             // Verify the number of files in the zip
-            Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate), filesToZip.Length,
+            Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), filesToZip.Length,
                                  "Incorrect number of entries in the zip file.");
 
             // run the COM script to check the ZIP archive
@@ -902,7 +941,7 @@ namespace Ionic.Zip.Tests
         }
 
 
-        [TestMethod]
+        [Test]
         public void COM_CheckWithExtract()
         {
             string zipFileToCreate = Path.Combine(TopLevelDir, "COM_CheckWithExtract.zip");
@@ -922,7 +961,7 @@ namespace Ionic.Zip.Tests
             }
 
             // Verify the number of files in the zip
-            Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate), filesToZip.Length,
+            Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), filesToZip.Length,
                                  "Incorrect number of entries in the zip file.");
 
             // run the COM script to check and test-extract the ZIP archive
@@ -935,7 +974,7 @@ namespace Ionic.Zip.Tests
         }
 
 
-        [TestMethod]
+        [Test]
         public void COM_CheckError()
         {
             //Directory.SetCurrentDirectory(TopLevelDir);
@@ -949,7 +988,7 @@ namespace Ionic.Zip.Tests
             Assert.IsTrue(testOut.StartsWith("That zip is not OK"));
         }
 
-        [TestMethod]
+        [Test]
         public void COM_CheckPassword()
         {
             // create and fill the directories
@@ -980,7 +1019,7 @@ namespace Ionic.Zip.Tests
 
                 TestContext.WriteLine("Checking the count...");
                 // Verify the number of files in the zip
-                Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate),
+                Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate),
                                      filesToZip.Length,
                                      "Incorrect number of entries in the zip file.");
 
@@ -1009,7 +1048,7 @@ namespace Ionic.Zip.Tests
 
 
 
-        [TestMethod]
+        [Test]
         public void InfoZip_Unzip()
         {
             if (!InfoZipIsPresent)
@@ -1045,7 +1084,7 @@ namespace Ionic.Zip.Tests
                         zip1.Save(zipFileToCreate);
                     }
 
-                    Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate),
+                    Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate),
                                          filesToZip.Length,
                                          "Incorrect number of entries in the zip file" +
                                          " (i,j)=({0},{1}).", i, j);
@@ -1069,7 +1108,7 @@ namespace Ionic.Zip.Tests
                     }
 
                     var extractedFiles = Directory.GetFiles(Path.Combine(extractDir, shortDir));
-                    Assert.AreEqual<int>
+                    Assert.AreEqual
                         (filesToZip.Length, extractedFiles.Length,
                          "Incorrect number of extracted files. (i,j)={0},{1}",
                          i, j);
@@ -1083,7 +1122,7 @@ namespace Ionic.Zip.Tests
         }
 
 
-        [TestMethod]
+        [Test]
         public void InfoZip_Zip()
         {
             if (!InfoZipIsPresent)
@@ -1131,7 +1170,7 @@ namespace Ionic.Zip.Tests
                 System.Threading.Thread.Sleep(1200);
 
                 // Verify the number of files in the zip
-                Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate),
+                Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate),
                                      filesToZip.Length,
                                      "Incorrect number of entries in the zip file.");
 
@@ -1151,7 +1190,7 @@ namespace Ionic.Zip.Tests
 
 
 
-        [TestMethod]
+        [Test]
         public void InfoZip_Zip_Password()
         {
             if (!InfoZipIsPresent)
@@ -1181,7 +1220,7 @@ namespace Ionic.Zip.Tests
             System.Threading.Thread.Sleep(1200);
 
             // Verify the number of files in the zip
-            Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate),
+            Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate),
                                  filesToZip.Length,
                                  "Incorrect number of entries in the zip file.");
 
@@ -1199,7 +1238,7 @@ namespace Ionic.Zip.Tests
 
 
 
-        [TestMethod]
+        [Test]
         public void InfoZip_Zip_Split()
         {
             if (!InfoZipIsPresent)
@@ -1276,7 +1315,7 @@ namespace Ionic.Zip.Tests
         // "errors" and warnings...true multi-part support doesn't exist
         // yet (coming soon).
 
-        [TestMethod]
+        [Test]
         public void InfoZip_Unzip_Split()
         {
             if (!InfoZipIsPresent)
@@ -1349,7 +1388,7 @@ namespace Ionic.Zip.Tests
 #endif
 
 
-        [TestMethod]
+        [Test]
         public void InfoZip_Unzip_z64_wi11936()
         {
             if (!InfoZipIsPresent)
@@ -1415,7 +1454,7 @@ namespace Ionic.Zip.Tests
         }
 
 
-        [TestMethod]
+        [Test]
         public void InfoZip_Unzip_ZeroLengthFile()
         {
             if (!InfoZipIsPresent)
@@ -1453,7 +1492,7 @@ namespace Ionic.Zip.Tests
                 }
 
                 // Verify the number of files in the zip
-                Assert.AreEqual<int>(1, TestUtilities.CountEntries(zipFileToCreate),
+                Assert.AreEqual(1, TestUtilities.CountEntries(zipFileToCreate),
                                      "Incorrect number of entries in the zip file.");
 
                 string extractDir = "extract." + k;
@@ -1474,7 +1513,7 @@ namespace Ionic.Zip.Tests
 
 
 
-        [TestMethod]
+        [Test]
         public void Perl_Zip()
         {
             if (perl == null)
@@ -1512,7 +1551,7 @@ namespace Ionic.Zip.Tests
 
 
 
-        [TestMethod]
+        [Test]
         public void SevenZip_Zip_1()
         {
             if (!SevenZipIsPresent)
@@ -1531,7 +1570,7 @@ namespace Ionic.Zip.Tests
             this.Exec(sevenZip, String.Format("a {0} {1}", zipFileToCreate, subdir));
 
             // Verify the number of files in the zip
-            Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate), filesToZip.Length,
+            Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), filesToZip.Length,
                                  "Incorrect number of entries in the zip file.");
 
             // run the COM script to unzip the ZIP archive
@@ -1547,7 +1586,7 @@ namespace Ionic.Zip.Tests
 
 
 
-        [TestMethod]
+        [Test]
         public void SevenZip_Zip_2()
         {
             if (!SevenZipIsPresent)
@@ -1569,7 +1608,7 @@ namespace Ionic.Zip.Tests
             this.Exec(sevenZip, String.Format("a {0} {1}", zipFileToCreate, subdir));
 
             // Verify the number of files in the zip
-            Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate), filesToZip.Length,
+            Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), filesToZip.Length,
                                  "Incorrect number of entries in the zip file.");
 
             // unzip
@@ -1587,7 +1626,7 @@ namespace Ionic.Zip.Tests
 
 
 
-        [TestMethod]
+        [Test]
         public void SevenZip_Unzip()
         {
             if (!SevenZipIsPresent)
@@ -1612,7 +1651,7 @@ namespace Ionic.Zip.Tests
             }
 
             // Verify the number of files in the zip
-            Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate), filesToZip.Length,
+            Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), filesToZip.Length,
                                  "Incorrect number of entries in the zip file.");
 
             // unpack the zip archive via 7z.exe
@@ -1627,7 +1666,7 @@ namespace Ionic.Zip.Tests
         }
 
 
-        [TestMethod]
+        [Test]
         public void SevenZip_Unzip_Password()
         {
             if (!SevenZipIsPresent)
@@ -1651,7 +1690,7 @@ namespace Ionic.Zip.Tests
             }
 
             // Verify the number of files in the zip
-            Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate), filesToZip.Length,
+            Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), filesToZip.Length,
                                  "Incorrect number of entries in the zip file.");
 
             // unpack the zip archive via 7z.exe
@@ -1668,7 +1707,7 @@ namespace Ionic.Zip.Tests
 
 
 
-        [TestMethod]
+        [Test]
         public void SevenZip_Unzip_Password_NonSeekableOutput()
         {
             if (!SevenZipIsPresent)
@@ -1737,7 +1776,7 @@ namespace Ionic.Zip.Tests
                 }
 
                 // Verify the number of files in the zip
-                Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate), filesToZip.Length,
+                Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), filesToZip.Length,
                                      "Incorrect number of entries in the zip file.");
 
                 // unpack the zip archive via 7z.exe
@@ -1757,7 +1796,7 @@ namespace Ionic.Zip.Tests
 
 
 
-        [TestMethod]
+        [Test]
         public void SevenZip_Unzip_SFX()
         {
             if (!SevenZipIsPresent)
@@ -1783,7 +1822,7 @@ namespace Ionic.Zip.Tests
             }
 
             // Verify the number of files in the zip
-            Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate),
+            Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate),
                                  filesToZip.Length,
                                  "Incorrect number of entries in the zip file.");
 
@@ -1800,14 +1839,14 @@ namespace Ionic.Zip.Tests
 
 
 
-        [TestMethod]
+        [Test]
         public void Winzip_Zip()
         {
             Winzip_Zip_Variable("");
         }
 
 
-        [TestMethod]
+        [Test]
         public void Winzip_Zip_Password()
         {
             if (!WinZipIsPresent)
@@ -1829,25 +1868,25 @@ namespace Ionic.Zip.Tests
         }
 
 
-        [TestMethod]
+        [Test]
         public void Winzip_Zip_Normal()
         {
             Winzip_Zip_Variable("-en");
         }
 
-        [TestMethod]
+        [Test]
         public void Winzip_Zip_Fast()
         {
             Winzip_Zip_Variable("-ef");
         }
 
-        [TestMethod]
+        [Test]
         public void Winzip_Zip_SuperFast()
         {
             Winzip_Zip_Variable("-es");
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(Ionic.Zip.ZipException))]
         public void Winzip_Zip_EZ()
         {
@@ -1856,7 +1895,7 @@ namespace Ionic.Zip.Tests
             Winzip_Zip_Variable("-ez");
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(Ionic.Zip.ZipException))]
         public void Winzip_Zip_PPMd()
         {
@@ -1865,14 +1904,14 @@ namespace Ionic.Zip.Tests
             Winzip_Zip_Variable("-ep");
         }
 
-        [TestMethod]
+        [Test]
         public void Winzip_Zip_Bzip2()
         {
             if (!WinZipIsPresent) throw new Exception("no winzip");
             Winzip_Zip_Variable("-eb");
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(Ionic.Zip.ZipException))]
         public void Winzip_Zip_Enhanced()
         {
@@ -1882,7 +1921,7 @@ namespace Ionic.Zip.Tests
         }
 
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(Ionic.Zip.ZipException))]
         public void Winzip_Zip_LZMA()
         {
@@ -1950,7 +1989,7 @@ namespace Ionic.Zip.Tests
 
 
 
-        [TestMethod]
+        [Test]
         [Timeout(9 * 60 * 1000)]  // in ms, 60 * 1000 = 1min
         public void Winzip_Unzip_2()
         {
@@ -1973,7 +2012,7 @@ namespace Ionic.Zip.Tests
             }
 
             // Verify the number of files in the zip
-            Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate), filesToZip.Count,
+            Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), filesToZip.Count,
                                  "Incorrect number of entries in the zip file.");
 
             // now, extract the zip
@@ -1992,7 +2031,7 @@ namespace Ionic.Zip.Tests
 
 
 
-        [TestMethod]
+        [Test]
         public void Winzip_Unzip_ZeroLengthFile()
         {
             if (!WinZipIsPresent)
@@ -2030,7 +2069,7 @@ namespace Ionic.Zip.Tests
                 }
 
                 // Verify the number of files in the zip
-                Assert.AreEqual<int>(1, TestUtilities.CountEntries(zipFileToCreate),
+                Assert.AreEqual(1, TestUtilities.CountEntries(zipFileToCreate),
                                      "Incorrect number of entries in the zip file.");
 
                 // now, test the zip. Possibly need a password.
@@ -2048,7 +2087,7 @@ namespace Ionic.Zip.Tests
 
 
 
-        [TestMethod]
+        [Test]
         public void Winzip_Unzip_Password()
         {
             if (!WinZipIsPresent)
@@ -2071,7 +2110,7 @@ namespace Ionic.Zip.Tests
             }
 
             // Verify the number of files in the zip
-            Assert.AreEqual<int>(filesToZip.Length, TestUtilities.CountEntries(zipFileToCreate),
+            Assert.AreEqual(filesToZip.Length, TestUtilities.CountEntries(zipFileToCreate),
                                  "Incorrect number of entries in the zip file.");
 
             // now, test the zip
@@ -2096,7 +2135,7 @@ namespace Ionic.Zip.Tests
 
 
 
-        [TestMethod]
+        [Test]
         public void Winzip_Unzip_Password_NonSeekableOutput()
         {
             if (!WinZipIsPresent)
@@ -2139,7 +2178,7 @@ namespace Ionic.Zip.Tests
                 }
 
                 // Verify the number of files in the zip
-                Assert.AreEqual<int>(filesToZip.Length,
+                Assert.AreEqual(filesToZip.Length,
                                      TestUtilities.CountEntries(zipFileToCreate),
                                      "Incorrect number of entries in the zip file.");
 
@@ -2169,7 +2208,7 @@ namespace Ionic.Zip.Tests
 
 
 
-        [TestMethod]
+        [Test]
         public void Winzip_Unzip_SFX()
         {
             if (!WinZipIsPresent)
@@ -2193,7 +2232,7 @@ namespace Ionic.Zip.Tests
             }
 
             // Verify the number of files in the zip
-            Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate),
+            Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate),
                                  filesToZip.Count,
                                  "Incorrect number of entries in the zip file.");
 
@@ -2214,7 +2253,7 @@ namespace Ionic.Zip.Tests
         }
 
 
-        [TestMethod]
+        [Test]
         public void Winzip_Unzip_Bzip2()
         {
             if (!WinZipIsPresent) throw new Exception("no winzip");
@@ -2242,7 +2281,7 @@ namespace Ionic.Zip.Tests
 
             TestContext.WriteLine("Verifying the number of files in the zip");
             // Verify the number of files in the zip
-            Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate),
+            Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate),
                                  filesToZip.Length + additionalFiles.Count,
                                  "Incorrect number of entries in the zip file.");
 
@@ -2264,7 +2303,7 @@ namespace Ionic.Zip.Tests
             var numStored = TestUtilities.CountOccurrences(wzzipOut, "Compression Method: Stored");
             TestContext.WriteLine("Found {0} stored entries.", numStored);
 
-            Assert.AreEqual<int>(numBzipped + numStored,
+            Assert.AreEqual(numBzipped + numStored,
                                  filesToZip.Length + additionalFiles.Count);
             Assert.IsTrue(numBzipped > 2 * numStored,
                            "The number of bzipped files is too low.");
@@ -2289,7 +2328,7 @@ namespace Ionic.Zip.Tests
         }
 
 
-        [TestMethod]
+        [Test]
         public void Winzip_Unzip_Bzip2_Large()
         {
             // BZip2 uses work buffers of 900k (ish). When compressing files that
@@ -2323,7 +2362,7 @@ namespace Ionic.Zip.Tests
 
             // Verify the number of files in the zip
             TestContext.WriteLine("Verifying the number of files in the zip...");
-            Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate),
+            Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate),
                                  filesToZip.Length,
                                  "Incorrect number of entries in the zip file.");
 
@@ -2334,7 +2373,7 @@ namespace Ionic.Zip.Tests
             // verify that the output states that the compression method
             // used for each entry was BZIP2...
             TestContext.WriteLine("Verifying that BZIP2 was the comp method used...");
-            Assert.AreEqual<int>(TestUtilities.CountOccurrences(wzzipOut, "Compression Method: BZipped"),
+            Assert.AreEqual(TestUtilities.CountOccurrences(wzzipOut, "Compression Method: BZipped"),
                                  filesToZip.Length);
 
             // now, extract the zip
@@ -2349,7 +2388,7 @@ namespace Ionic.Zip.Tests
 
 
 
-        [TestMethod]
+        [Test]
         public void Winzip_Unzip_Basic()
         {
             if (!WinZipIsPresent)
@@ -2387,7 +2426,7 @@ namespace Ionic.Zip.Tests
             }
 
             // Verify the number of files in the zip
-            Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate),
+            Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate),
                                  filesToZip.Length + additionalFiles.Count,
                                  "Incorrect number of entries in the zip file.");
 
@@ -2458,10 +2497,10 @@ namespace Ionic.Zip.Tests
 
                     DateTime t1 = File.GetLastWriteTime(filename);
                     DateTime t2 = File.GetLastWriteTime(orig);
-                    Assert.AreEqual<DateTime>(t1, t2);
+                    Assert.AreEqual(t1, t2);
                     t1 = File.GetCreationTime(filename);
                     t2 = File.GetCreationTime(orig);
-                    Assert.AreEqual<DateTime>(t1, t2);
+                    Assert.AreEqual(t1, t2);
                 }
             }
         }
@@ -2538,50 +2577,50 @@ namespace Ionic.Zip.Tests
 
 
 
-        [TestMethod]
+        [Test]
         public void Extract_WinZip_SelfExtractor()
         {
             _Extract_ZipFile("winzip-sfx.exe");
         }
 
-        [TestMethod]
+        [Test]
         public void Extract_Docx()
         {
             _Extract_ZipFile("Vanishing Oatmeal Cookies.docx");
         }
 
-        [TestMethod]
+        [Test]
         public void Extract_ZipWithDuplicateNames_wi10330()
         {
             _Extract_ZipFile("wi10330-badzip.zip");
         }
 
-        [TestMethod]
+        [Test]
         public void Extract_Xlsx()
         {
             _Extract_ZipFile("Book1.xlsx");
         }
 
-        [TestMethod]
+        [Test]
         public void Extract_DWF()
         {
             _Extract_ZipFile("plot.dwf");
         }
 
-        [TestMethod]
+        [Test]
         public void Extract_InfoZipAppNote()
         {
             _Extract_ZipFile("appnote-iz-latest.zip");
         }
 
-        [TestMethod]
+        [Test]
         public void Extract_AndroidApp()
         {
             _Extract_ZipFile("Calendar.apk");
         }
 
 
-        [TestMethod]
+        [Test]
         public void Extract_ZipWithRelativePathsOutside()
         {
             _Extract_ZipFile("relative-paths-outside.zip");
@@ -2589,7 +2628,7 @@ namespace Ionic.Zip.Tests
             Assert.IsTrue(File.Exists(@"extract\Temp\evil.txt"));
         }
 
-        [TestMethod]
+        [Test]
         public void Extract_ZipWithRelativePathsInSubdir()
         {
             _Extract_ZipFile("relative-paths-in-subdir.zip");
@@ -2597,7 +2636,7 @@ namespace Ionic.Zip.Tests
             Assert.IsTrue(File.Exists(@"extract\Temp\evil.txt"));
         }
 
-        [TestMethod]
+        [Test]
         public void Extract_ZipWithRelativePathsInSubdirOutside()
         {
             _Extract_ZipFile("relative-paths-in-subdir-outside.zip");
@@ -2605,7 +2644,7 @@ namespace Ionic.Zip.Tests
             Assert.IsTrue(File.Exists(@"extract\Temp\evil.txt"));
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(IOException))]
         public void Extract_ZipWithAbsolutePathsOutside()
         {

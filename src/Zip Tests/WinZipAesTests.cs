@@ -27,7 +27,8 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
+using Ionic.Tests;
 
 using Ionic.Zip;
 using Ionic.Zip.Tests.Utilities;
@@ -37,19 +38,19 @@ namespace Ionic.Zip.Tests.WinZipAes
     /// <summary>
     /// Summary description for WinZipAesTests
     /// </summary>
-    [TestClass]
+    [TestFixture]
     public class WinZipAesTests : IonicTestClass
     {
         public WinZipAesTests() : base() { }
 
 
-        [TestMethod]
+        [Test]
         public void WZA_CreateZip()
         {
             WZA_CreateZip_Impl("WZA_CreateZip", 14400, 5000);
         }
 
-        [TestMethod]
+        [Test]
         public void WZA_CreateZip_VerySmallFiles()
         {
             WZA_CreateZip_Impl("WZA_CreateZip_VerySmallFiles", 14, 5);
@@ -113,7 +114,7 @@ namespace Ionic.Zip.Tests.WinZipAes
                     string comment = String.Format("This archive uses Encryption: {0}, password({1}), NonSeekable=({2})",
                                                    EncOptions[k], password, (m == 0) ? "No" : "Yes");
 
-                    _DotNetZip_CreateZip(filesToZip, EncOptions[k], password, comment, zipFileToCreate, (m==1));
+                    _DotNetZip_CreateZip(filesToZip, EncOptions[k], password, comment, zipFileToCreate, (m == 1));
 
                     if (EncOptions[k] == EncryptionAlgorithm.None)
                         BasicVerifyZip(zipFileToCreate);
@@ -129,12 +130,12 @@ namespace Ionic.Zip.Tests.WinZipAes
                         foreach (var e in zip2)
                         {
                             TestContext.WriteLine(" Entry: {0}  c({1})  unc({2})", e.FileName, e.CompressedSize, e.UncompressedSize);
-                            Assert.AreEqual<EncryptionAlgorithm>(EncOptions[k], e.Encryption);
+                            Assert.AreEqual(EncOptions[k], e.Encryption);
                             e.ExtractWithPassword(extractDir, password);
                             filename = Path.Combine(extractDir, e.FileName);
                             string actualCheckString = TestUtilities.CheckSumToString(TestUtilities.ComputeChecksum(filename));
                             Assert.IsTrue(checksums.ContainsKey(e.FileName), "Checksum is missing");
-                            Assert.AreEqual<string>(checksums[e.FileName], actualCheckString, "Checksums for ({0}) do not match.", e.FileName);
+                            Assert.AreEqual(checksums[e.FileName], actualCheckString, "Checksums for ({0}) do not match.", e.FileName);
                             TestContext.WriteLine("     Checksums match ({0}).\n", actualCheckString);
                         }
                     }
@@ -185,7 +186,7 @@ namespace Ionic.Zip.Tests.WinZipAes
 
 
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(Ionic.Zip.BadPasswordException))]
         public void WZA_CreateZip_NoPassword()
         {
@@ -223,7 +224,7 @@ namespace Ionic.Zip.Tests.WinZipAes
                 zip1.Save(zipFileToCreate);
             }
 
-            #if NOT
+#if NOT
             WinzipVerify(zipFileToCreate);
 
             // validate all the checksums
@@ -242,17 +243,17 @@ namespace Ionic.Zip.Tests.WinZipAes
                         // verify the checksum of the file is correct
                         string expectedCheckString = checksums[e.FileName];
                         string actualCheckString = TestUtilities.CheckSumToString(TestUtilities.ComputeChecksum(PathToExtractedFile));
-                        Assert.AreEqual<String>(expectedCheckString, actualCheckString, "Unexpected checksum on extracted filesystem file ({0}).", PathToExtractedFile);
+                        Assert.AreEqual(expectedCheckString, actualCheckString, "Unexpected checksum on extracted filesystem file ({0}).", PathToExtractedFile);
                     }
                 }
             }
-            #endif
+#endif
 
         }
 
 
 
-        [TestMethod]
+        [Test]
         public void WZA_CreateZip_DirectoriesOnly()
         {
             if (!WinZipIsPresent)
@@ -288,30 +289,30 @@ namespace Ionic.Zip.Tests.WinZipAes
 
             BasicVerifyZip(zipFileToCreate, password);
 
-            Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate), entries);
+            Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), entries);
         }
 
 
 
-        [TestMethod]
+        [Test]
         public void WZA_CreateZip_ZeroLengthFiles_256()
         {
             string password = TestUtilities.GenerateRandomPassword(12);
             _Internal_CreateZip_ZeroLengthFiles(password, EncryptionAlgorithm.WinZipAes256);
         }
-        [TestMethod]
+        [Test]
         public void WZA_CreateZip_ZeroLengthFiles_128()
         {
             string password = TestUtilities.GenerateRandomPassword(12);
             _Internal_CreateZip_ZeroLengthFiles(password, EncryptionAlgorithm.WinZipAes128);
         }
 
-        [TestMethod]
+        [Test]
         public void WZA_CreateZip_ZeroLengthFiles_NoPassword_256()
         {
             _Internal_CreateZip_ZeroLengthFiles(null, EncryptionAlgorithm.WinZipAes256);
         }
-        [TestMethod]
+        [Test]
         public void WZA_CreateZip_ZeroLengthFiles_NoPassword_128()
         {
             _Internal_CreateZip_ZeroLengthFiles(null, EncryptionAlgorithm.WinZipAes128);
@@ -345,7 +346,7 @@ namespace Ionic.Zip.Tests.WinZipAes
 
             BasicVerifyZip(zipFileToCreate, password);
 
-            Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate),
+            Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate),
                                  filesToZip.Length);
         }
 
@@ -382,14 +383,14 @@ namespace Ionic.Zip.Tests.WinZipAes
 
 
 
-        [TestMethod]
+        [Test]
         public void WZA_ReadEncryptedZips()
         {
             _Internal_ReadEncryptedZips(true);
         }
 
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(Ionic.Zip.BadPasswordException))]
         public void WZA_ReadZip_Fail_BadPassword()
         {
@@ -424,7 +425,7 @@ namespace Ionic.Zip.Tests.WinZipAes
         }
 
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(Ionic.Zip.BadPasswordException))]
         public void WZA_ReadZip_Fail_NoPassword_128()
         {
@@ -432,7 +433,7 @@ namespace Ionic.Zip.Tests.WinZipAes
             GenerateFiles_CreateZip("-ycAES128", password, 1);
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(Ionic.Zip.BadPasswordException))]
         public void WZA_ReadZip_Fail_NoPassword_256()
         {
@@ -440,7 +441,7 @@ namespace Ionic.Zip.Tests.WinZipAes
             GenerateFiles_CreateZip("-ycAES256", password, 1);
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(Ionic.Zip.BadPasswordException))]
         public void WZA_ReadZip_Fail_WrongPassword()
         {
@@ -448,7 +449,7 @@ namespace Ionic.Zip.Tests.WinZipAes
             GenerateFiles_CreateZip("-ycAES256", password, 2);
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(Ionic.Zip.BadPasswordException))]
         public void WZA_ReadZip_Fail_WrongMethod()
         {
@@ -516,11 +517,11 @@ namespace Ionic.Zip.Tests.WinZipAes
                     }
                 }
             }
-            Assert.AreEqual<int>(expectedFilesExtracted, actualFilesExtracted);
+            Assert.AreEqual(expectedFilesExtracted, actualFilesExtracted);
         }
 
 
-        [TestMethod]
+        [Test]
         public void WZA_OneZeroByteFile_wi11131()
         {
             string zipF = "WZA_OneZeroByteFile_wi11131.zip";
@@ -537,11 +538,11 @@ namespace Ionic.Zip.Tests.WinZipAes
             }
 
             BasicVerifyZip(zipF);
-            Assert.AreEqual<int>(1, TestUtilities.CountEntries(zipF));
+            Assert.AreEqual(1, TestUtilities.CountEntries(zipF));
         }
 
 
-        [TestMethod]
+        [Test]
         public void WZA_CreateZip_NoCompression()
         {
             if (!WinZipIsPresent)
@@ -596,7 +597,7 @@ namespace Ionic.Zip.Tests.WinZipAes
                 {
                     if (!e.IsDirectory)
                     {
-                        Assert.AreEqual<short>(0, (short)e.CompressionMethod);
+                        Assert.AreEqual(0, (short)e.CompressionMethod);
                         e.ExtractWithPassword("unpack", password);
                         string PathToExtractedFile = Path.Combine("unpack", e.FileName);
                         Assert.IsTrue(checksums.ContainsKey(e.FileName));
@@ -604,13 +605,13 @@ namespace Ionic.Zip.Tests.WinZipAes
                         // verify the checksum of the file is correct
                         string expectedCheckString = checksums[e.FileName];
                         string actualCheckString = TestUtilities.CheckSumToString(TestUtilities.ComputeChecksum(PathToExtractedFile));
-                        Assert.AreEqual<String>(expectedCheckString, actualCheckString, "Unexpected checksum on extracted filesystem file ({0}).", PathToExtractedFile);
+                        Assert.AreEqual(expectedCheckString, actualCheckString, "Unexpected checksum on extracted filesystem file ({0}).", PathToExtractedFile);
                     }
                 }
             }
         }
 
-        [TestMethod]
+        [Test]
         public void WZA_CreateZip_Spanned()
         {
             int filesize = 1024 * 1024;
@@ -631,12 +632,12 @@ namespace Ionic.Zip.Tests.WinZipAes
                     foreach (ZipEntry ze in zip2.Entries)
                         ze.ExtractWithPassword(sr, "test1234");
                 }
-                Assert.AreEqual<long>(filesize, sr.Length, "Unexpected output length");
+                Assert.AreEqual(filesize, sr.Length, "Unexpected output length");
             }
         }
 
 
-        [TestMethod]
+        [Test]
         public void WZA_CreateZip_EmptyPassword()
         {
             if (!WinZipIsPresent)
@@ -700,14 +701,14 @@ namespace Ionic.Zip.Tests.WinZipAes
                         // verify the checksum of the file is correct
                         string expectedCheckString = checksums[e.FileName];
                         string actualCheckString = TestUtilities.CheckSumToString(TestUtilities.ComputeChecksum(PathToExtractedFile));
-                        Assert.AreEqual<String>(expectedCheckString, actualCheckString, "Unexpected checksum on extracted filesystem file ({0}).", PathToExtractedFile);
+                        Assert.AreEqual(expectedCheckString, actualCheckString, "Unexpected checksum on extracted filesystem file ({0}).", PathToExtractedFile);
                     }
                 }
             }
         }
 
 
-        [TestMethod]
+        [Test]
         public void WZA_RemoveEntryAndSave()
         {
             if (!WinZipIsPresent)
@@ -759,7 +760,7 @@ namespace Ionic.Zip.Tests.WinZipAes
                 }
 
                 // Verify the files are in the zip
-                Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate), TextFiles.Length,
+                Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), TextFiles.Length,
                                      String.Format("Trial {0}: The Zip file has the wrong number of entries.", k));
 
                 if (k == 1)
@@ -768,7 +769,7 @@ namespace Ionic.Zip.Tests.WinZipAes
         }
 
 
-        [TestMethod]
+        [Test]
         public void WZA_SmallBuffers_wi7967()
         {
             if (!WinZipIsPresent)
@@ -802,7 +803,7 @@ namespace Ionic.Zip.Tests.WinZipAes
 
 
 
-        [TestMethod]
+        [Test]
         public void WZA_InMemory_wi8493()
         {
             if (!WinZipIsPresent)
@@ -822,14 +823,14 @@ namespace Ionic.Zip.Tests.WinZipAes
                         zip.Password = password;
                         zip.Encryption = EncryptionAlgorithm.WinZipAes256;
                         zip.AddEntry(Path.GetRandomFileName(), "Hello, World!");
-                        if (m==1)
+                        if (m == 1)
                             zip.Save(ms);
                         else
                             zip.Save(zipFileToCreate);
                     }
 
-                    if (m==1)
-                        File.WriteAllBytes(zipFileToCreate,ms.ToArray());
+                    if (m == 1)
+                        File.WriteAllBytes(zipFileToCreate, ms.ToArray());
 
                     BasicVerifyZip(zipFileToCreate, password);
                 }
@@ -837,7 +838,7 @@ namespace Ionic.Zip.Tests.WinZipAes
         }
 
 
-        [TestMethod]
+        [Test]
         public void WZA_InMemory_wi8493a()
         {
             if (!WinZipIsPresent)
@@ -863,14 +864,14 @@ namespace Ionic.Zip.Tests.WinZipAes
                     zip.AddFiles(TextFiles, "files");
                     zip.Save(ms);
                 }
-                File.WriteAllBytes(zipFileToCreate,ms.ToArray());
+                File.WriteAllBytes(zipFileToCreate, ms.ToArray());
 
                 BasicVerifyZip(zipFileToCreate, password);
             }
         }
 
 
-        [TestMethod]
+        [Test]
         public void WZA_MacCheck_ZeroLengthEntry_wi13892()
         {
             if (!WinZipIsPresent)
@@ -915,7 +916,7 @@ namespace Ionic.Zip.Tests.WinZipAes
 
 
 
-        [TestMethod]
+        [Test]
         public void WZA_Update_SwitchCompression()
         {
             if (!WinZipIsPresent)
@@ -981,7 +982,7 @@ namespace Ionic.Zip.Tests.WinZipAes
 
         }
 
-        [TestMethod]
+        [Test]
         public void WZA_InMemory_MultiplesOf16KBlockSize()
         {
 

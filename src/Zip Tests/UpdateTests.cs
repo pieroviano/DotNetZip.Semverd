@@ -28,7 +28,8 @@ using System.Linq;
 using System.IO;
 using System.Text;
 using System.Collections.Generic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
+using Ionic.Tests;
 
 using Ionic.Zip;
 using Ionic.Zip.Tests.Utilities;
@@ -38,12 +39,12 @@ namespace Ionic.Zip.Tests.Update
     /// <summary>
     /// Summary description for UnitTest1
     /// </summary>
-    [TestClass]
+    [TestFixture]
     public class UpdateTests : IonicTestClass
     {
         public UpdateTests() : base() { }
 
-        [TestMethod]
+        [Test]
         public void UpdateZip_AddNewDirectory()
         {
             string zipFileToCreate = Path.Combine(TopLevelDir, "UpdateZip_AddNewDirectory.zip");
@@ -79,7 +80,7 @@ namespace Ionic.Zip.Tests.Update
                 zip.Save(zipFileToCreate);
             }
 
-            Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate), entries,
+            Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), entries,
                     "The created Zip file has an unexpected number of entries.");
 
             BasicVerifyZip(zipFileToCreate);
@@ -100,12 +101,12 @@ namespace Ionic.Zip.Tests.Update
                 zip.Save();
             }
 
-            Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate), entries,
+            Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), entries,
                     "The overwritten Zip file has the wrong number of entries.");
 
             using (ZipFile readzip = new ZipFile(zipFileToCreate))
             {
-                Assert.AreEqual<string>(newComment,
+                Assert.AreEqual(newComment,
                                         readzip.Comment,
                                         "The zip comment is incorrect.");
             }
@@ -113,7 +114,7 @@ namespace Ionic.Zip.Tests.Update
 
 
 
-        [TestMethod]
+        [Test]
         public void UpdateZip_ChangeMetadata_AES()
         {
             Directory.SetCurrentDirectory(TopLevelDir);
@@ -143,7 +144,7 @@ namespace Ionic.Zip.Tests.Update
             }
 
             // Verify the correct number of files are in the zip
-            Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate), numFilesToCreate,
+            Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), numFilesToCreate,
                                  "Fie! The updated Zip file has the wrong number of entries.");
 
             // test extract (and implicitly check CRCs, passwords, etc)
@@ -162,7 +163,7 @@ namespace Ionic.Zip.Tests.Update
             }
 
             // Verify the correct number of files are in the zip
-            Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate), numFilesToCreate + 1,
+            Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), numFilesToCreate + 1,
                                  "Fie! The updated Zip file has the wrong number of entries.");
 
             // test extract (and implicitly check CRCs, passwords, etc)
@@ -190,7 +191,7 @@ namespace Ionic.Zip.Tests.Update
 
 
 
-        [TestMethod]
+        [Test]
         public void UpdateZip_RemoveEntry_ByLastModTime()
         {
             // select the name of the zip file
@@ -228,7 +229,7 @@ namespace Ionic.Zip.Tests.Update
             }
 
             // Verify the files are in the zip
-            Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate), entriesAdded,
+            Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), entriesAdded,
                 "The Zip file has the wrong number of entries.");
 
 
@@ -261,7 +262,7 @@ namespace Ionic.Zip.Tests.Update
             }
 
             // Verify the correct number of files are in the zip
-            Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate), entriesAdded - numRemoved,
+            Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), entriesAdded - numRemoved,
                 "Fie! The updated Zip file has the wrong number of entries.");
 
             // verify that all entries in the archive are within the threshold
@@ -275,7 +276,7 @@ namespace Ionic.Zip.Tests.Update
         }
 
 
-        [TestMethod]
+        [Test]
         public void UpdateZip_RemoveEntry_ByFilename_WithPassword()
         {
             string password = "*!ookahoo";
@@ -314,7 +315,7 @@ namespace Ionic.Zip.Tests.Update
             }
 
             // Verify the files are in the zip
-            Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate), entriesToBeAdded,
+            Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), entriesToBeAdded,
                 "The Zip file has the wrong number of entries.");
 
 
@@ -357,20 +358,20 @@ namespace Ionic.Zip.Tests.Update
                     string sLine = sr.ReadLine();
                     sr.Close();
 
-                    Assert.AreEqual<string>(repeatedLine, sLine,
+                    Assert.AreEqual(repeatedLine, sLine,
                                 String.Format("The content of the originally added file ({0}) in the zip archive is incorrect.", s1));
 
                 }
             }
 
             // Verify the files are in the zip
-            Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate), entriesToBeAdded - filesToRemove.Count,
+            Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), entriesToBeAdded - filesToRemove.Count,
                 "The updated Zip file has the wrong number of entries.");
         }
 
 
 
-        [TestMethod]
+        [Test]
         public void UpdateZip_RenameEntry()
         {
             string dirToZip = Path.GetFileNameWithoutExtension(Path.GetRandomFileName());
@@ -402,7 +403,7 @@ namespace Ionic.Zip.Tests.Update
                 }
 
                 // Verify the number of files in the zip
-                Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate),
+                Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate),
                                      files.Length,
                                      "the Zip file has the wrong number of entries.");
 
@@ -454,17 +455,17 @@ namespace Ionic.Zip.Tests.Update
                     }
                 }
 
-                Assert.AreEqual<int>(renameCount, renameCount2,
+                Assert.AreEqual(renameCount, renameCount2,
                     "The updated Zip file has the wrong number of renamed entries.");
 
-                Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate),
+                Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate),
                                      files.Length,
                                      "Wrong number of entries.");
             }
         }
 
 
-        [TestMethod]
+        [Test]
         public void UpdateZip_UpdateEntryComment()
         {
             for (int k = 0; k < 2; k++)
@@ -518,7 +519,7 @@ namespace Ionic.Zip.Tests.Update
                 }
 
                 // Verify the files are in the zip
-                Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate), entriesToBeAdded,
+                Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), entriesToBeAdded,
                     "the Zip file has the wrong number of entries.");
 
                 // update the comments for a few files in the zip archive
@@ -561,7 +562,7 @@ namespace Ionic.Zip.Tests.Update
                         string sLine = sr.ReadLine();
                         sr.Close();
 
-                        Assert.AreEqual<string>(repeatedLine, sLine,
+                        Assert.AreEqual(repeatedLine, sLine,
                                     String.Format("The content of the originally added file ({0}) in the zip archive is incorrect.", s1));
 
                         if (!String.IsNullOrEmpty(zip3[s1].Comment))
@@ -571,11 +572,11 @@ namespace Ionic.Zip.Tests.Update
                     }
                 }
 
-                Assert.AreEqual<int>(updateCount, commentCount,
+                Assert.AreEqual(updateCount, commentCount,
                     "The updated Zip file has the wrong number of entries with comments.");
 
                 // Verify the files are in the zip
-                Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate), entriesToBeAdded,
+                Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), entriesToBeAdded,
                     "The updated Zip file has the wrong number of entries.");
             }
         }
@@ -583,7 +584,7 @@ namespace Ionic.Zip.Tests.Update
 
 
 
-        [TestMethod]
+        [Test]
         public void UpdateZip_RemoveEntry_ByFilename()
         {
             for (int k = 0; k < 2; k++)
@@ -635,7 +636,7 @@ namespace Ionic.Zip.Tests.Update
                 }
 
                 // Verify the files are in the zip
-                Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate), entriesToBeAdded - k,
+                Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), entriesToBeAdded - k,
                     "Trial {0}: the Zip file has the wrong number of entries.", k);
 
                 if (k == 0)
@@ -681,14 +682,14 @@ namespace Ionic.Zip.Tests.Update
                             string sLine = sr.ReadLine();
                             sr.Close();
 
-                            Assert.AreEqual<string>(repeatedLine, sLine,
+                            Assert.AreEqual(repeatedLine, sLine,
                                         String.Format("The content of the originally added file ({0}) in the zip archive is incorrect.", s1));
 
                         }
                     }
 
                     // Verify the files are in the zip
-                    Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate),
+                    Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate),
                                          entriesToBeAdded - filesToRemove.Count,
                                          "The updated Zip file has the wrong number of entries.");
                 }
@@ -698,7 +699,7 @@ namespace Ionic.Zip.Tests.Update
 
 
 
-        [TestMethod]
+        [Test]
         public void UpdateZip_RemoveEntry_ViaIndexer_WithPassword()
         {
             string password = TestUtilities.GenerateRandomPassword();
@@ -739,7 +740,7 @@ namespace Ionic.Zip.Tests.Update
             }
 
             // Verify the files are in the zip
-            Assert.AreEqual<int>(entriesToBeAdded, TestUtilities.CountEntries(zipFileToCreate),
+            Assert.AreEqual(entriesToBeAdded, TestUtilities.CountEntries(zipFileToCreate),
                 "The Zip file has the wrong number of entries.");
 
             // selectively remove a few files in the zip archive
@@ -782,7 +783,7 @@ namespace Ionic.Zip.Tests.Update
                     string sLine = sr.ReadLine();
                     sr.Close();
 
-                    Assert.AreEqual<string>(repeatedLine,
+                    Assert.AreEqual(repeatedLine,
                                             sLine,
                                             String.Format("The content of the originally added file ({0}) in the zip archive is incorrect.", s1));
 
@@ -790,14 +791,14 @@ namespace Ionic.Zip.Tests.Update
             }
 
             // Verify the files are in the zip
-            Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate),
+            Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate),
                                  entriesToBeAdded - filesToRemove.Count,
                                  "The updated Zip file has the wrong number of entries.");
         }
 
 
 
-        [TestMethod]
+        [Test]
         public void UpdateZip_RemoveAllEntries()
         {
             string password = "Wheeee!!" + TestUtilities.GenerateRandomLowerString(7);
@@ -838,7 +839,7 @@ namespace Ionic.Zip.Tests.Update
             }
 
             // Verify the files are in the zip
-            Assert.AreEqual<int>(entriesToBeAdded,
+            Assert.AreEqual(entriesToBeAdded,
                                  TestUtilities.CountEntries(zipFileToCreate),
                                  "The Zip file has the wrong number of entries.");
 
@@ -851,14 +852,14 @@ namespace Ionic.Zip.Tests.Update
             }
 
             // Verify the files are in the zip
-            Assert.AreEqual<int>(0, TestUtilities.CountEntries(zipFileToCreate),
+            Assert.AreEqual(0, TestUtilities.CountEntries(zipFileToCreate),
                 "The Zip file has the wrong number of entries.");
 
 
         }
 
 
-        [TestMethod]
+        [Test]
         public void UpdateZip_AddFile_OldEntriesWithPassword()
         {
             string password = "Secret!";
@@ -898,7 +899,7 @@ namespace Ionic.Zip.Tests.Update
             }
 
             // Verify the files are in the zip
-            Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate), entriesAdded,
+            Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), entriesAdded,
                 "The Zip file has the wrong number of entries.");
 
 
@@ -926,7 +927,7 @@ namespace Ionic.Zip.Tests.Update
             }
 
             // Verify the number of files in the zip
-            Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate),
+            Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate),
                                  entriesAdded + addedFiles.Count,
                                  "The Zip file has the wrong number of entries.");
 
@@ -945,7 +946,7 @@ namespace Ionic.Zip.Tests.Update
                     string sLine = sr.ReadLine();
                     sr.Close();
 
-                    Assert.AreEqual<string>(repeatedLine, sLine,
+                    Assert.AreEqual(repeatedLine, sLine,
                             String.Format("The content of the Updated file ({0}) in the zip archive is incorrect.", s));
                 }
             }
@@ -972,7 +973,7 @@ namespace Ionic.Zip.Tests.Update
                         string sLine = sr.ReadLine();
                         sr.Close();
 
-                        Assert.AreEqual<string>(repeatedLine, sLine,
+                        Assert.AreEqual(repeatedLine, sLine,
                                 String.Format("The content of the originally added file ({0}) in the zip archive is incorrect.", s1));
                     }
                 }
@@ -981,7 +982,7 @@ namespace Ionic.Zip.Tests.Update
 
 
 
-        [TestMethod]
+        [Test]
         public void UpdateZip_UpdateItem()
         {
             string filename = null;
@@ -1019,7 +1020,7 @@ namespace Ionic.Zip.Tests.Update
             }
 
             // Verify the files are in the zip
-            Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate), entriesAdded,
+            Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), entriesAdded,
                 "The Zip file has the wrong number of entries.");
 
             // create another subdirectory
@@ -1050,7 +1051,7 @@ namespace Ionic.Zip.Tests.Update
             }
 
             // Verify the number of files in the zip
-            Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate), newFileCount,
+            Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), newFileCount,
                 "The Zip file has the wrong number of entries.");
 
             // now extract the files and verify their contents
@@ -1068,14 +1069,14 @@ namespace Ionic.Zip.Tests.Update
                     string sLine = sr.ReadLine();
                     sr.Close();
 
-                    Assert.AreEqual<string>(repeatedLine, sLine,
+                    Assert.AreEqual(repeatedLine, sLine,
                             String.Format("The content of the Updated file ({0}) in the zip archive is incorrect.", s));
                 }
             }
         }
 
 
-        [TestMethod]
+        [Test]
         public void UpdateZip_UpdateItem_UpdateTwice()
         {
             string filename = "text.txt";
@@ -1126,7 +1127,7 @@ namespace Ionic.Zip.Tests.Update
         }
 
 
-        [TestMethod]
+        [Test]
         public void UpdateZip_UpdateItem_UpdateMultipleTimes_SaveAs_Save()
         {
             string filename = "text1.txt";
@@ -1198,7 +1199,7 @@ namespace Ionic.Zip.Tests.Update
         }
 
 
-        [TestMethod]
+        [Test]
         public void UpdateZip_UpdateItem_UpdateMultipleTimes_SaveAsTwice()
         {
             string filename = "text1.txt";
@@ -1270,7 +1271,7 @@ namespace Ionic.Zip.Tests.Update
         }
 
 
-        [TestMethod]
+        [Test]
         public void UpdateZip_UpdateItem_UpdateMultipleTimes_SaveAsStream()
         {
             string filename = "text1.txt";
@@ -1347,7 +1348,7 @@ namespace Ionic.Zip.Tests.Update
         }
 
 
-        [TestMethod]
+        [Test]
         public void UpdateZip_UpdateItem_UpdateMultipleTimesFromStream_SaveAsStream()
         {
             string filename = "text1.txt";
@@ -1426,7 +1427,7 @@ namespace Ionic.Zip.Tests.Update
         }
 
 
-        [TestMethod]
+        [Test]
         public void UpdateZip_AddFile_NewEntriesWithPassword()
         {
             string password = "V.Secret!";
@@ -1464,7 +1465,7 @@ namespace Ionic.Zip.Tests.Update
             }
 
             // Verify the number of files in the zip
-            Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate), entriesAdded,
+            Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), entriesAdded,
                 "The Zip file has the wrong number of entries.");
 
             // Create a bunch of new files...
@@ -1493,7 +1494,7 @@ namespace Ionic.Zip.Tests.Update
 
 
             // Verify the number of files in the zip
-            Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate), entriesAdded + addedFiles.Count,
+            Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), entriesAdded + addedFiles.Count,
                 "The Zip file has the wrong number of entries.");
 
 
@@ -1511,7 +1512,7 @@ namespace Ionic.Zip.Tests.Update
                     string sLine = sr.ReadLine();
                     sr.Close();
 
-                    Assert.AreEqual<string>(repeatedLine, sLine,
+                    Assert.AreEqual(repeatedLine, sLine,
                             String.Format("The content of the Updated file ({0}) in the zip archive is incorrect.", s));
                 }
             }
@@ -1538,7 +1539,7 @@ namespace Ionic.Zip.Tests.Update
                         string sLine = sr.ReadLine();
                         sr.Close();
 
-                        Assert.AreEqual<string>(repeatedLine, sLine,
+                        Assert.AreEqual(repeatedLine, sLine,
                                 String.Format("The content of the originally added file ({0}) in the zip archive is incorrect.", s1));
                     }
                 }
@@ -1546,7 +1547,7 @@ namespace Ionic.Zip.Tests.Update
         }
 
 
-        [TestMethod]
+        [Test]
         public void UpdateZip_AddFile_DifferentPasswords()
         {
             string password1 = Path.GetRandomFileName();
@@ -1587,7 +1588,7 @@ namespace Ionic.Zip.Tests.Update
             }
 
             // Verify the number of files in the zip
-            Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate), entriesAdded,
+            Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), entriesAdded,
                 "The Zip file has the wrong number of entries.");
 
             // Create a bunch of new files...
@@ -1617,7 +1618,7 @@ namespace Ionic.Zip.Tests.Update
 
 
             // Verify the number of files in the zip
-            Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate), entriesAdded + addedFiles.Count,
+            Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), entriesAdded + addedFiles.Count,
                 "The Zip file has the wrong number of entries.");
 
 
@@ -1635,7 +1636,7 @@ namespace Ionic.Zip.Tests.Update
                     string sLine = sr.ReadLine();
                     sr.Close();
 
-                    Assert.AreEqual<string>(repeatedLine, sLine,
+                    Assert.AreEqual(repeatedLine, sLine,
                             String.Format("The content of the Updated file ({0}) in the zip archive is incorrect.", s));
                 }
             }
@@ -1662,7 +1663,7 @@ namespace Ionic.Zip.Tests.Update
                         string sLine = sr.ReadLine();
                         sr.Close();
 
-                        Assert.AreEqual<string>(repeatedLine, sLine,
+                        Assert.AreEqual(repeatedLine, sLine,
                                 String.Format("The content of the originally added file ({0}) in the zip archive is incorrect.", s1));
                     }
                 }
@@ -1672,7 +1673,7 @@ namespace Ionic.Zip.Tests.Update
 
 
 
-        [TestMethod]
+        [Test]
         public void UpdateZip_UpdateFile_NoPasswords()
         {
             string filename = null;
@@ -1710,7 +1711,7 @@ namespace Ionic.Zip.Tests.Update
             }
 
             // Verify the number of files in the zip
-            Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate), entriesAdded,
+            Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), entriesAdded,
                 "Zoiks! The Zip file has the wrong number of entries.");
 
 
@@ -1759,7 +1760,7 @@ namespace Ionic.Zip.Tests.Update
                     string sLine = sr.ReadLine();
                     sr.Close();
 
-                    Assert.AreEqual<string>(repeatedLine, sLine,
+                    Assert.AreEqual(repeatedLine, sLine,
                             String.Format("The content of the Updated file ({0}) in the zip archive is incorrect.", s));
                 }
             }
@@ -1785,7 +1786,7 @@ namespace Ionic.Zip.Tests.Update
                         string sLine = sr.ReadLine();
                         sr.Close();
 
-                        Assert.AreEqual<string>(repeatedLine, sLine,
+                        Assert.AreEqual(repeatedLine, sLine,
                                 String.Format("The content of the originally added file ({0}) in the zip archive is incorrect.", s1));
                     }
                 }
@@ -1793,7 +1794,7 @@ namespace Ionic.Zip.Tests.Update
         }
 
 
-        [TestMethod]
+        [Test]
         public void UpdateZip_UpdateFile_2_NoPasswords()
         {
             string filename = null;
@@ -1831,7 +1832,7 @@ namespace Ionic.Zip.Tests.Update
             }
 
             // Verify the number of files in the zip
-            Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate), entriesAdded,
+            Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), entriesAdded,
                 "Zoiks! The Zip file has the wrong number of entries.");
 
 
@@ -1866,7 +1867,7 @@ namespace Ionic.Zip.Tests.Update
             }
 
             // Verify the number of files in the zip
-            Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate), entriesAdded,
+            Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), entriesAdded,
                 "Zoiks! The Zip file has the wrong number of entries.");
 
             // update those files AGAIN in the zip archive
@@ -1892,7 +1893,7 @@ namespace Ionic.Zip.Tests.Update
                     string sLine = sr.ReadLine();
                     sr.Close();
 
-                    Assert.AreEqual<string>(repeatedLine, sLine,
+                    Assert.AreEqual(repeatedLine, sLine,
                             String.Format("The content of the Updated file ({0}) in the zip archive is incorrect.", s));
                 }
             }
@@ -1918,7 +1919,7 @@ namespace Ionic.Zip.Tests.Update
                         string sLine = sr.ReadLine();
                         sr.Close();
 
-                        Assert.AreEqual<string>(repeatedLine, sLine,
+                        Assert.AreEqual(repeatedLine, sLine,
                                 String.Format("The content of the originally added file ({0}) in the zip archive is incorrect.", s1));
                     }
                 }
@@ -1927,7 +1928,7 @@ namespace Ionic.Zip.Tests.Update
 
 
 
-        [TestMethod]
+        [Test]
         public void UpdateZip_UpdateFile_OldEntriesWithPassword()
         {
             string Password = "1234567";
@@ -1967,7 +1968,7 @@ namespace Ionic.Zip.Tests.Update
             }
 
             // Verify the number of files in the zip
-            Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate), entriesAdded,
+            Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), entriesAdded,
                 "The Zip file has the wrong number of entries.");
 
             // create another subdirectory
@@ -2014,7 +2015,7 @@ namespace Ionic.Zip.Tests.Update
                     string sLine = sr.ReadLine();
                     sr.Close();
 
-                    Assert.AreEqual<string>(repeatedLine, sLine,
+                    Assert.AreEqual(repeatedLine, sLine,
                             String.Format("The content of the Updated file ({0}) in the zip archive is incorrect.", s));
                 }
             }
@@ -2040,7 +2041,7 @@ namespace Ionic.Zip.Tests.Update
                         string sLine = sr.ReadLine();
                         sr.Close();
 
-                        Assert.AreEqual<string>(repeatedLine, sLine,
+                        Assert.AreEqual(repeatedLine, sLine,
                                 String.Format("The content of the originally added file ({0}) in the zip archive is incorrect.", s1));
                     }
                 }
@@ -2048,7 +2049,7 @@ namespace Ionic.Zip.Tests.Update
         }
 
 
-        [TestMethod]
+        [Test]
         public void UpdateZip_UpdateFile_NewEntriesWithPassword()
         {
             string Password = " P@ssw$rd";
@@ -2088,7 +2089,7 @@ namespace Ionic.Zip.Tests.Update
             }
 
             // Verify the files are in the zip
-            Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate), entriesAdded,
+            Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), entriesAdded,
                 "The Zip file has the wrong number of entries.");
 
             // create another subdirectory
@@ -2136,7 +2137,7 @@ namespace Ionic.Zip.Tests.Update
                     string sLine = sr.ReadLine();
                     sr.Close();
 
-                    Assert.AreEqual<string>(repeatedLine, sLine,
+                    Assert.AreEqual(repeatedLine, sLine,
                             String.Format("The content of the Updated file ({0}) in the zip archive is incorrect.", s));
                 }
             }
@@ -2162,7 +2163,7 @@ namespace Ionic.Zip.Tests.Update
                         string sLine = sr.ReadLine();
                         sr.Close();
 
-                        Assert.AreEqual<string>(repeatedLine, sLine,
+                        Assert.AreEqual(repeatedLine, sLine,
                                 String.Format("The content of the originally added file ({0}) in the zip archive is incorrect.", s1));
                     }
                 }
@@ -2170,7 +2171,7 @@ namespace Ionic.Zip.Tests.Update
         }
 
 
-        [TestMethod]
+        [Test]
         public void UpdateZip_UpdateFile_DifferentPasswords()
         {
             string Password1 = "Whoofy1";
@@ -2211,7 +2212,7 @@ namespace Ionic.Zip.Tests.Update
             }
 
             // Verify the files are in the zip
-            Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate), entriesAdded,
+            Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), entriesAdded,
                 "The Zip file has the wrong number of entries.");
 
             // create another subdirectory
@@ -2259,7 +2260,7 @@ namespace Ionic.Zip.Tests.Update
                     string sLine = sr.ReadLine();
                     sr.Close();
 
-                    Assert.AreEqual<string>(sLine, repeatedLine,
+                    Assert.AreEqual(sLine, repeatedLine,
                             String.Format("The content of the Updated file ({0}) in the zip archive is incorrect.", s));
                 }
             }
@@ -2286,7 +2287,7 @@ namespace Ionic.Zip.Tests.Update
                         string sLine = sr.ReadLine();
                         sr.Close();
 
-                        Assert.AreEqual<string>(repeatedLine, sLine,
+                        Assert.AreEqual(repeatedLine, sLine,
                                 String.Format("The content of the originally added file ({0}) in the zip archive is incorrect.", s1));
                     }
                 }
@@ -2294,7 +2295,7 @@ namespace Ionic.Zip.Tests.Update
         }
 
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(System.ArgumentException))]
         public void UpdateZip_AddFile_ExistingFile_Error()
         {
@@ -2346,7 +2347,7 @@ namespace Ionic.Zip.Tests.Update
         }
 
 
-        [TestMethod]
+        [Test]
         public void Update_MultipleSaves_wi10319()
         {
             string zipFileToCreate = "MultipleSaves_wi10319.zip";
@@ -2397,7 +2398,7 @@ namespace Ionic.Zip.Tests.Update
 
 
 
-        [TestMethod]
+        [Test]
         public void Update_MultipleSaves_wi10694()
         {
             string zipFileToCreate = "Update_MultipleSaves_wi10694.zip";
@@ -2412,7 +2413,7 @@ namespace Ionic.Zip.Tests.Update
                 zip1.Save(zipFileToCreate);
             }
 
-            Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate), 2 * filesToZip.Length,
+            Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), 2 * filesToZip.Length,
                                  "Incorrect number of entries in the zip file.");
 
             using (var zip2 = ZipFile.Read(zipFileToCreate))
@@ -2430,13 +2431,13 @@ namespace Ionic.Zip.Tests.Update
                 zip2.Save();
             }
 
-            Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate), 2 * filesToZip.Length,
+            Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), 2 * filesToZip.Length,
                                  "Incorrect number of entries in the zip file.");
         }
 
 
 
-        [TestMethod]
+        [Test]
         public void Update_MultipleSavesWithRename_wi10544()
         {
             // select the name of the zip file
@@ -2488,7 +2489,7 @@ namespace Ionic.Zip.Tests.Update
         }
 
 
-        [TestMethod]
+        [Test]
         public void Update_FromRoot_wi11988()
         {
             string zipFileToCreate = "FromRoot.zip";
@@ -2510,7 +2511,7 @@ namespace Ionic.Zip.Tests.Update
                     zip.Save(zipFileToCreate);
                 }
 
-                Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate),
+                Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate),
                                      files.Length);
                 Assert.IsTrue(files.Length > 3);
                 BasicVerifyZip(zipFileToCreate);

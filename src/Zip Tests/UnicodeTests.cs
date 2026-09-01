@@ -26,7 +26,7 @@
 using System;
 using System.Text;
 using System.Collections.Generic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 using Ionic.Zip;
 using Ionic.Zip.Tests.Utilities;
@@ -37,19 +37,19 @@ namespace Ionic.Zip.Tests.Unicode
     /// <summary>
     /// Summary description for UnicodeTests
     /// </summary>
-    [TestClass]
+    [TestFixture]
     public class UnicodeTests : IonicTestClass
     {
         public UnicodeTests() : base() { }
 
 
-        [TestMethod]
+        [Test]
         public void Create_UnicodeEntries()
         {
             int i;
-            string origComment = "This is a Unicode comment. "+
-                                 "Chinese: 弹 出 应 用 程 序 "+
-                                 "Norwegian/Danish: æøåÆØÅ. "+
+            string origComment = "This is a Unicode comment. " +
+                                 "Chinese: 弹 出 应 用 程 序 " +
+                                 "Norwegian/Danish: æøåÆØÅ. " +
                                  "Portugese: Configurações.";
             string[] formats = {
                 "弹出应用程序{0:D3}.bin",
@@ -98,14 +98,15 @@ namespace Ionic.Zip.Tests.Unicode
                     }
 
                     // Verify the number of files in the zip
-                    Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate), filesToZip.Length,
+                    Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), filesToZip.Length,
                             "Incorrect number of entries in the zip file.");
 
                     i = 0;
 
                     // verify the filenames are (or are not) unicode
 
-                    var options = new ReadOptions {
+                    var options = new ReadOptions
+                    {
                         Encoding = (j == 0) ? System.Text.Encoding.UTF8 : ZipFile.DefaultEncoding
                     };
                     using (ZipFile zip2 = ZipFile.Read(zipFileToCreate, options))
@@ -115,11 +116,11 @@ namespace Ionic.Zip.Tests.Unicode
                             string fname = String.Format(formats[k], i);
                             if (j == 0)
                             {
-                                Assert.AreEqual<String>(fname, Path.GetFileName(e.FileName));
+                                Assert.AreEqual(fname, Path.GetFileName(e.FileName));
                             }
                             else
                             {
-                                Assert.AreNotEqual<String>(fname, Path.GetFileName(e.FileName));
+                                Assert.AreNotEqual(fname, Path.GetFileName(e.FileName));
                             }
                             i++;
                         }
@@ -129,7 +130,7 @@ namespace Ionic.Zip.Tests.Unicode
                         // unicode is not supported on the zip archive comment!
                         // But this library won't enforce that.
                         // We will leave it up to the application.
-                        // Assert.AreNotEqual<String>(origComment, zip2.Comment);
+                        // Assert.AreNotEqual(origComment, zip2.Comment);
 
                     }
                 }
@@ -169,7 +170,7 @@ namespace Ionic.Zip.Tests.Unicode
         }
 
 
-        [TestMethod]
+        [Test]
         public void Create_UnicodeEntries_Mixed()
         {
             var filesToZip = _CreateUnicodeFiles();
@@ -213,7 +214,7 @@ namespace Ionic.Zip.Tests.Unicode
                 }
 
                 // Verify the number of files in the zip
-                Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate), filesToZip.Count,
+                Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), filesToZip.Count,
                         "Incorrect number of entries in the zip file.");
 
                 _CheckUnicodeZip(zipFileToCreate, j);
@@ -223,7 +224,7 @@ namespace Ionic.Zip.Tests.Unicode
 
 
 
-        [TestMethod]
+        [Test]
         public void Unicode_Create_ZOS_wi12634()
         {
             TestContext.WriteLine("==Unicode_Create_ZOS_wi12634()=");
@@ -283,11 +284,11 @@ namespace Ionic.Zip.Tests.Unicode
                     }
                 }
 
-                Assert.IsTrue(excCount==0,
+                Assert.IsTrue(excCount == 0,
                               "Exceptions occurred during zip creation.");
 
                 // Verify the number of files in the zip
-                Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate), filesToZip.Count,
+                Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), filesToZip.Count,
                         "Incorrect number of entries in the zip file.");
 
                 _CheckUnicodeZip(zipFileToCreate, j);
@@ -297,7 +298,7 @@ namespace Ionic.Zip.Tests.Unicode
 
 
 
-        [TestMethod]
+        [Test]
         public void UnicodeComment_wi10392()
         {
             const string zipFileToCreate = "UnicodeComment_wi10392.zip";
@@ -314,7 +315,8 @@ namespace Ionic.Zip.Tests.Unicode
 
             string comment2 = null;
             TestContext.WriteLine("==== checking zip");
-            var options = new ReadOptions {
+            var options = new ReadOptions
+            {
                 Encoding = Encoding.UTF8
             };
             using (ZipFile zip2 = ZipFile.Read(zipFileToCreate, options))
@@ -322,19 +324,19 @@ namespace Ionic.Zip.Tests.Unicode
                 comment2 = zip2.Comment;
             }
 
-            Assert.AreEqual<String>(cyrillicComment, comment2,
+            Assert.AreEqual(cyrillicComment, comment2,
                                     "The comments are not equal.");
         }
 
 
-        [TestMethod]
+        [Test]
         public void UnicodeUpdate_wi12744()
         {
             const string specialEntryName = "Привет.txt";
 
             // two passes: one that uses the old "useUnicodeAsNecessary" property,
             // and the second that uses the newer property.
-            for (int k=0; k < 2; k++)
+            for (int k = 0; k < 2; k++)
             {
 
                 string zipFileToCreate = String.Format("UnicodeUpdate_wi12744-{0}.zip", k);
@@ -343,7 +345,7 @@ namespace Ionic.Zip.Tests.Unicode
                 TestContext.WriteLine("==== creating zip, trial {0}", k);
                 using (ZipFile zip1 = new ZipFile())
                 {
-                    if (k==0)
+                    if (k == 0)
                     {
 #pragma warning disable 618
                         zip1.UseUnicodeAsNecessary = true;
@@ -361,9 +363,9 @@ namespace Ionic.Zip.Tests.Unicode
 
 
                 TestContext.WriteLine("==== create a directory with 2 addl files in it");
-                string subdir = Path.Combine(TopLevelDir, "files"+k);
+                string subdir = Path.Combine(TopLevelDir, "files" + k);
                 Directory.CreateDirectory(subdir);
-                for (int i=0; i < 2; i++)
+                for (int i = 0; i < 2; i++)
                 {
                     var filename = Path.Combine(subdir, "file" + i + ".txt");
                     TestUtilities.CreateAndFillFileText(filename, _rnd.Next(5000) + 2000);
@@ -380,7 +382,7 @@ namespace Ionic.Zip.Tests.Unicode
                 using (ZipFile zip3 = ZipFile.Read(zipFileToCreate))
                 {
                     var e = zip3[specialEntryName];
-                    Assert.IsTrue(e!=null, "Entry not found");
+                    Assert.IsTrue(e != null, "Entry not found");
                     Assert.IsTrue(e.FileName == specialEntryName, "name mismatch");
                 }
             }
@@ -405,11 +407,11 @@ namespace Ionic.Zip.Tests.Unicode
                     string fname = String.Format(miscNameFormats[k], i);
                     if (j != 1 || k == 0)
                     {
-                        Assert.AreEqual<String>(fname, e.FileName, "cycle ({0},{1},{2})", i, j, k);
+                        Assert.AreEqual(fname, e.FileName, "cycle ({0},{1},{2})", i, j, k);
                     }
                     else
                     {
-                        Assert.AreNotEqual<String>(fname, e.FileName, "cycle ({0},{1},{2})", i, j, k);
+                        Assert.AreNotEqual(fname, e.FileName, "cycle ({0},{1},{2})", i, j, k);
                     }
                     i++;
                 }
@@ -430,7 +432,7 @@ namespace Ionic.Zip.Tests.Unicode
             }
         }
 
-        [TestMethod]
+        [Test]
         public void Create_WithSpecifiedCodepage()
         {
             int i;
@@ -465,7 +467,7 @@ namespace Ionic.Zip.Tests.Unicode
                 // three cases: one for old-style
                 // ProvisionalAlternateEncoding, one for "AsNecessary"
                 // and one for "Always"
-                for (int j=0; j < 3; j++)
+                for (int j = 0; j < 3; j++)
                 {
 
                     // select the name of the zip file
@@ -510,7 +512,8 @@ namespace Ionic.Zip.Tests.Unicode
                     try
                     {
                         // verify the filenames are (or are not) unicode
-                        var options = new ReadOptions {
+                        var options = new ReadOptions
+                        {
                             Encoding = System.Text.Encoding.GetEncoding(trials[k].codepage)
                         };
                         using (ZipFile zip2 = ZipFile.Read(zipFileToCreate, options))
@@ -538,7 +541,7 @@ namespace Ionic.Zip.Tests.Unicode
 
 
 
-        [TestMethod]
+        [Test]
         public void CodePage_UpdateZip_AlternateEncoding_wi10180()
         {
             System.Text.Encoding JIS = System.Text.Encoding.GetEncoding("shift_jis");
@@ -552,7 +555,7 @@ namespace Ionic.Zip.Tests.Unicode
             // three trials: one for old-style
             // ProvisionalAlternateEncoding, one for "AsNecessary"
             // and one for "Always"
-            for (int j=0; j < 3; j++)
+            for (int j = 0; j < 3; j++)
             {
                 string zipFileToCreate = String.Format("wi10180-{0}.zip", j);
 
@@ -588,8 +591,8 @@ namespace Ionic.Zip.Tests.Unicode
                     foreach (var e in zip0)
                     {
                         TestContext.WriteLine("existing entry name: {0}  encoding: {1}",
-                                              e.FileName, e.AlternateEncoding.EncodingName );
-                        Assert.AreEqual<System.Text.Encoding>
+                                              e.FileName, e.AlternateEncoding.EncodingName);
+                        Assert.AreEqual
                             (options.Encoding, e.AlternateEncoding);
                     }
                     zip0.AddEntry(filenames[1], "This is more content..." + System.DateTime.UtcNow.ToString("G"));
@@ -603,7 +606,7 @@ namespace Ionic.Zip.Tests.Unicode
                 {
                     foreach (string f in filenames)
                     {
-                        Assert.AreEqual<string>(f, zip0[f].FileName,
+                        Assert.AreEqual(f, zip0[f].FileName,
                                                 "The FileName was not expected, (cycle {0}) ", j);
                     }
                 }
@@ -612,7 +615,7 @@ namespace Ionic.Zip.Tests.Unicode
 
 
 
-        [TestMethod]
+        [Test]
         public void Unicode_AddDirectoryByName_wi8984()
         {
             string format = "弹出应用程序{0:D3}.dir"; // Chinese characters
@@ -622,12 +625,12 @@ namespace Ionic.Zip.Tests.Unicode
             // three trials: one for old-style
             // ProvisionalAlternateEncoding, one for "AsNecessary"
             // and one for "Always"
-            for (int j=0; j < 3; j++)
+            for (int j = 0; j < 3; j++)
             {
                 TestContext.WriteLine("Trial {0}", j);
                 for (int n = 1; n <= 10; n++)
                 {
-                TestContext.WriteLine("nEntries {0}", n);
+                    TestContext.WriteLine("nEntries {0}", n);
                     var dirsAdded = new System.Collections.Generic.List<String>();
                     var zipFileToCreate = String.Format("wi8984-{0}-{1:N2}.zip", j, n);
                     using (ZipFile zip1 = new ZipFile(zipFileToCreate))
@@ -672,7 +675,7 @@ namespace Ionic.Zip.Tests.Unicode
                             dirCount++;
                         }
                     }
-                    Assert.AreEqual<int>(n, dirCount);
+                    Assert.AreEqual(n, dirCount);
                     TestContext.WriteLine("");
                 }
                 TestContext.WriteLine("");

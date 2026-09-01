@@ -28,7 +28,7 @@ using System;
 using System.Text;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 using Ionic.Zip;
 using Ionic.Zip.Tests.Utilities;
@@ -40,7 +40,7 @@ namespace Ionic.Zip.Tests
     /// <summary>
     /// Summary description for Compatibility
     /// </summary>
-    [TestClass]
+    [TestFixture]
     public class Progress : IonicTestClass
     {
         public Progress() : base() { }
@@ -83,11 +83,11 @@ namespace Ionic.Zip.Tests
 
 
 
-        [TestMethod]
+        [Test]
         public void Progress_ReadFile()
         {
             Directory.SetCurrentDirectory(TopLevelDir);
-            string  zipFileToCreate = Path.Combine(TopLevelDir, "Progress_ReadFile.zip");
+            string zipFileToCreate = Path.Combine(TopLevelDir, "Progress_ReadFile.zip");
             string dirToZip = Path.GetFileNameWithoutExtension(Path.GetRandomFileName());
 
             var files = TestUtilities.GenerateFilesFlat(dirToZip);
@@ -99,11 +99,12 @@ namespace Ionic.Zip.Tests
             }
 
             int count = TestUtilities.CountEntries(zipFileToCreate);
-            Assert.IsTrue(count>0);
+            Assert.IsTrue(count > 0);
 
-            var options = new ReadOptions {
-                    StatusMessageWriter = new StringWriter(),
-                    ReadProgress = ReadProgress1
+            var options = new ReadOptions
+            {
+                StatusMessageWriter = new StringWriter(),
+                ReadProgress = ReadProgress1
             };
             using (ZipFile zip = ZipFile.Read(zipFileToCreate, options))
             {
@@ -112,7 +113,7 @@ namespace Ionic.Zip.Tests
                 zip.Save();
             }
             TestContext.WriteLine(options.StatusMessageWriter.ToString());
-            Assert.AreEqual<Int32>(count, TestUtilities.CountEntries(zipFileToCreate)+1);
+            Assert.AreEqual(count, TestUtilities.CountEntries(zipFileToCreate) + 1);
         }
 
 
@@ -134,11 +135,11 @@ namespace Ionic.Zip.Tests
         }
 
 
-        [TestMethod]
+        [Test]
         public void Progress_AddFiles()
         {
             Directory.SetCurrentDirectory(TopLevelDir);
-            string  zipFileToCreate = Path.Combine(TopLevelDir, "Progress_AddFiles.zip");
+            string zipFileToCreate = Path.Combine(TopLevelDir, "Progress_AddFiles.zip");
             string dirToZip = Path.GetFileNameWithoutExtension(Path.GetRandomFileName());
 
             var files = TestUtilities.GenerateFilesFlat(dirToZip);
@@ -153,7 +154,7 @@ namespace Ionic.Zip.Tests
             TestContext.WriteLine(sw.ToString());
 
             int count = TestUtilities.CountEntries(zipFileToCreate);
-            Assert.AreEqual<Int32>(count, files.Length);
+            Assert.AreEqual(count, files.Length);
         }
 
     }

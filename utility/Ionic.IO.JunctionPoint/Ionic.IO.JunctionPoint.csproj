@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <AssemblyName>Ionic.IO.JunctionPoint</AssemblyName>
+    <RootNamespace>Ionic.IO</RootNamespace>
+    <!-- Win32 reparse-point P/Invoke: the assembly is portable, the behaviour is Windows-only. -->
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+  </PropertyGroup>
+
+</Project>

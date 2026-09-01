@@ -4,7 +4,8 @@ using System.Text;
 using System.Collections.Generic;
 using Ionic.BZip2;
 
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
+using Ionic.Tests;
 using System.IO;
 
 namespace Ionic.BZip2.Tests
@@ -12,7 +13,7 @@ namespace Ionic.BZip2.Tests
     /// <summary>
     /// Summary description for UnitTest1
     /// </summary>
-    [TestClass]
+    [TestFixture]
     public class UnitTest1
     {
         private System.Random rnd;
@@ -30,24 +31,6 @@ namespace Ionic.BZip2.Tests
                                           System.StringSplitOptions.RemoveEmptyEntries);
         }
 
-
-        private TestContext testContextInstance;
-
-        /// <summary>
-        ///Gets or sets the test context which provides
-        ///information about and functionality for the current test run.
-        ///</summary>
-        public TestContext TestContext
-        {
-            get
-            {
-                return testContextInstance;
-            }
-            set
-            {
-                testContextInstance = value;
-            }
-        }
 
         #region Additional test attributes
         //
@@ -75,11 +58,11 @@ namespace Ionic.BZip2.Tests
         protected System.Collections.Generic.List<string> FilesToRemove;
 
         // Use TestInitialize to run code before running each test
-        [TestInitialize()]
+        [SetUp]
         public void MyTestInitialize()
         {
             CurrentDir = System.IO.Directory.GetCurrentDirectory();
-            Assert.AreNotEqual<string>(System.IO.Path.GetFileName(CurrentDir), "Temp", "at start");
+            Assert.AreNotEqual(System.IO.Path.GetFileName(CurrentDir), "Temp", "at start");
 
             string parentDir = System.Environment.GetEnvironmentVariable("TEMP");
 
@@ -92,10 +75,10 @@ namespace Ionic.BZip2.Tests
 
 
         // Use TestCleanup to run code after each test has run
-        [TestCleanup()]
+        [TearDown]
         public void MyTestCleanup()
         {
-            Assert.AreNotEqual<string>(Path.GetFileName(CurrentDir), "Temp", "at finish");
+            Assert.AreNotEqual(Path.GetFileName(CurrentDir), "Temp", "at finish");
             Directory.SetCurrentDirectory(CurrentDir);
             IOException GotException = null;
             int Tries = 0;
@@ -224,7 +207,7 @@ namespace Ionic.BZip2.Tests
                 throw new ArgumentException("args");
 
             // Microsoft.VisualStudio.TestTools.UnitTesting
-            this.TestContext.WriteLine("running command: {0} {1}", program, args);
+            TestContext.WriteLine("running command: {0} {1}", program, args);
 
             string output;
             int rc = Exec_NoContext(program, args, waitForExit, out output);
@@ -233,9 +216,9 @@ namespace Ionic.BZip2.Tests
                 throw new Exception(String.Format("Non-zero RC {0}: {1}", program, output));
 
             if (emitOutput)
-                this.TestContext.WriteLine("output: {0}", output);
+                TestContext.WriteLine("output: {0}", output);
             else
-                this.TestContext.WriteLine("A-OK. (output suppressed)");
+                TestContext.WriteLine("A-OK. (output suppressed)");
 
             return output;
         }
@@ -243,8 +226,8 @@ namespace Ionic.BZip2.Tests
         internal static int Exec_NoContext(string program, string args, bool waitForExit, out string output)
         {
             System.Diagnostics.Process p = new System.Diagnostics.Process
-                {
-                    StartInfo =
+            {
+                StartInfo =
                     {
                         FileName = program,
                         CreateNoWindow = true,
@@ -253,7 +236,7 @@ namespace Ionic.BZip2.Tests
                         UseShellExecute = false,
                     }
 
-                };
+            };
 
             if (waitForExit)
             {
@@ -299,13 +282,13 @@ namespace Ionic.BZip2.Tests
                     // pick a word at random
                     int n = this.rnd.Next(L);
                     int batchLength = LoremIpsumWords[n].Length +
-                        LoremIpsumWords[n+1].Length +
-                        LoremIpsumWords[n+2].Length + 3;
+                        LoremIpsumWords[n + 1].Length +
+                        LoremIpsumWords[n + 2].Length + 3;
                     sw.Write(LoremIpsumWords[n]);
                     sw.Write(" ");
-                    sw.Write(LoremIpsumWords[n+1]);
+                    sw.Write(LoremIpsumWords[n + 1]);
                     sw.Write(" ");
-                    sw.Write(LoremIpsumWords[n+2]);
+                    sw.Write(LoremIpsumWords[n + 2]);
                     sw.Write(" ");
                     bytesRemaining -= batchLength;
                 } while (bytesRemaining > 0);
@@ -315,8 +298,8 @@ namespace Ionic.BZip2.Tests
         #endregion
 
 
-        [TestMethod]
-        [Timeout(15 * 60*1000)] // 60*1000 = 1min
+        [Test]
+        [Timeout(15 * 60 * 1000)] // 60*1000 = 1min
         public void BZ_LargeParallel()
         {
             string filename = "LargeFile.txt";
@@ -325,7 +308,7 @@ namespace Ionic.BZip2.Tests
 
             CreateAndFillTextFile(filename, minSize);
 
-            Func<Stream,Stream>[] getBzStream = {
+            Func<Stream, Stream>[] getBzStream = {
                 new Func<Stream,Stream>( s0 => {
                         return new Ionic.BZip2.BZip2OutputStream(s0);
                     }),
@@ -335,7 +318,7 @@ namespace Ionic.BZip2.Tests
             };
 
             var ts = new TimeSpan[2];
-            for (int k=0; k < 2; k++)
+            for (int k = 0; k < 2; k++)
             {
                 var stopwatch = new System.Diagnostics.Stopwatch();
                 TestContext.WriteLine("Trial {0}", k);
@@ -353,15 +336,15 @@ namespace Ionic.BZip2.Tests
                 TestContext.WriteLine("Trial complete {0} : {1}", k, ts[k]);
             }
 
-            Assert.IsTrue(ts[1]<ts[0],
+            Assert.IsTrue(ts[1] < ts[0],
                           "Parallel compression took MORE time.");
         }
 
 
 
 
-        [TestMethod]
-        [Timeout(15 * 60*1000)] // 60*1000 = 1min
+        [Test]
+        [Timeout(15 * 60 * 1000)] // 60*1000 = 1min
         public void BZ_Basic()
         {
             TestContext.WriteLine("Creating fodder file.");
@@ -372,7 +355,7 @@ namespace Ionic.BZip2.Tests
             // emit many many lines into a text file:
             using (var sw = new StreamWriter(File.Create(fname)))
             {
-                for (int k=0; k < n; k++)
+                for (int k = 0; k < n; k++)
                 {
                     sw.WriteLine(line);
                 }
@@ -380,7 +363,7 @@ namespace Ionic.BZip2.Tests
             int crcOriginal = GetCrc(fname);
             int blockSize = 0;
 
-            Func<Stream,Stream>[] getBzStream = {
+            Func<Stream, Stream>[] getBzStream = {
                 new Func<Stream,Stream>( s0 => {
                         var decorator = new Ionic.BZip2.BZip2OutputStream(s0, blockSize);
                         return decorator;
@@ -391,11 +374,11 @@ namespace Ionic.BZip2.Tests
                     })
             };
 
-            int[] blockSizes = { 1,2,3,4,5,6,7,8,9 };
+            int[] blockSizes = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 
-            for (int k=0; k < getBzStream.Length; k++)
+            for (int k = 0; k < getBzStream.Length; k++)
             {
-                for (int m=0; m < blockSizes.Length; m++)
+                for (int m = 0; m < blockSizes.Length; m++)
                 {
                     blockSize = blockSizes[m];
                     var getStream = getBzStream[k];
@@ -404,10 +387,10 @@ namespace Ionic.BZip2.Tests
                     // compress into bz2
                     var bzFname = String.Format("{0}.{1}.blocksize{2}{3}.bz2",
                                                 root,
-                                                (k==0)?"SingleThread":"MultiThread",
+                                                (k == 0) ? "SingleThread" : "MultiThread",
                                                 blockSize, ext);
 
-                    TestContext.WriteLine("Compress cycle ({0},{1})", k,m);
+                    TestContext.WriteLine("Compress cycle ({0},{1})", k, m);
                     TestContext.WriteLine("file {0}", bzFname);
                     using (var fs = File.OpenRead(fname))
                     {
@@ -431,7 +414,7 @@ namespace Ionic.BZip2.Tests
 
                     TestContext.WriteLine("Check CRC");
                     int crcDecompressed = GetCrc(decompressedFname);
-                    Assert.AreEqual<int>(crcOriginal, crcDecompressed,
+                    Assert.AreEqual(crcOriginal, crcDecompressed,
                                          "CRC mismatch {0:X8} != {1:X8}",
                                          crcOriginal, crcDecompressed);
                     TestContext.WriteLine("");
@@ -444,7 +427,7 @@ namespace Ionic.BZip2.Tests
         }
 
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(IOException))]
         public void BZ_Error_1()
         {
@@ -457,7 +440,7 @@ namespace Ionic.BZip2.Tests
                 CopyStream(decompressor, output);
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(IOException))]
         public void BZ_Error_2()
         {
@@ -469,7 +452,7 @@ namespace Ionic.BZip2.Tests
         }
 
 
-        [TestMethod]
+        [Test]
         public void BZ_Utility()
         {
             var bzbin = GetTestDependentDir(CurrentDir, "Tools\\BZip2\\bin\\Debug\\net40");
@@ -481,11 +464,11 @@ namespace Ionic.BZip2.Tests
             {
                 int count = this.rnd.Next(18) + 4;
                 TestContext.WriteLine("Doing string {0}", key);
-                var s =  TestStrings[key];
+                var s = TestStrings[key];
                 var fname = String.Format("Pippo-{0}.txt", key);
                 using (var sw = new StreamWriter(File.Create(fname)))
                 {
-                    for (int k=0; k < count; k++)
+                    for (int k = 0; k < count; k++)
                     {
                         sw.WriteLine(s);
                     }
@@ -514,13 +497,13 @@ namespace Ionic.BZip2.Tests
                               fname);
 
                 int crcDecompressed = GetCrc(fname);
-                Assert.AreEqual<int>(crcOriginal, crcDecompressed,
+                Assert.AreEqual(crcOriginal, crcDecompressed,
                                      "CRC mismatch {0:X8}!={1:X8}",
                                      crcOriginal, crcDecompressed);
             }
         }
 
-        [TestMethod]
+        [Test]
         public void BZ_StreamCopy()
         {
             var src = new MemoryStream(Encoding.ASCII.GetBytes("Hello"));
@@ -552,7 +535,7 @@ namespace Ionic.BZip2.Tests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void BZ_Samples()
         {
             string testBin = GetTestBinDir(CurrentDir);
@@ -585,7 +568,7 @@ namespace Ionic.BZip2.Tests
 
 
 
-        internal static Dictionary<String,String> TestStrings = new Dictionary<String,String>() {
+        internal static Dictionary<String, String> TestStrings = new Dictionary<String, String>() {
             {"LetMeDoItNow", "I expect to pass through the world but once. Any good therefore that I can do, or any kindness I can show to any creature, let me do it now. Let me not defer it, for I shall not pass this way again. -- Anonymous, although some have attributed it to Stephen Grellet" },
 
             {"UntilHeExtends", "Until he extends the circle of his compassion to all living things, man will not himself find peace. - Albert Schweitzer, early 20th-century German Nobel Peace Prize-winning mission doctor and theologian." },

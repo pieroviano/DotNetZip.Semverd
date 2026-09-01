@@ -27,7 +27,7 @@
 using System;
 using System.Text;
 using System.Collections.Generic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using RE = System.Text.RegularExpressions;
 
 using Ionic.Zip;
@@ -39,7 +39,7 @@ namespace Ionic.Zip.Tests.LongRunning
     /// <summary>
     /// Summary description for LongRunning
     /// </summary>
-    [TestClass]
+    [TestFixture]
     public class LongRunning : IonicTestClass
     {
         Int64 maxBytesXferred = 0;
@@ -129,7 +129,7 @@ namespace Ionic.Zip.Tests.LongRunning
 
 
 
-        [TestMethod, Timeout(120 * 60 * 1000)]
+        [Test, Timeout(120 * 60 * 1000)]
         public void CreateZip_AddDirectory_LargeNumberOfSmallFiles()
         {
             // start the visible progress monitor
@@ -137,7 +137,8 @@ namespace Ionic.Zip.Tests.LongRunning
                                                        "Large # of Small Files",
                                                        "Creating files");
             int max1 = 0;
-            Action<Int16, Int32> progressUpdate = (x, y) => {
+            Action<Int16, Int32> progressUpdate = (x, y) =>
+            {
                 if (x == 0)
                 {
                     _txrx.Send(String.Format("pb 1 max {0}", y));
@@ -166,15 +167,14 @@ namespace Ionic.Zip.Tests.LongRunning
             for (int m = 0; m < settings.Length; m++)
             {
                 string zipFileToCreate = String.Format("LrgNumOfSmallFiles-{0}.zip", m);
-                string dirToZip =  "zipthis" + m;
+                string dirToZip = "zipthis" + m;
                 Directory.CreateDirectory(dirToZip);
                 TestContext.WriteLine("============================================");
                 TestContext.WriteLine("Creating files, cycle {0}...", m);
 
                 int subdirCount = 0;
                 int entries =
-                    TestUtilities.GenerateFilesOneLevelDeep(TestContext,
-                                                            "LargeNumberOfFiles",
+                    TestUtilities.GenerateFilesOneLevelDeep("LargeNumberOfFiles",
                                                             dirToZip,
                                                             settings[m],
                                                             progressUpdate,
@@ -203,7 +203,7 @@ namespace Ionic.Zip.Tests.LongRunning
                 _txrx.Send("pb 0 step");
 
                 TestContext.WriteLine("Checking zip - {0}", DateTime.Now.ToString("G"));
-                Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate), entries);
+                Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), entries);
 
                 _txrx.Send("status cleaning up...");
                 // clean up for this cycle
@@ -287,7 +287,7 @@ namespace Ionic.Zip.Tests.LongRunning
                         _pb1Set = true;
                     }
                     _pb2Set = false;
-                    _epCycles=0;
+                    _epCycles = 0;
                     break;
 
                 case ZipProgressEventType.Extracting_EntryBytesWritten:
@@ -301,15 +301,15 @@ namespace Ionic.Zip.Tests.LongRunning
                         }
                         _txrx.Send(String.Format("status Extracting {0} :: [{1}/{2}mb] ({3:N0}%)",
                                                  e.CurrentEntry.FileName,
-                                                 e.BytesTransferred/(1024*1024),
-                                                 e.TotalBytesToTransfer/(1024*1024),
+                                                 e.BytesTransferred / (1024 * 1024),
+                                                 e.TotalBytesToTransfer / (1024 * 1024),
                                                  ((double)e.BytesTransferred / (0.01 * e.TotalBytesToTransfer))
                                                  ));
                         string msg = String.Format("pb 2 value {0}", e.BytesTransferred);
                         _txrx.Send(msg);
                     }
-                        if (maxBytesXferred < e.BytesTransferred)
-                            maxBytesXferred = e.BytesTransferred;
+                    if (maxBytesXferred < e.BytesTransferred)
+                        maxBytesXferred = e.BytesTransferred;
                     break;
 
                 case ZipProgressEventType.Extracting_AfterExtractEntry:
@@ -323,23 +323,23 @@ namespace Ionic.Zip.Tests.LongRunning
         {
             var finfo = new FileInfo(fileName);
             var flen = finfo.Length;
-            var segmentSize = flen/128;
-            var bytes = new byte[Math.Min(segmentSize,128)];
+            var segmentSize = flen / 128;
+            var bytes = new byte[Math.Min(segmentSize, 128)];
             using (var fs = File.Open(fileName, FileMode.Open, FileAccess.ReadWrite))
             {
                 while (fs.Position < flen - segmentSize - 8)
                 {
-                var t = _rnd.Next((int)segmentSize) + 8;
-                fs.Seek(t, SeekOrigin.Current);
-                _rnd.NextBytes(bytes);
-                fs.Write(bytes, 0, bytes.Length/2+_rnd.Next(bytes.Length/2));
+                    var t = _rnd.Next((int)segmentSize) + 8;
+                    fs.Seek(t, SeekOrigin.Current);
+                    _rnd.NextBytes(bytes);
+                    fs.Write(bytes, 0, bytes.Length / 2 + _rnd.Next(bytes.Length / 2));
                 }
             }
         }
 
 
 
-        [TestMethod, Timeout(60 * 60 * 1000)]
+        [Test, Timeout(60 * 60 * 1000)]
         public void LargeFile_WithProgress()
         {
             // This test checks the Int64 limits in progress events (Save + Extract)
@@ -397,7 +397,7 @@ namespace Ionic.Zip.Tests.LongRunning
 
             _txrx.Send("pb 0 step");
             TestContext.WriteLine("Save complete {0}", System.DateTime.Now.ToString("G"));
-            Assert.AreEqual<Int64>(actualFileSize, maxBytesXferred);
+            Assert.AreEqual(actualFileSize, maxBytesXferred);
             var chk1 = TestUtilities.ComputeChecksum(filename);
 
             // remove the large file before extracting
@@ -416,18 +416,18 @@ namespace Ionic.Zip.Tests.LongRunning
             _txrx.Send("pb 0 step");
 
             TestContext.WriteLine("Extract complete {0}", System.DateTime.Now.ToString("G"));
-            Assert.AreEqual<Int64>(actualFileSize, maxBytesXferred);
+            Assert.AreEqual(actualFileSize, maxBytesXferred);
             var exFile = Path.Combine(unpackDir, Path.Combine(dirToZip, baseName));
             var chk2 = TestUtilities.ComputeChecksum(exFile);
 
             string s1 = TestUtilities.CheckSumToString(chk1);
             string s2 = TestUtilities.CheckSumToString(chk2);
-            Assert.AreEqual<string>(s1,s2);
+            Assert.AreEqual(s1, s2);
             TestContext.WriteLine("     Checksums match ({0}).\n", s2);
             TestContext.WriteLine("Test complete {0}", System.DateTime.Now.ToString("G"));
         }
 
 
-   }
+    }
 
 }

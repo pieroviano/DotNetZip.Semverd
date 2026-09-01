@@ -31,7 +31,7 @@ using System.Text.RegularExpressions;
 using System.Net;
 using System.IO;
 using Ionic.Zip;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace Ionic.Zip.Tests.Utilities
 {
@@ -61,7 +61,7 @@ namespace Ionic.Zip.Tests.Utilities
 
         internal static void Cleanup(string CurrentDir, List<String> FilesToRemove)
         {
-            Assert.AreNotEqual<string>(Path.GetFileName(CurrentDir), "Temp", "at finish");
+            Assert.AreNotEqual(Path.GetFileName(CurrentDir), "Temp", "at finish");
             Directory.SetCurrentDirectory(CurrentDir);
             IOException GotException = null;
             int Tries = 0;
@@ -76,7 +76,7 @@ namespace Ionic.Zip.Tests.Utilities
                         {
                             // turn off any ReadOnly attributes
                             ClearReadOnly(filename);
-                            Directory.Delete(filename, true);
+                            DeleteDirectoryTree(filename);
                         }
                         if (File.Exists(filename))
                         {
@@ -93,6 +93,35 @@ namespace Ionic.Zip.Tests.Utilities
                 }
             } while ((GotException != null) && (Tries < 4));
             if (GotException != null) throw GotException;
+        }
+
+
+        /// <summary>
+        ///   Deletes a directory tree that may contain NTFS reparse points.
+        /// </summary>
+        /// <remarks>
+        ///   Directory.Delete(path, true) cannot remove a tree that contains a
+        ///   directory junction: it treats every reparse point it meets as a volume
+        ///   mount point, and fails with UnauthorizedAccessException on a junction
+        ///   that is not one. So unlink the reparse points first -- a non-recursive
+        ///   Directory.Delete on a reparse point removes the link itself and leaves
+        ///   its target untouched -- and then delete what remains.
+        /// </remarks>
+        public static void DeleteDirectoryTree(string dirname)
+        {
+            // never traverse a reparse point; just unlink it
+            if ((File.GetAttributes(dirname) & FileAttributes.ReparsePoint) != 0)
+            {
+                Directory.Delete(dirname, false);
+                return;
+            }
+
+            foreach (var d in Directory.GetDirectories(dirname))
+            {
+                DeleteDirectoryTree(d); // recurse
+            }
+
+            Directory.Delete(dirname, true);
         }
 
 
@@ -162,10 +191,10 @@ namespace Ionic.Zip.Tests.Utilities
             int n = 0;
             do
             {
-                n = s.IndexOf(sample,n);
-                if (n>0) nFound++;
+                n = s.IndexOf(sample, n);
+                if (n > 0) nFound++;
                 n++;
-            } while (n>0);
+            } while (n > 0);
             return nFound;
         }
 
@@ -205,7 +234,7 @@ namespace Ionic.Zip.Tests.Utilities
 
                         var bytes = fodder[n];
                         int len = bytes.Length - rnd.Next(variationSize);
-                        fs.Write(bytes,0,len);
+                        fs.Write(bytes, 0, len);
                         bytesRemaining -= len;
                         fs.Write(newLinePair, 0, newLinePair.Length);
                         bytesRemaining -= newLinePair.Length;
@@ -322,7 +351,7 @@ namespace Ionic.Zip.Tests.Utilities
                     fileStream.Write(buffer, 0, sizeOfChunkToWrite);
                     bytesRemaining -= sizeOfChunkToWrite;
                     nCycles++;
-                    if (size > 1024*1024)
+                    if (size > 1024 * 1024)
                     {
                         if ((nCycles % 256) == 0)
                         {
@@ -581,18 +610,18 @@ namespace Ionic.Zip.Tests.Utilities
 
 
 
-        internal static int GenerateFilesOneLevelDeep(TestContext tc,
+        internal static int GenerateFilesOneLevelDeep(
                                                       string testName,
                                                       string dirToZip,
                                                       Action<Int16, Int32> update,
                                                       out int subdirCount)
         {
             int[] settings = { 7, 6, 17, 23, 4000, 4000 }; // to randomly set dircount, filecount, and filesize
-            return GenerateFilesOneLevelDeep(tc, testName, dirToZip, settings, update, out subdirCount);
+            return GenerateFilesOneLevelDeep(testName, dirToZip, settings, update, out subdirCount);
         }
 
 
-        internal static int GenerateFilesOneLevelDeep(TestContext tc,
+        internal static int GenerateFilesOneLevelDeep(
                                                       string testName,
                                                       string dirToZip,
                                                       int[] settings,
@@ -605,7 +634,7 @@ namespace Ionic.Zip.Tests.Utilities
             subdirCount = _rnd.Next(settings[0]) + settings[1];
             if (update != null)
                 update(0, subdirCount);
-            tc.WriteLine("{0}: Creating {1} subdirs.", testName, subdirCount);
+            TestContext.WriteLine("{0}: Creating {1} subdirs.", testName, subdirCount);
             for (int i = 0; i < subdirCount; i++)
             {
                 string subdir = Path.Combine(dirToZip, String.Format("dir{0:D4}", i));
@@ -614,7 +643,7 @@ namespace Ionic.Zip.Tests.Utilities
                 int filecount = _rnd.Next(settings[2]) + settings[3];
                 if (update != null)
                     update(1, filecount);
-                tc.WriteLine(":: Subdir {0}, Creating {1} files.", i, filecount);
+                TestContext.WriteLine(":: Subdir {0}, Creating {1} files.", i, filecount);
                 for (int j = 0; j < filecount; j++)
                 {
                     int n = _rnd.Next(2);
@@ -662,9 +691,9 @@ namespace Ionic.Zip.Tests.Utilities
                                                    int numFilesToCreate,
                                                    int lowSize,
                                                    int highSize,
-                                                   Action<Int32,Int32,Int64> update)
+                                                   Action<Int32, Int32, Int64> update)
         {
-            if (numFilesToCreate==0)
+            if (numFilesToCreate == 0)
                 numFilesToCreate = _rnd.Next(23) + 14;
 
             if (lowSize == highSize && lowSize == 0)
@@ -679,9 +708,10 @@ namespace Ionic.Zip.Tests.Utilities
             Action<Int64> byteUpdate = null;
             if (update != null)
             {
-                byteUpdate = new Action<Int64>( x => {
-                        update(1,i,x);
-                    });
+                byteUpdate = new Action<Int64>(x =>
+                {
+                    update(1, i, x);
+                });
             }
 
             string[] filesToZip = new string[numFilesToCreate];
@@ -694,7 +724,7 @@ namespace Ionic.Zip.Tests.Utilities
                 TestUtilities.CreateAndFillFileText(filesToZip[i],
                                                     sz,
                                                     byteUpdate);
-                if (update != null) update(2,i,numFilesToCreate);
+                if (update != null) update(2, i, numFilesToCreate);
             }
             return filesToZip;
         }
@@ -727,8 +757,8 @@ namespace Ionic.Zip.Tests.Utilities
             string testBin = TestUtilities.GetTestBinDir(cdir);
             string progressMonitorTool = Path.Combine(testBin, "Resources\\UnitTestProgressMonitor.exe");
             string requiredDll = Path.Combine(testBin, "Resources\\Ionic.CopyData.dll");
-            Assert.IsTrue(File.Exists(progressMonitorTool), "progress monitor tool does not exist ({0})",  progressMonitorTool);
-            Assert.IsTrue(File.Exists(requiredDll), "required DLL does not exist ({0})",  requiredDll);
+            Assert.IsTrue(File.Exists(progressMonitorTool), "progress monitor tool does not exist ({0})", progressMonitorTool);
+            Assert.IsTrue(File.Exists(requiredDll), "required DLL does not exist ({0})", requiredDll);
 
             // start the progress monitor
             //this.Exec(progressMonitorTool, String.Format("-channel {0}", progressChannel), false);
@@ -771,10 +801,11 @@ namespace Ionic.Zip.Tests.Utilities
                 // Must read at least one of the stderr or stdout asynchronously,
                 // to avoid deadlock. I choose to read stderr.
                 StringBuilder sb = new StringBuilder();
-                p.ErrorDataReceived += new System.Diagnostics.DataReceivedEventHandler((o, e) => {
-                        if (!String.IsNullOrEmpty(e.Data))
-                            sb.Append(e.Data);
-                    });
+                p.ErrorDataReceived += new System.Diagnostics.DataReceivedEventHandler((o, e) =>
+                {
+                    if (!String.IsNullOrEmpty(e.Data))
+                        sb.Append(e.Data);
+                });
                 p.Start();
                 p.BeginErrorReadLine();
                 output = p.StandardOutput.ReadToEnd();

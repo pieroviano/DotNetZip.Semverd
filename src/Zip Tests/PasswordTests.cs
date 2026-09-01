@@ -24,19 +24,20 @@
 
 using System;
 using System.Collections.Generic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
+using Ionic.Tests;
 using System.IO;
 
 using Ionic.Zip.Tests.Utilities;
 
 namespace Ionic.Zip.Tests.Password
 {
-    [TestClass]
+    [TestFixture]
     public class PasswordTests : IonicTestClass
     {
         public PasswordTests() : base() { }
 
-        [TestMethod]
+        [Test]
         public void Password_BasicAddAndExtract()
         {
             int i;
@@ -89,7 +90,7 @@ namespace Ionic.Zip.Tests.Password
                     }
                     TestContext.WriteLine(sw.ToString());
 
-                    Assert.AreEqual<int>(TestUtilities.CountEntries(ZipFileToCreate), NumFilesToCreate,
+                    Assert.AreEqual(TestUtilities.CountEntries(ZipFileToCreate), NumFilesToCreate,
                             "The Zip file has an unexpected number of entries.");
 
                     TestContext.WriteLine("\n---------------------verifying checksums...");
@@ -107,7 +108,7 @@ namespace Ionic.Zip.Tests.Password
                             if (!e.IsDirectory)
                             {
                                 byte[] c2 = TestUtilities.ComputeChecksum(Path.Combine(extractDir, e.FileName));
-                                Assert.AreEqual<string>(checksums[e.FileName],
+                                Assert.AreEqual(checksums[e.FileName],
                                         TestUtilities.CheckSumToString(c2), "The checksum of the extracted file is incorrect.");
                             }
                         }
@@ -119,7 +120,7 @@ namespace Ionic.Zip.Tests.Password
 
 
 
-        [TestMethod]
+        [Test]
         public void Password_CheckZipPassword_wi13664()
         {
             string[] passwords = { null,
@@ -129,10 +130,10 @@ namespace Ionic.Zip.Tests.Password
 
             string dirToZip = Path.Combine(TopLevelDir, "zipthis");
             int entries = TestUtilities.GenerateFilesOneLevelDeep
-                (TestContext, "wi13664", dirToZip, null, out _);
+                ("wi13664", dirToZip, null, out _);
             string[] filesToZip = Directory.GetFiles("zipthis", "*.*", SearchOption.AllDirectories);
 
-            Assert.AreEqual<int>(filesToZip.Length, entries,
+            Assert.AreEqual(filesToZip.Length, entries,
                                  "Incorrect number of entries in the directory.");
 
             for (int j = 0; j < passwords.Length; j++)
@@ -153,14 +154,14 @@ namespace Ionic.Zip.Tests.Password
         }
 
 
-        [TestMethod]
+        [Test]
         public void Password_UnsetEncryptionAfterSetPassword_wi13909_ZOS()
         {
             // Verify that unsetting the Encryption property after
             // setting a Password results in no encryption being used.
             // This method tests ZipOutputStream.
             string unusedPassword = TestUtilities.GenerateRandomPassword();
-            int numTotalEntries = _rnd.Next(46)+653;
+            int numTotalEntries = _rnd.Next(46) + 653;
             string zipFileToCreate = "UnsetEncryption.zip";
 
             using (FileStream fs = File.Create(zipFileToCreate))
@@ -170,9 +171,9 @@ namespace Ionic.Zip.Tests.Password
                     zos.Password = unusedPassword;
                     zos.Encryption = EncryptionAlgorithm.None;
 
-                    for (int i=0; i < numTotalEntries; i++)
+                    for (int i = 0; i < numTotalEntries; i++)
                     {
-                        if (_rnd.Next(7)==0)
+                        if (_rnd.Next(7) == 0)
                         {
                             string entryName = String.Format("{0:D5}/", i);
                             zos.PutNextEntry(entryName);
@@ -181,12 +182,12 @@ namespace Ionic.Zip.Tests.Password
                         {
                             string entryName = String.Format("{0:D5}.txt", i);
                             zos.PutNextEntry(entryName);
-                            if (_rnd.Next(12)==0)
+                            if (_rnd.Next(12) == 0)
                             {
                                 var block = TestUtilities.GenerateRandomAsciiString() + " ";
                                 string contentBuffer = String.Format("This is the content for entry {0}", i);
                                 int n = _rnd.Next(6) + 2;
-                                for (int j=0; j < n; j++)
+                                for (int j = 0; j < n; j++)
                                     contentBuffer += block;
                                 byte[] buffer = System.Text.Encoding.ASCII.GetBytes(contentBuffer);
                                 zos.Write(buffer, 0, buffer.Length);
@@ -201,14 +202,14 @@ namespace Ionic.Zip.Tests.Password
 
 
 
-        [TestMethod]
+        [Test]
         public void Password_UnsetEncryptionAfterSetPassword_wi13909_ZF()
         {
             // Verify that unsetting the Encryption property after
             // setting a Password results in no encryption being used.
             // This method tests ZipFile.
             string unusedPassword = TestUtilities.GenerateRandomPassword();
-            int numTotalEntries = _rnd.Next(46)+653;
+            int numTotalEntries = _rnd.Next(46) + 653;
             string zipFileToCreate = "UnsetEncryption.zip";
 
             using (var zip = new ZipFile())
@@ -216,9 +217,9 @@ namespace Ionic.Zip.Tests.Password
                 zip.Password = unusedPassword;
                 zip.Encryption = EncryptionAlgorithm.None;
 
-                for (int i=0; i < numTotalEntries; i++)
+                for (int i = 0; i < numTotalEntries; i++)
                 {
-                    if (_rnd.Next(7)==0)
+                    if (_rnd.Next(7) == 0)
                     {
                         string entryName = String.Format("{0:D5}", i);
                         zip.AddDirectoryByName(entryName);
@@ -226,13 +227,13 @@ namespace Ionic.Zip.Tests.Password
                     else
                     {
                         string entryName = String.Format("{0:D5}.txt", i);
-                        if (_rnd.Next(12)==0)
+                        if (_rnd.Next(12) == 0)
                         {
                             var block = TestUtilities.GenerateRandomAsciiString() + " ";
                             string contentBuffer = String.Format("This is the content for entry {0}", i);
-                                int n = _rnd.Next(6) + 2;
-                                for (int j=0; j < n; j++)
-                                    contentBuffer += block;
+                            int n = _rnd.Next(6) + 2;
+                            for (int j = 0; j < n; j++)
+                                contentBuffer += block;
                             byte[] buffer = System.Text.Encoding.ASCII.GetBytes(contentBuffer);
                             zip.AddEntry(entryName, contentBuffer);
                         }
@@ -247,7 +248,7 @@ namespace Ionic.Zip.Tests.Password
         }
 
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(Ionic.Zip.BadPasswordException))]
         public void Password_CheckBadPassword_wi13668()
         {
@@ -278,12 +279,12 @@ namespace Ionic.Zip.Tests.Password
 
             TestContext.WriteLine("Current Dir: {0}", CurrentDir);
 
-            return  Path.Combine(SourceDir,
+            return Path.Combine(SourceDir,
                                  "Zip Tests\\bin\\Debug\\net40\\zips\\" + shortFileName);
         }
 
 
-        [TestMethod]
+        [Test]
         public void Password_MultipleEntriesDifferentPasswords()
         {
             string ZipFileToCreate = Path.Combine(TopLevelDir, "Password_MultipleEntriesDifferentPasswords.zip");
@@ -324,7 +325,7 @@ namespace Ionic.Zip.Tests.Password
                 zip.Save();
             }
 
-            Assert.AreEqual<int>(TestUtilities.CountEntries(ZipFileToCreate), filenames.Length,
+            Assert.AreEqual(TestUtilities.CountEntries(ZipFileToCreate), filenames.Length,
                     "The zip file created has the wrong number of entries.");
 
             using (ZipFile zip = new ZipFile(ZipFileToCreate))
@@ -334,13 +335,13 @@ namespace Ionic.Zip.Tests.Password
                     zip[Path.GetFileName(filenames[j])].ExtractWithPassword("unpack", ExtractExistingFileAction.OverwriteSilently, passwords[j]);
                     string newpath = Path.Combine("unpack", filenames[j]);
                     string chk = TestUtilities.GetCheckSumString(newpath);
-                    Assert.AreEqual<string>(checksums[j], chk, "File checksums do not match.");
+                    Assert.AreEqual(checksums[j], chk, "File checksums do not match.");
                 }
             }
         }
 
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(Ionic.Zip.BadPasswordException))]
         public void Password_Extract_WrongPassword()
         {
@@ -385,7 +386,7 @@ namespace Ionic.Zip.Tests.Password
         }
 
 
-        [TestMethod]
+        [Test]
         public void Password_AddEntryWithPasswordToExistingZip()
         {
             string zipFileToCreate = "AddEntryWithPasswordToExistingZip.zip";
@@ -413,7 +414,7 @@ namespace Ionic.Zip.Tests.Password
                 zip.Save();
             }
 
-            Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate), 2,
+            Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), 2,
                     "wrong number of entries.");
 
             string fileX = Path.Combine(dnzDir, "Tools\\Unzip\\bin\\Debug\\net40\\unzip.exe");
@@ -426,7 +427,7 @@ namespace Ionic.Zip.Tests.Password
                 zip.Save();
             }
 
-            Assert.AreEqual<int>(TestUtilities.CountEntries(zipFileToCreate), 3,
+            Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), 3,
                     "wrong number of entries.");
 
             string unpackDir = "unpack";
@@ -439,7 +440,7 @@ namespace Ionic.Zip.Tests.Password
                     zip[baseName].Extract(unpackDir, ExtractExistingFileAction.OverwriteSilently);
                     newpath = Path.Combine(unpackDir, filenames[j]);
                     chk = TestUtilities.GetCheckSumString(newpath);
-                    Assert.AreEqual<string>(checksums[j], chk, "Checksums do not match.");
+                    Assert.AreEqual(checksums[j], chk, "Checksums do not match.");
                 }
 
                 baseName = Path.GetFileName(fileX);
@@ -450,14 +451,14 @@ namespace Ionic.Zip.Tests.Password
 
                 newpath = Path.Combine(unpackDir, fileX);
                 chk = TestUtilities.GetCheckSumString(newpath);
-                Assert.AreEqual<string>(checksumX, chk, "Checksums do not match.");
+                Assert.AreEqual(checksumX, chk, "Checksums do not match.");
             }
         }
 
 
 
 
-        [TestMethod]
+        [Test]
         public void SilentDeletion_wi10639()
         {
             string zipFileToCreate = "SilentDeletion.zip";
@@ -477,7 +478,7 @@ namespace Ionic.Zip.Tests.Password
 
             TestContext.WriteLine("Extract one file with wrong password.");
 
-             // pick a random entry to extract
+            // pick a random entry to extract
             int ix = -1;
             string extractedFile = null;
             // perform two passes: first with correct password to extract the
@@ -485,13 +486,13 @@ namespace Ionic.Zip.Tests.Password
             // deleted.
 
             Directory.CreateDirectory(extractDir);
-            for (int i=0; i < 2; i++)
+            for (int i = 0; i < 2; i++)
             {
                 try
                 {
                     using (var zip = ZipFile.Read(zipFileToCreate))
                     {
-                        if (i==0)
+                        if (i == 0)
                         {
                             do
                             {
@@ -499,20 +500,20 @@ namespace Ionic.Zip.Tests.Password
                             }
                             while (zip[ix].IsDirectory);
                             TestContext.WriteLine("Selected entry: {0}", zip[ix].FileName);
-                            extractedFile = Path.Combine(extractDir, zip[ix].FileName.Replace("/","\\"));
+                            extractedFile = Path.Combine(extractDir, zip[ix].FileName.Replace("/", "\\"));
                             TestContext.WriteLine("name for extracted file: {0}", extractedFile);
                             Assert.IsFalse(File.Exists(extractedFile), "The file exists.");
                         }
                         TestContext.WriteLine("Cycle {0}: ExtractWithPassword()", i);
                         zip[ix].ExtractWithPassword(extractDir,
                                                     ExtractExistingFileAction.OverwriteSilently,
-                                                    (i==0)? password : wrongPassword);
+                                                    (i == 0) ? password : wrongPassword);
                     }
                 }
                 catch (BadPasswordException)
                 {
                     // only swallow exceptions on the first go-round
-                    if (i==0) throw;
+                    if (i == 0) throw;
                 }
                 Assert.IsTrue(File.Exists(extractedFile), "Cycle {0}: The extracted file does not exist.", i);
             }
