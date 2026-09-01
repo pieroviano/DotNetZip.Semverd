@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Text;
 using System.Collections.Generic;
-using Ionic.Zlib;
-
-using NUnit.Framework;
-using Ionic.Tests;
 using System.IO;
+using System.Text;
+using Ionic.Tests;
+using NUnit.Framework;
 
 namespace Ionic.Zlib.Tests
 {
@@ -13,27 +11,22 @@ namespace Ionic.Zlib.Tests
     /// Summary description for UnitTest1
     /// </summary>
     [TestFixture]
-    public class UnitTest1
+    public class ZlibTests
     {
-        System.Random rnd;
-        Dictionary<String, String> TestStrings;
+        private readonly System.Random rnd = new System.Random();
 
-        public UnitTest1()
+        private readonly Dictionary<String, String> TestStrings = new Dictionary<String, String>()
         {
-            this.rnd = new System.Random();
-            TestStrings = new Dictionary<String, String>()
-                {
-                    { "LetMeDoItNow", LetMeDoItNow },
-                    { "GoPlacidly", GoPlacidly },
-                    { "IhaveaDream", IhaveaDream },
-                    { "LoremIpsum", LoremIpsum },
-                };
-        }
+            { "LetMeDoItNow", LetMeDoItNow },
+            { "GoPlacidly", GoPlacidly },
+            { "IhaveaDream", IhaveaDream },
+            { "LoremIpsum", LoremIpsum },
+        };
 
-        static UnitTest1()
+        static ZlibTests()
         {
             LoremIpsumWords = LoremIpsum.Split(" ".ToCharArray(),
-                                               StringSplitOptions.RemoveEmptyEntries);
+                StringSplitOptions.RemoveEmptyEntries);
         }
 
 
@@ -190,13 +183,13 @@ namespace Ionic.Zlib.Tests
             System.Diagnostics.Process p = new System.Diagnostics.Process
             {
                 StartInfo =
-                    {
-                        FileName = program,
-                        CreateNoWindow = true,
-                        Arguments = args,
-                        WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden,
-                        UseShellExecute = false,
-                    }
+                {
+                    FileName = program,
+                    CreateNoWindow = true,
+                    Arguments = args,
+                    WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden,
+                    UseShellExecute = false,
+                }
 
             };
 
@@ -364,7 +357,7 @@ namespace Ionic.Zlib.Tests
             var gzbin = GetTestDependentDir(CurrentDir, "Tools\\GZip\\bin\\Debug\\net40");
             var dnzGzipexe = Path.Combine(gzbin, "gzip.exe");
             Assert.IsTrue(File.Exists(dnzGzipexe), "Gzip.exe is missing {0}",
-                          dnzGzipexe);
+                dnzGzipexe);
 
             foreach (var key in TestStrings.Keys)
             {
@@ -388,11 +381,11 @@ namespace Ionic.Zlib.Tests
 
                 var gzfile = fname + ".gz";
                 Assert.IsTrue(File.Exists(gzfile), "File is missing. {0}",
-                              gzfile);
+                    gzfile);
 
                 File.Delete(fname);
                 Assert.IsTrue(!File.Exists(fname), "The delete failed. {0}",
-                              fname);
+                    fname);
 
                 System.Threading.Thread.Sleep(1200);
 
@@ -400,12 +393,12 @@ namespace Ionic.Zlib.Tests
                 TestContext.WriteLine("Exec: gzip {0}", args);
                 gzout = this.Exec(dnzGzipexe, args);
                 Assert.IsTrue(File.Exists(fname), "File is missing. {0}",
-                              fname);
+                    fname);
 
                 int crcDecompressed = DoCrc(fname);
                 Assert.AreEqual(crcOriginal, crcDecompressed,
-                                     "CRC mismatch {0:X8}!={1:X8}",
-                                     crcOriginal, crcDecompressed);
+                    "CRC mismatch {0:X8}!={1:X8}",
+                    crcOriginal, crcDecompressed);
             }
         }
 
@@ -646,7 +639,7 @@ namespace Ionic.Zlib.Tests
                     Assert.AreEqual(0, compressingStream.AvailableBytesIn, "Deflate should be greedy.");
 
                 TestContext.WriteLine("Stage {0}: uncompressed/compresssed bytes so far:  ({1,6}/{2,6})",
-                      k, compressingStream.TotalBytesIn, compressingStream.TotalBytesOut);
+                    k, compressingStream.TotalBytesIn, compressingStream.TotalBytesOut);
             }
 
             rc = compressingStream.Deflate(FlushType.Finish);
@@ -656,7 +649,7 @@ namespace Ionic.Zlib.Tests
             Assert.AreEqual(ZlibConstants.Z_OK, rc, String.Format("at EndDeflate() [{0}]", compressingStream.Message));
 
             TestContext.WriteLine("Final: uncompressed/compressed bytes: ({0,6},{1,6})",
-                  compressingStream.TotalBytesIn, compressingStream.TotalBytesOut);
+                compressingStream.TotalBytesIn, compressingStream.TotalBytesOut);
 
             ZlibCodec decompressingStream = new ZlibCodec(CompressionMode.Decompress);
 
@@ -679,7 +672,7 @@ namespace Ionic.Zlib.Tests
                     break;
 
                 Assert.AreEqual(ZlibConstants.Z_OK, rc, String.Format("at Inflate() [{0}] TotalBytesOut={1}",
-                                       decompressingStream.Message, decompressingStream.TotalBytesOut));
+                    decompressingStream.Message, decompressingStream.TotalBytesOut));
             }
 
             rc = decompressingStream.EndInflate();
@@ -771,9 +764,9 @@ namespace Ionic.Zlib.Tests
             // first, compress:
             msSinkCompressed = new System.IO.MemoryStream();
             ZlibStream zIn = new ZlibStream(StringToMemoryStream(WhatWouldThingsHaveBeenLike),
-                                           CompressionMode.Compress,
-                                           CompressionLevel.BestCompression,
-                                           true);
+                CompressionMode.Compress,
+                CompressionLevel.BestCompression,
+                true);
             CopyStream(zIn, msSinkCompressed);
 
             // At this point, msSinkCompressed contains the compressed bytes.
@@ -1013,7 +1006,7 @@ namespace Ionic.Zlib.Tests
                             }
 
                             string DecompressedFile =
-                                                        String.Format("{0}.{1}.decompressed", CompressedFile, (j == 0) ? "Ionic" : "BCL");
+                                String.Format("{0}.{1}.decompressed", CompressedFile, (j == 0) ? "Ionic" : "BCL");
 
                             TestContext.WriteLine("........{0} ...", System.IO.Path.GetFileName(DecompressedFile));
 
@@ -1213,10 +1206,10 @@ namespace Ionic.Zlib.Tests
             String TextToCompress = UntilHeExtends;
 
             CompressionLevel[] levels = {CompressionLevel.Level0,
-                                         CompressionLevel.Level1,
-                                         CompressionLevel.Default,
-                                         CompressionLevel.Level7,
-                                         CompressionLevel.BestCompression};
+                CompressionLevel.Level1,
+                CompressionLevel.Default,
+                CompressionLevel.Level7,
+                CompressionLevel.BestCompression};
 
             // compress with various Ionic levels, and System.IO.Compression (default level)
             for (int k = 0; k < levels.Length + 1; k++)
@@ -1234,7 +1227,7 @@ namespace Ionic.Zlib.Tests
                 }
 
                 TestContext.WriteLine("Text to compress is {0} bytes: '{1}'",
-                                      TextToCompress.Length, TextToCompress);
+                    TextToCompress.Length, TextToCompress);
                 TestContext.WriteLine("using compressor: {0}", compressor.GetType().FullName);
 
                 StreamWriter sw = new StreamWriter(compressor, Encoding.ASCII);
@@ -1298,7 +1291,7 @@ namespace Ionic.Zlib.Tests
                 }
 
                 TestContext.WriteLine("Text to compress is {0} bytes: '{1}'",
-                                      TextToCompress.Length, TextToCompress);
+                    TextToCompress.Length, TextToCompress);
                 TestContext.WriteLine("using compressor: {0}", compressor.GetType().FullName);
 
                 StreamWriter sw = new StreamWriter(compressor, Encoding.ASCII);
@@ -1354,7 +1347,7 @@ namespace Ionic.Zlib.Tests
             Stream compressor = new DeflateStream(ms1, CompressionMode.Compress, false);
 
             TestContext.WriteLine("Text to compress is {0} bytes: '{1}'",
-                                  TextToCompress.Length, TextToCompress);
+                TextToCompress.Length, TextToCompress);
             TestContext.WriteLine("using compressor: {0}", compressor.GetType().FullName);
 
             StreamWriter sw = new StreamWriter(compressor, Encoding.ASCII);
@@ -1395,7 +1388,7 @@ namespace Ionic.Zlib.Tests
             Stream compressor = new GZipStream(ms1, CompressionMode.Compress, false);
 
             TestContext.WriteLine("Text to compress is {0} bytes: '{1}'",
-                                  TextToCompress.Length, TextToCompress);
+                TextToCompress.Length, TextToCompress);
             TestContext.WriteLine("using compressor: {0}", compressor.GetType().FullName);
 
             StreamWriter sw = new StreamWriter(compressor, Encoding.ASCII);
@@ -1435,7 +1428,7 @@ namespace Ionic.Zlib.Tests
             Stream compressor = new ZlibStream(ms1, CompressionMode.Compress, false);
 
             TestContext.WriteLine("Text to compress is {0} bytes: '{1}'",
-                                  TextToCompress.Length, TextToCompress);
+                TextToCompress.Length, TextToCompress);
             TestContext.WriteLine("using compressor: {0}", compressor.GetType().FullName);
 
             StreamWriter sw = new StreamWriter(compressor, Encoding.ASCII);
@@ -1497,8 +1490,8 @@ namespace Ionic.Zlib.Tests
                         for (int i = 0; i < 2; i++)
                         {
                             string CompressedFileRoot = String.Format("{0}.{1}.{2}.compressed", FileToCompress,
-                                              (k == 0) ? "GZIP" : "DEFLATE",
-                                              (i == 0) ? "Ionic" : "BCL");
+                                (k == 0) ? "GZIP" : "DEFLATE",
+                                (i == 0) ? "Ionic" : "BCL");
 
                             int x = k + i * 2;
                             int z = (x == 0) ? 4 : 1;
@@ -1645,7 +1638,7 @@ namespace Ionic.Zlib.Tests
             }
 
             TestContext.WriteLine("Compressed {0} bytes into {1} bytes",
-                                  buffer.Length, compressedBytes.Length);
+                buffer.Length, compressedBytes.Length);
 
             byte[] decompressed = null;
             using (MemoryStream ms2 = new MemoryStream())
@@ -1758,7 +1751,7 @@ namespace Ionic.Zlib.Tests
             }
 
             TestContext.WriteLine("{0}: Compressed {1} bytes into {2} bytes", sw.Elapsed,
-                                  originalLength, ms1.Length);
+                originalLength, ms1.Length);
 
             var crc = new Ionic.Crc.CRC32();
             int crc2 = 0;
@@ -1986,95 +1979,68 @@ I have a dream that one day every valley shall be exalted, and every hill and mo
 ";
 
         internal static string LoremIpsum =
-"Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Integer " +
-"vulputate, nibh non rhoncus euismod, erat odio pellentesque lacus, sit " +
-"amet convallis mi augue et odio. Phasellus cursus urna facilisis " +
-"quam. Suspendisse nec metus et sapien scelerisque euismod. Nullam " +
-"molestie sem quis nisl. Fusce pellentesque, ante sed semper egestas, sem " +
-"nulla vestibulum nulla, quis sollicitudin leo lorem elementum " +
-"wisi. Aliquam vestibulum nonummy orci. Sed in dolor sed enim ullamcorper " +
-"accumsan. Duis vel nibh. Class aptent taciti sociosqu ad litora torquent " +
-"per conubia nostra, per inceptos hymenaeos. Sed faucibus, enim sit amet " +
-"venenatis laoreet, nisl elit posuere est, ut sollicitudin tortor velit " +
-"ut ipsum. Aliquam erat volutpat. Phasellus tincidunt vehicula " +
-"eros. Curabitur vitae erat. " +
-"\n " +
-"Quisque pharetra lacus quis sapien. Duis id est non wisi sagittis " +
-"adipiscing. Nulla facilisi. Etiam quam erat, lobortis eu, facilisis nec, " +
-"blandit hendrerit, metus. Fusce hendrerit. Nunc magna libero, " +
-"sollicitudin non, vulputate non, ornare id, nulla.  Suspendisse " +
-"potenti. Nullam in mauris. Curabitur et nisl vel purus vehicula " +
-"sodales. Class aptent taciti sociosqu ad litora torquent per conubia " +
-"nostra, per inceptos hymenaeos. Cum sociis natoque penatibus et magnis " +
-"dis parturient montes, nascetur ridiculus mus. Donec semper, arcu nec " +
-"dignissim porta, eros odio tempus pede, et laoreet nibh arcu et " +
-"nisl. Morbi pellentesque eleifend ante. Morbi dictum lorem non " +
-"ante. Nullam et augue sit amet sapien varius mollis. " +
-"\n " +
-"Nulla erat lorem, fringilla eget, ultrices nec, dictum sed, " +
-"sapien. Aliquam libero ligula, porttitor scelerisque, lobortis nec, " +
-"dignissim eu, elit. Etiam feugiat, dui vitae laoreet faucibus, tellus " +
-"urna molestie purus, sit amet pretium lorem pede in erat.  Ut non libero " +
-"et sapien porttitor eleifend. Vestibulum ante ipsum primis in faucibus " +
-"orci luctus et ultrices posuere cubilia Curae; In at lorem et lacus " +
-"feugiat iaculis. Nunc tempus eros nec arcu tristique egestas. Quisque " +
-"metus arcu, pretium in, suscipit dictum, bibendum sit amet, " +
-"mauris. Aliquam non urna. Suspendisse eget diam. Aliquam erat " +
-"volutpat. In euismod aliquam lorem. Mauris dolor nisl, consectetuer sit " +
-"amet, suscipit sodales, rutrum in, lorem. Nunc nec nisl. Nulla ante " +
-"libero, aliquam porttitor, aliquet at, imperdiet sed, diam. Pellentesque " +
-"tincidunt nisl et ipsum. Suspendisse purus urna, semper quis, laoreet " +
-"in, vestibulum vel, arcu. Nunc elementum eros nec mauris. " +
-"\n " +
-"Vivamus congue pede at quam. Aliquam aliquam leo vel turpis. Ut " +
-"commodo. Integer tincidunt sem a risus. Cras aliquam libero quis " +
-"arcu. Integer posuere. Nulla malesuada, wisi ac elementum sollicitudin, " +
-"libero libero molestie velit, eu faucibus est ante eu libero. Sed " +
-"vestibulum, dolor ac ultricies consectetuer, tellus risus interdum diam, " +
-"a imperdiet nibh eros eget mauris. Donec faucibus volutpat " +
-"augue. Phasellus vitae arcu quis ipsum ultrices fermentum. Vivamus " +
-"ultricies porta ligula. Nullam malesuada. Ut feugiat urna non " +
-"turpis. Vivamus ipsum. Vivamus eleifend condimentum risus. Curabitur " +
-"pede. Maecenas suscipit pretium tortor. Integer pellentesque. " +
-"\n " +
-"Mauris est. Aenean accumsan purus vitae ligula. Lorem ipsum dolor sit " +
-"amet, consectetuer adipiscing elit. Nullam at mauris id turpis placerat " +
-"accumsan. Sed pharetra metus ut ante. Aenean vel urna sit amet ante " +
-"pretium dapibus. Sed nulla. Sed nonummy, lacus a suscipit semper, erat " +
-"wisi convallis mi, et accumsan magna elit laoreet sem. Nam leo est, " +
-"cursus ut, molestie ac, laoreet id, mauris. Suspendisse auctor nibh. " +
-"\n";
+            "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Integer " +
+            "vulputate, nibh non rhoncus euismod, erat odio pellentesque lacus, sit " +
+            "amet convallis mi augue et odio. Phasellus cursus urna facilisis " +
+            "quam. Suspendisse nec metus et sapien scelerisque euismod. Nullam " +
+            "molestie sem quis nisl. Fusce pellentesque, ante sed semper egestas, sem " +
+            "nulla vestibulum nulla, quis sollicitudin leo lorem elementum " +
+            "wisi. Aliquam vestibulum nonummy orci. Sed in dolor sed enim ullamcorper " +
+            "accumsan. Duis vel nibh. Class aptent taciti sociosqu ad litora torquent " +
+            "per conubia nostra, per inceptos hymenaeos. Sed faucibus, enim sit amet " +
+            "venenatis laoreet, nisl elit posuere est, ut sollicitudin tortor velit " +
+            "ut ipsum. Aliquam erat volutpat. Phasellus tincidunt vehicula " +
+            "eros. Curabitur vitae erat. " +
+            "\n " +
+            "Quisque pharetra lacus quis sapien. Duis id est non wisi sagittis " +
+            "adipiscing. Nulla facilisi. Etiam quam erat, lobortis eu, facilisis nec, " +
+            "blandit hendrerit, metus. Fusce hendrerit. Nunc magna libero, " +
+            "sollicitudin non, vulputate non, ornare id, nulla.  Suspendisse " +
+            "potenti. Nullam in mauris. Curabitur et nisl vel purus vehicula " +
+            "sodales. Class aptent taciti sociosqu ad litora torquent per conubia " +
+            "nostra, per inceptos hymenaeos. Cum sociis natoque penatibus et magnis " +
+            "dis parturient montes, nascetur ridiculus mus. Donec semper, arcu nec " +
+            "dignissim porta, eros odio tempus pede, et laoreet nibh arcu et " +
+            "nisl. Morbi pellentesque eleifend ante. Morbi dictum lorem non " +
+            "ante. Nullam et augue sit amet sapien varius mollis. " +
+            "\n " +
+            "Nulla erat lorem, fringilla eget, ultrices nec, dictum sed, " +
+            "sapien. Aliquam libero ligula, porttitor scelerisque, lobortis nec, " +
+            "dignissim eu, elit. Etiam feugiat, dui vitae laoreet faucibus, tellus " +
+            "urna molestie purus, sit amet pretium lorem pede in erat.  Ut non libero " +
+            "et sapien porttitor eleifend. Vestibulum ante ipsum primis in faucibus " +
+            "orci luctus et ultrices posuere cubilia Curae; In at lorem et lacus " +
+            "feugiat iaculis. Nunc tempus eros nec arcu tristique egestas. Quisque " +
+            "metus arcu, pretium in, suscipit dictum, bibendum sit amet, " +
+            "mauris. Aliquam non urna. Suspendisse eget diam. Aliquam erat " +
+            "volutpat. In euismod aliquam lorem. Mauris dolor nisl, consectetuer sit " +
+            "amet, suscipit sodales, rutrum in, lorem. Nunc nec nisl. Nulla ante " +
+            "libero, aliquam porttitor, aliquet at, imperdiet sed, diam. Pellentesque " +
+            "tincidunt nisl et ipsum. Suspendisse purus urna, semper quis, laoreet " +
+            "in, vestibulum vel, arcu. Nunc elementum eros nec mauris. " +
+            "\n " +
+            "Vivamus congue pede at quam. Aliquam aliquam leo vel turpis. Ut " +
+            "commodo. Integer tincidunt sem a risus. Cras aliquam libero quis " +
+            "arcu. Integer posuere. Nulla malesuada, wisi ac elementum sollicitudin, " +
+            "libero libero molestie velit, eu faucibus est ante eu libero. Sed " +
+            "vestibulum, dolor ac ultricies consectetuer, tellus risus interdum diam, " +
+            "a imperdiet nibh eros eget mauris. Donec faucibus volutpat " +
+            "augue. Phasellus vitae arcu quis ipsum ultrices fermentum. Vivamus " +
+            "ultricies porta ligula. Nullam malesuada. Ut feugiat urna non " +
+            "turpis. Vivamus ipsum. Vivamus eleifend condimentum risus. Curabitur " +
+            "pede. Maecenas suscipit pretium tortor. Integer pellentesque. " +
+            "\n " +
+            "Mauris est. Aenean accumsan purus vitae ligula. Lorem ipsum dolor sit " +
+            "amet, consectetuer adipiscing elit. Nullam at mauris id turpis placerat " +
+            "accumsan. Sed pharetra metus ut ante. Aenean vel urna sit amet ante " +
+            "pretium dapibus. Sed nulla. Sed nonummy, lacus a suscipit semper, erat " +
+            "wisi convallis mi, et accumsan magna elit laoreet sem. Nam leo est, " +
+            "cursus ut, molestie ac, laoreet id, mauris. Suspendisse auctor nibh. " +
+            "\n";
 
         static string[] LoremIpsumWords;
 
         private const int WORKING_BUFFER_SIZE = 0x4000;
 
     }
-
-
-    public class MySlowMemoryStream : MemoryStream
-    {
-        // ctor
-        public MySlowMemoryStream(byte[] bytes) : base(bytes, false) { }
-
-        public override int Read(byte[] buffer, int offset, int count)
-        {
-            if (count < 0)
-                throw new ArgumentOutOfRangeException();
-
-            if (count == 0)
-                return 0;
-
-            // force stream to read just one byte at a time
-            int NextByte = base.ReadByte();
-            if (NextByte == -1)
-                return 0;
-
-            buffer[offset] = (byte)NextByte;
-            return 1;
-        }
-    }
-
-
-
 }

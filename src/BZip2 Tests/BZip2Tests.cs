@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Text;
 using System.Collections.Generic;
-using Ionic.BZip2;
 
 using NUnit.Framework;
 using Ionic.Tests;
@@ -14,17 +13,11 @@ namespace Ionic.BZip2.Tests
     /// Summary description for UnitTest1
     /// </summary>
     [TestFixture]
-    public class UnitTest1
+    public class BZip2Tests
     {
-        private System.Random rnd;
+        private readonly System.Random rnd = new System.Random();
 
-        public UnitTest1()
-        {
-            this.rnd = new System.Random();
-            FilesToRemove = new System.Collections.Generic.List<string>();
-        }
-
-        static UnitTest1()
+        static BZip2Tests()
         {
             string lorem = TestStrings["LoremIpsum"];
             LoremIpsumWords = lorem.Split(" ".ToCharArray(),
@@ -55,7 +48,7 @@ namespace Ionic.BZip2.Tests
 
         private string CurrentDir = null;
         private string TopLevelDir = null;
-        protected System.Collections.Generic.List<string> FilesToRemove;
+        protected System.Collections.Generic.List<string> FilesToRemove = new System.Collections.Generic.List<string>();
 
         // Use TestInitialize to run code before running each test
         [SetUp]
