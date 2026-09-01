@@ -1,4 +1,4 @@
-// WinZipAesTests.cs
+﻿// WinZipAesTests.cs
 // ------------------------------------------------------------------
 //
 // Copyright (c) 2009 Dino Chiesa and Microsoft Corporation.
@@ -27,7 +27,8 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
-using NUnit.Framework;
+using Xunit;
+using Assert = Ionic.Tests.Assert;
 using Ionic.Tests;
 
 using Ionic.Zip;
@@ -38,19 +39,18 @@ namespace Ionic.Zip.Tests.WinZipAes
     /// <summary>
     /// Summary description for WinZipAesTests
     /// </summary>
-    [TestFixture]
     public class WinZipAesTests : IonicTestClass
     {
-        public WinZipAesTests() : base() { }
+        public WinZipAesTests(Xunit.Abstractions.ITestOutputHelper output) : base(output) { }
 
 
-        [Test]
+        [Fact]
         public void WZA_CreateZip()
         {
             WZA_CreateZip_Impl("WZA_CreateZip", 14400, 5000);
         }
 
-        [Test]
+        [Fact]
         public void WZA_CreateZip_VerySmallFiles()
         {
             WZA_CreateZip_Impl("WZA_CreateZip_VerySmallFiles", 14, 5);
@@ -186,8 +186,7 @@ namespace Ionic.Zip.Tests.WinZipAes
 
 
 
-        [Test]
-        [ExpectedException(typeof(Ionic.Zip.BadPasswordException))]
+        [ExpectedExceptionFact(typeof(Ionic.Zip.BadPasswordException))]
         public void WZA_CreateZip_NoPassword()
         {
             string zipFileToCreate = "WZA_CreateZip_NoPassword.zip";
@@ -253,7 +252,7 @@ namespace Ionic.Zip.Tests.WinZipAes
 
 
 
-        [Test]
+        [Fact]
         public void WZA_CreateZip_DirectoriesOnly()
         {
             if (!WinZipIsPresent)
@@ -294,25 +293,25 @@ namespace Ionic.Zip.Tests.WinZipAes
 
 
 
-        [Test]
+        [Fact]
         public void WZA_CreateZip_ZeroLengthFiles_256()
         {
             string password = TestUtilities.GenerateRandomPassword(12);
             _Internal_CreateZip_ZeroLengthFiles(password, EncryptionAlgorithm.WinZipAes256);
         }
-        [Test]
+        [Fact]
         public void WZA_CreateZip_ZeroLengthFiles_128()
         {
             string password = TestUtilities.GenerateRandomPassword(12);
             _Internal_CreateZip_ZeroLengthFiles(password, EncryptionAlgorithm.WinZipAes128);
         }
 
-        [Test]
+        [Fact]
         public void WZA_CreateZip_ZeroLengthFiles_NoPassword_256()
         {
             _Internal_CreateZip_ZeroLengthFiles(null, EncryptionAlgorithm.WinZipAes256);
         }
-        [Test]
+        [Fact]
         public void WZA_CreateZip_ZeroLengthFiles_NoPassword_128()
         {
             _Internal_CreateZip_ZeroLengthFiles(null, EncryptionAlgorithm.WinZipAes128);
@@ -383,15 +382,14 @@ namespace Ionic.Zip.Tests.WinZipAes
 
 
 
-        [Test]
+        [Fact]
         public void WZA_ReadEncryptedZips()
         {
             _Internal_ReadEncryptedZips(true);
         }
 
 
-        [Test]
-        [ExpectedException(typeof(Ionic.Zip.BadPasswordException))]
+        [ExpectedExceptionFact(typeof(Ionic.Zip.BadPasswordException))]
         public void WZA_ReadZip_Fail_BadPassword()
         {
             _Internal_ReadEncryptedZips(false);
@@ -425,32 +423,28 @@ namespace Ionic.Zip.Tests.WinZipAes
         }
 
 
-        [Test]
-        [ExpectedException(typeof(Ionic.Zip.BadPasswordException))]
+        [ExpectedExceptionFact(typeof(Ionic.Zip.BadPasswordException))]
         public void WZA_ReadZip_Fail_NoPassword_128()
         {
             string password = TestUtilities.GenerateRandomPassword();
             GenerateFiles_CreateZip("-ycAES128", password, 1);
         }
 
-        [Test]
-        [ExpectedException(typeof(Ionic.Zip.BadPasswordException))]
+        [ExpectedExceptionFact(typeof(Ionic.Zip.BadPasswordException))]
         public void WZA_ReadZip_Fail_NoPassword_256()
         {
             string password = TestUtilities.GenerateRandomPassword();
             GenerateFiles_CreateZip("-ycAES256", password, 1);
         }
 
-        [Test]
-        [ExpectedException(typeof(Ionic.Zip.BadPasswordException))]
+        [ExpectedExceptionFact(typeof(Ionic.Zip.BadPasswordException))]
         public void WZA_ReadZip_Fail_WrongPassword()
         {
             string password = TestUtilities.GenerateRandomPassword();
             GenerateFiles_CreateZip("-ycAES256", password, 2);
         }
 
-        [Test]
-        [ExpectedException(typeof(Ionic.Zip.BadPasswordException))]
+        [ExpectedExceptionFact(typeof(Ionic.Zip.BadPasswordException))]
         public void WZA_ReadZip_Fail_WrongMethod()
         {
             string password = TestUtilities.GenerateRandomPassword();
@@ -521,7 +515,7 @@ namespace Ionic.Zip.Tests.WinZipAes
         }
 
 
-        [Test]
+        [Fact]
         public void WZA_OneZeroByteFile_wi11131()
         {
             string zipF = "WZA_OneZeroByteFile_wi11131.zip";
@@ -542,7 +536,7 @@ namespace Ionic.Zip.Tests.WinZipAes
         }
 
 
-        [Test]
+        [Fact]
         public void WZA_CreateZip_NoCompression()
         {
             if (!WinZipIsPresent)
@@ -611,7 +605,7 @@ namespace Ionic.Zip.Tests.WinZipAes
             }
         }
 
-        [Test]
+        [Fact]
         public void WZA_CreateZip_Spanned()
         {
             int filesize = 1024 * 1024;
@@ -637,7 +631,7 @@ namespace Ionic.Zip.Tests.WinZipAes
         }
 
 
-        [Test]
+        [Fact]
         public void WZA_CreateZip_EmptyPassword()
         {
             if (!WinZipIsPresent)
@@ -708,7 +702,7 @@ namespace Ionic.Zip.Tests.WinZipAes
         }
 
 
-        [Test]
+        [Fact]
         public void WZA_RemoveEntryAndSave()
         {
             if (!WinZipIsPresent)
@@ -769,7 +763,7 @@ namespace Ionic.Zip.Tests.WinZipAes
         }
 
 
-        [Test]
+        [Fact]
         public void WZA_SmallBuffers_wi7967()
         {
             if (!WinZipIsPresent)
@@ -803,7 +797,7 @@ namespace Ionic.Zip.Tests.WinZipAes
 
 
 
-        [Test]
+        [Fact]
         public void WZA_InMemory_wi8493()
         {
             if (!WinZipIsPresent)
@@ -838,7 +832,7 @@ namespace Ionic.Zip.Tests.WinZipAes
         }
 
 
-        [Test]
+        [Fact]
         public void WZA_InMemory_wi8493a()
         {
             if (!WinZipIsPresent)
@@ -871,7 +865,7 @@ namespace Ionic.Zip.Tests.WinZipAes
         }
 
 
-        [Test]
+        [Fact]
         public void WZA_MacCheck_ZeroLengthEntry_wi13892()
         {
             if (!WinZipIsPresent)
@@ -916,7 +910,7 @@ namespace Ionic.Zip.Tests.WinZipAes
 
 
 
-        [Test]
+        [Fact]
         public void WZA_Update_SwitchCompression()
         {
             if (!WinZipIsPresent)
@@ -982,7 +976,7 @@ namespace Ionic.Zip.Tests.WinZipAes
 
         }
 
-        [Test]
+        [Fact]
         public void WZA_InMemory_MultiplesOf16KBlockSize()
         {
 
@@ -1046,7 +1040,7 @@ namespace Ionic.Zip.Tests.WinZipAes
 
                 // ASSERT:
 
-                CollectionAssert.AreEqual(dat, reBuilt);
+                Assert.AreEqual(dat, reBuilt);
             }
         }
 

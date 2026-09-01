@@ -1,4 +1,4 @@
-// Compatibility.cs
+﻿// Compatibility.cs
 // ------------------------------------------------------------------
 //
 // Copyright (c) 2009-2011 Dino Chiesa .
@@ -38,7 +38,8 @@ using System;
 using System.Text;
 using System.Collections.Generic;
 using System.Linq;
-using NUnit.Framework;
+using Xunit;
+using Assert = Ionic.Tests.Assert;
 using Ionic.Tests;
 
 using Ionic.Zip;
@@ -51,9 +52,20 @@ namespace Ionic.Zip.Tests
     /// <summary>
     /// Summary description for Compatibility
     /// </summary>
-    [TestFixture]
-    public class Compatibility : IonicTestClass
+    public class Compatibility : IonicTestClass, IClassFixture<Compatibility.ComRegistration>
     {
+
+        public Compatibility(Xunit.Abstractions.ITestOutputHelper output, ComRegistration com)
+            : base(output)
+        {
+            // Every test here drives DotNetZip through COM, so none of them can
+            // run unless the DLL got registered. Skipping from the constructor
+            // skips the test; all the tests in this fixture are [SkippableFact]
+            // so that the runner reports it as such.
+            Skip.IfNot(com.Registered,
+                       "These tests register DotNetZip for COM interop with RegAsm, "
+                       + "which requires an elevated process. Run the test host as administrator.");
+        }
         EncryptionAlgorithm[] crypto =
         {
             EncryptionAlgorithm.None,
@@ -71,54 +83,59 @@ namespace Ionic.Zip.Tests
             };
 
 
-        [OneTimeSetUp]
-        public static void MyClassInitialize()
+        /// <summary>
+        ///   Registers DotNetZip for COM once for the whole fixture and
+        ///   unregisters it when the fixture is done -- what [OneTimeSetUp] and
+        ///   [OneTimeTearDown] used to do.
+        /// </summary>
+        public class ComRegistration : IDisposable
         {
-            // get the path to the DotNetZip DLL
-            string SourceDir = System.IO.Directory.GetCurrentDirectory();
-            for (int i = 0; i < 4; i++)
-                SourceDir = Path.GetDirectoryName(SourceDir);
-
-            IonicZipDll = Path.Combine(SourceDir, "Zip\\bin\\Debug\\net40\\DotNetZip.dll");
-
-            Assert.IsTrue(File.Exists(IonicZipDll), "DLL ({0}) does not exist", IonicZipDll);
-            Assert.IsTrue(File.Exists(RegAsm), "RegAsm ({0}) does not exist", RegAsm);
-
-            // Every test here drives DotNetZip through COM, so the fixture starts by
-            // registering the DLL. RegAsm /codebase writes to HKEY_CLASSES_ROOT, which
-            // only an elevated process may do; unelevated, all of these would fail on a
-            // RegAsm error that says nothing about what the runner has to do
-            // differently. Say it once, here, and skip instead.
-            if (!IsProcessElevated())
-                Assert.Ignore("These tests register DotNetZip for COM interop with RegAsm, "
-                              + "which requires an elevated process. Run the test host as administrator.");
-
-            // register it for COM interop
-            string output;
-
-            int rc = TestUtilities.Exec_NoContext(RegAsm, String.Format("\"{0}\" /codebase /verbose", IonicZipDll), out output);
-            if (rc != 0)
+            public ComRegistration()
             {
-                string cmd = String.Format("{0} \"{1}\" /codebase /verbose", RegAsm, IonicZipDll);
-                throw new Exception(String.Format("Failed to register DotNetZip with COM rc({0}) cmd({1}) out({2})", rc, cmd, output));
+                // get the path to the DotNetZip DLL
+                string SourceDir = System.IO.Directory.GetCurrentDirectory();
+                for (int i = 0; i < 4; i++)
+                    SourceDir = Path.GetDirectoryName(SourceDir);
+
+                IonicZipDll = Path.Combine(SourceDir, "Zip\\bin\\Debug\\net40\\DotNetZip.dll");
+
+                Assert.IsTrue(File.Exists(IonicZipDll), "DLL ({0}) does not exist", IonicZipDll);
+                Assert.IsTrue(File.Exists(RegAsm), "RegAsm ({0}) does not exist", RegAsm);
+
+                // RegAsm /codebase writes to HKEY_CLASSES_ROOT, which only an
+                // elevated process may do. Record that rather than throwing:
+                // a class fixture that throws fails every test in the fixture,
+                // and "not elevated" should read as skipped, not broken. Each
+                // test skips itself off this flag.
+                if (!IsProcessElevated()) return;
+
+                // register it for COM interop
+                string output;
+
+                int rc = TestUtilities.Exec_NoContext(RegAsm, String.Format("\"{0}\" /codebase /verbose", IonicZipDll), out output);
+                if (rc != 0)
+                {
+                    string cmd = String.Format("{0} \"{1}\" /codebase /verbose", RegAsm, IonicZipDll);
+                    throw new Exception(String.Format("Failed to register DotNetZip with COM rc({0}) cmd({1}) out({2})", rc, cmd, output));
+                }
+
+                Registered = true;
             }
 
-            _comRegistered = true;
-        }
+            /// <summary>Whether the DLL actually got registered.</summary>
+            public bool Registered { get; }
 
+            public void Dispose()
+            {
+                // nothing was registered, so there is nothing to undo
+                if (!Registered) return;
 
-        [OneTimeTearDown]
-        public static void MyClassCleanup()
-        {
-            // nothing was registered, so there is nothing to undo
-            if (!_comRegistered) return;
-            _comRegistered = false;
-
-            string output;
-            // unregister the DLL for COM interop
-            int rc = TestUtilities.Exec_NoContext(RegAsm, String.Format("\"{0}\" /unregister /verbose", IonicZipDll), out output);
-            if (rc != 0)
-                throw new Exception(String.Format("Failed to unregister DotNetZip with COM  rc({0}) ({1})", rc, output));
+                string output;
+                // unregister the DLL for COM interop
+                int rc = TestUtilities.Exec_NoContext(RegAsm, String.Format("\"{0}\" /unregister /verbose", IonicZipDll), out output);
+                if (rc != 0)
+                    throw new Exception(String.Format("Failed to unregister DotNetZip with COM  rc({0}) ({1})", rc, output));
+            }
         }
 
 
@@ -130,9 +147,6 @@ namespace Ionic.Zip.Tests
                     .IsInRole(System.Security.Principal.WindowsBuiltInRole.Administrator);
             }
         }
-
-
-        private static bool _comRegistered;
 
 
         private static string IonicZipDll;
@@ -311,8 +325,7 @@ namespace Ionic.Zip.Tests
         }
 
 
-        [Test]
-        [ExpectedException(typeof(Ionic.Zip.ZipException))]
+        [ExpectedExceptionFact(typeof(Ionic.Zip.ZipException))]
         public void Error_ZipFile_Initialize_Error()
         {
             string notaZipFile = GetScript("VbsUnzip-ShellApp.vbs");
@@ -328,7 +341,7 @@ namespace Ionic.Zip.Tests
 
 
 
-        [Test]
+        [SkippableFact]
         public void ShellApplication_Unzip()
         {
             // get a set of files to zip up
@@ -375,7 +388,7 @@ namespace Ionic.Zip.Tests
         }
 
 
-        [Test]
+        [SkippableFact]
         public void ShellApplication_Unzip_NonSeekableOutput()
         {
             // get a set of files to zip up
@@ -434,7 +447,7 @@ namespace Ionic.Zip.Tests
 
 #if SHELLAPP_UNZIP_SFX
 
-        [Test]
+        [SkippableFact]
         public void ShellApplication_Unzip_SFX()
         {
             // get a set of files to zip up
@@ -482,7 +495,7 @@ namespace Ionic.Zip.Tests
 
 
 
-        [Test]
+        [SkippableFact]
         public void ShellApplication_Unzip_2()
         {
             string zipFileToCreate = Path.Combine(TopLevelDir, "ShellApplication_Unzip-2.zip");
@@ -523,7 +536,7 @@ namespace Ionic.Zip.Tests
 
 
 
-        [Test]
+        [SkippableFact]
         public void ShellApplication_SelectedFiles_Unzip()
         {
             string zipFileToCreate = Path.Combine(TopLevelDir, "ShellApplication_SelectedFiles_Unzip.zip");
@@ -607,7 +620,7 @@ namespace Ionic.Zip.Tests
 
 
 
-        [Test]
+        [SkippableFact]
         public void ShellApplication_Zip()
         {
             string zipFileToCreate = Path.Combine(TopLevelDir, "ShellApplication_Zip.zip");
@@ -643,7 +656,7 @@ namespace Ionic.Zip.Tests
         }
 
 
-        [Test]
+        [SkippableFact]
         public void ShellApplication_Zip_2()
         {
             string zipFileToCreate = "ShellApplication_Zip.zip";
@@ -754,7 +767,7 @@ namespace Ionic.Zip.Tests
 
 
 #if Microsoft_VisualStudio_Zip
-        [Test]
+        [SkippableFact]
         public void VStudio_Zip()
         {
             string zipFileToCreate = Path.Combine(TopLevelDir, "VStudio_Zip.zip");
@@ -789,8 +802,7 @@ namespace Ionic.Zip.Tests
 #endif
 
 
-        [Test]
-        [Timeout(3 * 60 * 1000)]  // timeout in ms.
+        [SkippableFact]
         public void VStudio_UnZip()
         {
             string zipFileToCreate = "VStudio_UnZip.zip";
@@ -830,7 +842,7 @@ namespace Ionic.Zip.Tests
 
 
 
-        [Test]
+        [SkippableFact]
         public void COM_Zip()
         {
             string zipFileToCreate = Path.Combine(TopLevelDir, "COM_Zip.zip");
@@ -867,7 +879,7 @@ namespace Ionic.Zip.Tests
 
 
 
-        [Test]
+        [SkippableFact]
         public void COM_Unzip()
         {
             string zipFileToCreate = Path.Combine(TopLevelDir, "COM_Unzip.zip");
@@ -908,7 +920,7 @@ namespace Ionic.Zip.Tests
         }
 
 
-        [Test]
+        [SkippableFact]
         public void COM_Check()
         {
             string zipFileToCreate = Path.Combine(TopLevelDir, "COM_Check.zip");
@@ -941,7 +953,7 @@ namespace Ionic.Zip.Tests
         }
 
 
-        [Test]
+        [SkippableFact]
         public void COM_CheckWithExtract()
         {
             string zipFileToCreate = Path.Combine(TopLevelDir, "COM_CheckWithExtract.zip");
@@ -974,7 +986,7 @@ namespace Ionic.Zip.Tests
         }
 
 
-        [Test]
+        [SkippableFact]
         public void COM_CheckError()
         {
             //Directory.SetCurrentDirectory(TopLevelDir);
@@ -988,7 +1000,7 @@ namespace Ionic.Zip.Tests
             Assert.IsTrue(testOut.StartsWith("That zip is not OK"));
         }
 
-        [Test]
+        [SkippableFact]
         public void COM_CheckPassword()
         {
             // create and fill the directories
@@ -1048,7 +1060,7 @@ namespace Ionic.Zip.Tests
 
 
 
-        [Test]
+        [SkippableFact]
         public void InfoZip_Unzip()
         {
             if (!InfoZipIsPresent)
@@ -1122,7 +1134,7 @@ namespace Ionic.Zip.Tests
         }
 
 
-        [Test]
+        [SkippableFact]
         public void InfoZip_Zip()
         {
             if (!InfoZipIsPresent)
@@ -1190,7 +1202,7 @@ namespace Ionic.Zip.Tests
 
 
 
-        [Test]
+        [SkippableFact]
         public void InfoZip_Zip_Password()
         {
             if (!InfoZipIsPresent)
@@ -1238,7 +1250,7 @@ namespace Ionic.Zip.Tests
 
 
 
-        [Test]
+        [SkippableFact]
         public void InfoZip_Zip_Split()
         {
             if (!InfoZipIsPresent)
@@ -1315,7 +1327,7 @@ namespace Ionic.Zip.Tests
         // "errors" and warnings...true multi-part support doesn't exist
         // yet (coming soon).
 
-        [Test]
+        [SkippableFact]
         public void InfoZip_Unzip_Split()
         {
             if (!InfoZipIsPresent)
@@ -1388,7 +1400,7 @@ namespace Ionic.Zip.Tests
 #endif
 
 
-        [Test]
+        [SkippableFact]
         public void InfoZip_Unzip_z64_wi11936()
         {
             if (!InfoZipIsPresent)
@@ -1454,7 +1466,7 @@ namespace Ionic.Zip.Tests
         }
 
 
-        [Test]
+        [SkippableFact]
         public void InfoZip_Unzip_ZeroLengthFile()
         {
             if (!InfoZipIsPresent)
@@ -1513,7 +1525,7 @@ namespace Ionic.Zip.Tests
 
 
 
-        [Test]
+        [SkippableFact]
         public void Perl_Zip()
         {
             if (perl == null)
@@ -1551,7 +1563,7 @@ namespace Ionic.Zip.Tests
 
 
 
-        [Test]
+        [SkippableFact]
         public void SevenZip_Zip_1()
         {
             if (!SevenZipIsPresent)
@@ -1586,7 +1598,7 @@ namespace Ionic.Zip.Tests
 
 
 
-        [Test]
+        [SkippableFact]
         public void SevenZip_Zip_2()
         {
             if (!SevenZipIsPresent)
@@ -1626,7 +1638,7 @@ namespace Ionic.Zip.Tests
 
 
 
-        [Test]
+        [SkippableFact]
         public void SevenZip_Unzip()
         {
             if (!SevenZipIsPresent)
@@ -1666,7 +1678,7 @@ namespace Ionic.Zip.Tests
         }
 
 
-        [Test]
+        [SkippableFact]
         public void SevenZip_Unzip_Password()
         {
             if (!SevenZipIsPresent)
@@ -1707,7 +1719,7 @@ namespace Ionic.Zip.Tests
 
 
 
-        [Test]
+        [SkippableFact]
         public void SevenZip_Unzip_Password_NonSeekableOutput()
         {
             if (!SevenZipIsPresent)
@@ -1796,7 +1808,7 @@ namespace Ionic.Zip.Tests
 
 
 
-        [Test]
+        [SkippableFact]
         public void SevenZip_Unzip_SFX()
         {
             if (!SevenZipIsPresent)
@@ -1839,14 +1851,14 @@ namespace Ionic.Zip.Tests
 
 
 
-        [Test]
+        [SkippableFact]
         public void Winzip_Zip()
         {
             Winzip_Zip_Variable("");
         }
 
 
-        [Test]
+        [SkippableFact]
         public void Winzip_Zip_Password()
         {
             if (!WinZipIsPresent)
@@ -1868,26 +1880,25 @@ namespace Ionic.Zip.Tests
         }
 
 
-        [Test]
+        [SkippableFact]
         public void Winzip_Zip_Normal()
         {
             Winzip_Zip_Variable("-en");
         }
 
-        [Test]
+        [SkippableFact]
         public void Winzip_Zip_Fast()
         {
             Winzip_Zip_Variable("-ef");
         }
 
-        [Test]
+        [SkippableFact]
         public void Winzip_Zip_SuperFast()
         {
             Winzip_Zip_Variable("-es");
         }
 
-        [Test]
-        [ExpectedException(typeof(Ionic.Zip.ZipException))]
+        [ExpectedExceptionFact(typeof(Ionic.Zip.ZipException))]
         public void Winzip_Zip_EZ()
         {
             if (!WinZipIsPresent) throw new Exception("no winzip");
@@ -1895,8 +1906,7 @@ namespace Ionic.Zip.Tests
             Winzip_Zip_Variable("-ez");
         }
 
-        [Test]
-        [ExpectedException(typeof(Ionic.Zip.ZipException))]
+        [ExpectedExceptionFact(typeof(Ionic.Zip.ZipException))]
         public void Winzip_Zip_PPMd()
         {
             if (!WinZipIsPresent) throw new Exception("no winzip");
@@ -1904,15 +1914,14 @@ namespace Ionic.Zip.Tests
             Winzip_Zip_Variable("-ep");
         }
 
-        [Test]
+        [SkippableFact]
         public void Winzip_Zip_Bzip2()
         {
             if (!WinZipIsPresent) throw new Exception("no winzip");
             Winzip_Zip_Variable("-eb");
         }
 
-        [Test]
-        [ExpectedException(typeof(Ionic.Zip.ZipException))]
+        [ExpectedExceptionFact(typeof(Ionic.Zip.ZipException))]
         public void Winzip_Zip_Enhanced()
         {
             if (!WinZipIsPresent) throw new Exception("no winzip");
@@ -1921,8 +1930,7 @@ namespace Ionic.Zip.Tests
         }
 
 
-        [Test]
-        [ExpectedException(typeof(Ionic.Zip.ZipException))]
+        [ExpectedExceptionFact(typeof(Ionic.Zip.ZipException))]
         public void Winzip_Zip_LZMA()
         {
             if (!WinZipIsPresent) throw new Exception("no winzip");
@@ -1989,8 +1997,7 @@ namespace Ionic.Zip.Tests
 
 
 
-        [Test]
-        [Timeout(9 * 60 * 1000)]  // in ms, 60 * 1000 = 1min
+        [SkippableFact]
         public void Winzip_Unzip_2()
         {
             if (!WinZipIsPresent)
@@ -2031,7 +2038,7 @@ namespace Ionic.Zip.Tests
 
 
 
-        [Test]
+        [SkippableFact]
         public void Winzip_Unzip_ZeroLengthFile()
         {
             if (!WinZipIsPresent)
@@ -2087,7 +2094,7 @@ namespace Ionic.Zip.Tests
 
 
 
-        [Test]
+        [SkippableFact]
         public void Winzip_Unzip_Password()
         {
             if (!WinZipIsPresent)
@@ -2135,7 +2142,7 @@ namespace Ionic.Zip.Tests
 
 
 
-        [Test]
+        [SkippableFact]
         public void Winzip_Unzip_Password_NonSeekableOutput()
         {
             if (!WinZipIsPresent)
@@ -2208,7 +2215,7 @@ namespace Ionic.Zip.Tests
 
 
 
-        [Test]
+        [SkippableFact]
         public void Winzip_Unzip_SFX()
         {
             if (!WinZipIsPresent)
@@ -2253,7 +2260,7 @@ namespace Ionic.Zip.Tests
         }
 
 
-        [Test]
+        [SkippableFact]
         public void Winzip_Unzip_Bzip2()
         {
             if (!WinZipIsPresent) throw new Exception("no winzip");
@@ -2328,7 +2335,7 @@ namespace Ionic.Zip.Tests
         }
 
 
-        [Test]
+        [SkippableFact]
         public void Winzip_Unzip_Bzip2_Large()
         {
             // BZip2 uses work buffers of 900k (ish). When compressing files that
@@ -2388,7 +2395,7 @@ namespace Ionic.Zip.Tests
 
 
 
-        [Test]
+        [SkippableFact]
         public void Winzip_Unzip_Basic()
         {
             if (!WinZipIsPresent)
@@ -2577,50 +2584,50 @@ namespace Ionic.Zip.Tests
 
 
 
-        [Test]
+        [SkippableFact]
         public void Extract_WinZip_SelfExtractor()
         {
             _Extract_ZipFile("winzip-sfx.exe");
         }
 
-        [Test]
+        [SkippableFact]
         public void Extract_Docx()
         {
             _Extract_ZipFile("Vanishing Oatmeal Cookies.docx");
         }
 
-        [Test]
+        [SkippableFact]
         public void Extract_ZipWithDuplicateNames_wi10330()
         {
             _Extract_ZipFile("wi10330-badzip.zip");
         }
 
-        [Test]
+        [SkippableFact]
         public void Extract_Xlsx()
         {
             _Extract_ZipFile("Book1.xlsx");
         }
 
-        [Test]
+        [SkippableFact]
         public void Extract_DWF()
         {
             _Extract_ZipFile("plot.dwf");
         }
 
-        [Test]
+        [SkippableFact]
         public void Extract_InfoZipAppNote()
         {
             _Extract_ZipFile("appnote-iz-latest.zip");
         }
 
-        [Test]
+        [SkippableFact]
         public void Extract_AndroidApp()
         {
             _Extract_ZipFile("Calendar.apk");
         }
 
 
-        [Test]
+        [SkippableFact]
         public void Extract_ZipWithRelativePathsOutside()
         {
             _Extract_ZipFile("relative-paths-outside.zip");
@@ -2628,7 +2635,7 @@ namespace Ionic.Zip.Tests
             Assert.IsTrue(File.Exists(@"extract\Temp\evil.txt"));
         }
 
-        [Test]
+        [SkippableFact]
         public void Extract_ZipWithRelativePathsInSubdir()
         {
             _Extract_ZipFile("relative-paths-in-subdir.zip");
@@ -2636,7 +2643,7 @@ namespace Ionic.Zip.Tests
             Assert.IsTrue(File.Exists(@"extract\Temp\evil.txt"));
         }
 
-        [Test]
+        [SkippableFact]
         public void Extract_ZipWithRelativePathsInSubdirOutside()
         {
             _Extract_ZipFile("relative-paths-in-subdir-outside.zip");
@@ -2644,8 +2651,7 @@ namespace Ionic.Zip.Tests
             Assert.IsTrue(File.Exists(@"extract\Temp\evil.txt"));
         }
 
-        [Test]
-        [ExpectedException(typeof(IOException))]
+        [ExpectedExceptionFact(typeof(IOException))]
         public void Extract_ZipWithAbsolutePathsOutside()
         {
             _Extract_ZipFile("absolute-path-traversal.zip");

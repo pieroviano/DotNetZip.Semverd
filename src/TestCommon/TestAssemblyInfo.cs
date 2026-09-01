@@ -1,16 +1,20 @@
 // TestAssemblyInfo.cs
 // ------------------------------------------------------------------
 //
-// Assembly-level NUnit settings shared by the DotNetZip test projects.
+// Assembly-level xUnit settings shared by the DotNetZip test projects.
 //
 // ------------------------------------------------------------------
 
-using NUnit.Framework;
+using Xunit;
 
-// MSTest constructs a fresh instance of the test class for every test method;
-// NUnit's default is a single instance shared by every test in the fixture.
-// These tests were written against the MSTest model - IonicTestClass and friends
-// keep per-test state (TopLevelDir, the list of files to clean up, the progress
-// monitor channel) in instance fields - so ask NUnit for the same lifecycle
-// rather than auditing every fixture for state that leaks between tests.
-[assembly: FixtureLifeCycle(LifeCycle.InstancePerTestCase)]
+// These tests drive the library through the real file system, and they do it by
+// creating a temp directory per test and calling Directory.SetCurrentDirectory
+// into it. The current directory is process-wide, so two tests running at once
+// would silently read and write each other's files. MSTest and NUnit both ran
+// them one at a time; xUnit runs test classes in parallel by default, so say
+// otherwise here rather than rewrite every fixture to use absolute paths.
+//
+// (The other half of the old NUnit setting -- FixtureLifeCycle.InstancePerTestCase,
+// which these fixtures need because they keep per-test state in instance fields --
+// needs no equivalent: constructing the class once per test is xUnit's default.)
+[assembly: CollectionBehavior(DisableTestParallelization = true)]

@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Ionic.Tests;
-using NUnit.Framework;
+using Xunit;
+using Assert = Ionic.Tests.Assert;
 
 namespace Ionic.Zlib.Tests
 {
     /// <summary>
     /// Summary description for UnitTest1
     /// </summary>
-    [TestFixture]
-    public class ZlibTests
+    public class ZlibTests : TestBase, IDisposable
     {
         private readonly System.Random rnd = new System.Random();
 
@@ -54,9 +54,10 @@ namespace Ionic.Zlib.Tests
         private string CurrentDir = null;
         private string TopLevelDir = null;
 
-        // Use TestInitialize to run code before running each test
-        [SetUp]
-        public void MyTestInitialize()
+        // xUnit builds the class once per test, so the constructor is the
+        // per-test setup and Dispose is the per-test cleanup.
+        public ZlibTests(Xunit.Abstractions.ITestOutputHelper output)
+            : base(output)
         {
             CurrentDir = System.IO.Directory.GetCurrentDirectory();
             Assert.AreNotEqual(System.IO.Path.GetFileName(CurrentDir), "Temp", "at start");
@@ -69,9 +70,7 @@ namespace Ionic.Zlib.Tests
         }
 
 
-        // Use TestCleanup to run code after each test has run
-        [TearDown]
-        public void MyTestCleanup()
+        public void Dispose()
         {
             System.IO.Directory.SetCurrentDirectory(System.Environment.GetEnvironmentVariable("TEMP"));
             System.IO.Directory.Delete(TopLevelDir, true);
@@ -227,7 +226,7 @@ namespace Ionic.Zlib.Tests
         #endregion
 
 
-        [Test]
+        [Fact]
         public void zlib_Compat_decompress_wi13446()
         {
             var zlibbedFile = GetContentFile("zlibbed.file");
@@ -261,7 +260,7 @@ namespace Ionic.Zlib.Tests
         }
 
 
-        [Test]
+        [Fact]
         public void Zlib_BasicDeflateAndInflate()
         {
             string TextToCompress = LoremIpsum;
@@ -351,7 +350,7 @@ namespace Ionic.Zlib.Tests
         }
 
 
-        [Test]
+        [Fact]
         public void GZ_Utility()
         {
             var gzbin = GetTestDependentDir(CurrentDir, "Tools\\GZip\\bin\\Debug\\net40");
@@ -406,7 +405,7 @@ namespace Ionic.Zlib.Tests
 
 
 
-        [Test]
+        [Fact]
         public void Zlib_BasicDictionaryDeflateInflate()
         {
             int rc;
@@ -499,7 +498,7 @@ namespace Ionic.Zlib.Tests
             TestContext.WriteLine("result of inflate:\n{0}", result);
         }
 
-        [Test]
+        [Fact]
         public void Zlib_TestFlushSync()
         {
             int rc;
@@ -577,7 +576,7 @@ namespace Ionic.Zlib.Tests
             Console.WriteLine("result of inflate:\n(Thi){0}", result);
         }
 
-        [Test]
+        [Fact]
         public void Zlib_Codec_TestLargeDeflateInflate()
         {
             int rc;
@@ -688,7 +687,7 @@ namespace Ionic.Zlib.Tests
 
 
 
-        [Test]
+        [Fact]
         public void Zlib_CompressString()
         {
             TestContext.WriteLine("Original.Length: {0}", GoPlacidly.Length);
@@ -700,7 +699,7 @@ namespace Ionic.Zlib.Tests
             Assert.AreEqual(GoPlacidly.Length, uncompressed.Length);
         }
 
-        [Test]
+        [Fact]
         public void GZip_CompressString()
         {
             TestContext.WriteLine("Original.Length: {0}", GoPlacidly.Length);
@@ -712,7 +711,7 @@ namespace Ionic.Zlib.Tests
             Assert.AreEqual(GoPlacidly.Length, uncompressed.Length);
         }
 
-        [Test]
+        [Fact]
         public void Deflate_CompressString()
         {
             TestContext.WriteLine("Original.Length: {0}", GoPlacidly.Length);
@@ -726,7 +725,7 @@ namespace Ionic.Zlib.Tests
 
 
 
-        [Test]
+        [Fact]
         public void Zlib_ZlibStream_CompressWhileWriting()
         {
             System.IO.MemoryStream msSinkCompressed;
@@ -754,7 +753,7 @@ namespace Ionic.Zlib.Tests
 
 
 
-        [Test]
+        [Fact]
         public void Zlib_ZlibStream_CompressWhileReading_wi8557()
         {
             // workitem 8557
@@ -783,7 +782,7 @@ namespace Ionic.Zlib.Tests
 
 
 
-        [Test]
+        [Fact]
         public void Zlib_CodecTest()
         {
             int sz = this.rnd.Next(50000) + 50000;
@@ -931,7 +930,7 @@ namespace Ionic.Zlib.Tests
         }
 
 
-        [Test]
+        [Fact]
         public void Zlib_GZipStream_FileName_And_Comments()
         {
             // select the name of the zip file
@@ -1036,7 +1035,7 @@ namespace Ionic.Zlib.Tests
         }
 
 
-        [Test]
+        [Fact]
         public void Zlib_GZipStream_ByteByByte_CheckCrc()
         {
             // select the name of the zip file
@@ -1151,14 +1150,14 @@ namespace Ionic.Zlib.Tests
         }
 
 
-        [Test]
+        [Fact]
         public void Zlib_GZipStream_DecompressEmptyStream()
         {
             _DecompressEmptyStream(typeof(GZipStream));
         }
 
 
-        [Test]
+        [Fact]
         public void Zlib_ZlibStream_DecompressEmptyStream()
         {
             _DecompressEmptyStream(typeof(ZlibStream));
@@ -1200,7 +1199,7 @@ namespace Ionic.Zlib.Tests
         }
 
 
-        [Test]
+        [Fact]
         public void Zlib_DeflateStream_InMemory()
         {
             String TextToCompress = UntilHeExtends;
@@ -1267,7 +1266,7 @@ namespace Ionic.Zlib.Tests
 
 
 
-        [Test]
+        [Fact]
         public void Zlib_CloseTwice()
         {
             string TextToCompress = LetMeDoItNow;
@@ -1336,8 +1335,7 @@ namespace Ionic.Zlib.Tests
         }
 
 
-        [Test]
-        [ExpectedException(typeof(System.ObjectDisposedException))]
+        [ExpectedExceptionFact(typeof(System.ObjectDisposedException))]
         public void Zlib_DisposedException_DeflateStream()
         {
             string TextToCompress = LetMeDoItNow;
@@ -1377,8 +1375,7 @@ namespace Ionic.Zlib.Tests
         }
 
 
-        [Test]
-        [ExpectedException(typeof(System.ObjectDisposedException))]
+        [ExpectedExceptionFact(typeof(System.ObjectDisposedException))]
         public void Zlib_DisposedException_GZipStream()
         {
             string TextToCompress = IhaveaDream;
@@ -1417,8 +1414,7 @@ namespace Ionic.Zlib.Tests
         }
 
 
-        [Test]
-        [ExpectedException(typeof(System.ObjectDisposedException))]
+        [ExpectedExceptionFact(typeof(System.ObjectDisposedException))]
         public void Zlib_DisposedException_ZlibStream()
         {
             string TextToCompress = IhaveaDream;
@@ -1459,7 +1455,7 @@ namespace Ionic.Zlib.Tests
 
 
 
-        [Test]
+        [Fact]
         public void Zlib_Streams_VariousSizes()
         {
             byte[] working = new byte[WORKING_BUFFER_SIZE];
@@ -1698,7 +1694,7 @@ namespace Ionic.Zlib.Tests
 
 
 
-        [Test]
+        [Fact]
         public void Zlib_DeflateStream_wi8870()
         {
             for (int j = 0; j < 1000; j++)
@@ -1711,7 +1707,7 @@ namespace Ionic.Zlib.Tests
 
 
 
-        [Test]
+        [Fact]
         public void Zlib_ParallelDeflateStream()
         {
             var sw = new System.Diagnostics.Stopwatch();
@@ -1799,7 +1795,7 @@ namespace Ionic.Zlib.Tests
             TestContext.WriteLine("{0}: Done...", sw.Elapsed);
         }
 
-        [Test]
+        [Fact]
         public void Zlib_ParallelDeflateStream2()
         {
             var sw = new System.Diagnostics.Stopwatch();
@@ -1896,7 +1892,7 @@ namespace Ionic.Zlib.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void TestAdler32()
         {
             // create a buffer full of 0xff's

@@ -1,4 +1,4 @@
-// ErrorTests.cs
+﻿// ErrorTests.cs
 // ------------------------------------------------------------------
 //
 // Copyright (c) 2009-2011 Dino Chiesa .
@@ -28,7 +28,8 @@
 using System;
 using System.Text;
 using System.IO;
-using NUnit.Framework;
+using Xunit;
+using Assert = Ionic.Tests.Assert;
 using Ionic.Tests;
 
 //using Ionic.Zip;
@@ -40,14 +41,12 @@ namespace Ionic.Zip.Tests.Error
     /// <summary>
     /// Summary description for ErrorTests
     /// </summary>
-    [TestFixture]
     public class ErrorTests : IonicTestClass
     {
-        public ErrorTests() : base() { }
+        public ErrorTests(Xunit.Abstractions.ITestOutputHelper output) : base(output) { }
 
 
-        [Test]
-        [ExpectedException(typeof(FileNotFoundException))]
+        [ExpectedExceptionFact(typeof(FileNotFoundException))]
         public void Error_AddFile_NonExistentFile()
         {
             string zipFileToCreate = Path.Combine(TopLevelDir, "Error_AddFile_NonExistentFile.zip");
@@ -60,8 +59,7 @@ namespace Ionic.Zip.Tests.Error
         }
 
 
-        [Test]
-        [ExpectedException(typeof(System.ArgumentNullException))]
+        [ExpectedExceptionFact(typeof(System.ArgumentNullException))]
         public void Error_Read_NullStream()
         {
             System.IO.Stream s = null;
@@ -75,8 +73,7 @@ namespace Ionic.Zip.Tests.Error
         }
 
 
-        [Test]
-        [ExpectedException(typeof(Ionic.Zip.ZipException))]
+        [ExpectedExceptionFact(typeof(Ionic.Zip.ZipException))]
         public void CreateZip_AddDirectory_BlankName()
         {
             string zipFileToCreate = Path.Combine(TopLevelDir, "CreateZip_AddDirectory_BlankName.zip");
@@ -87,8 +84,7 @@ namespace Ionic.Zip.Tests.Error
             }
         }
 
-        [Test]
-        [ExpectedException(typeof(Ionic.Zip.ZipException))]
+        [ExpectedExceptionFact(typeof(Ionic.Zip.ZipException))]
         public void CreateZip_AddEntry_String_BlankName()
         {
             string zipFileToCreate = Path.Combine(TopLevelDir, "CreateZip_AddEntry_String_BlankName.zip");
@@ -160,16 +156,14 @@ namespace Ionic.Zip.Tests.Error
 
 
 
-        [Test]
-        [ExpectedException(typeof(Ionic.Zip.ZipException))]
+        [ExpectedExceptionFact(typeof(Ionic.Zip.ZipException))]
         public void Error_Extract_ExistingFileWithoutOverwrite_Throw()
         {
             _Internal_ExtractExisting((int)ExtractExistingFileAction.Throw);
         }
 
 
-        [Test]
-        [ExpectedException(typeof(Ionic.Zip.ZipException))]
+        [ExpectedExceptionFact(typeof(Ionic.Zip.ZipException))]
         public void Error_Extract_ExistingFileWithoutOverwrite_NoArg()
         {
             _Internal_ExtractExisting(4);
@@ -177,28 +171,26 @@ namespace Ionic.Zip.Tests.Error
 
 
         // not an error test
-        [Test]
+        [Fact]
         public void Extract_ExistingFileWithOverwrite_OverwriteSilently()
         {
             _Internal_ExtractExisting((int)ExtractExistingFileAction.OverwriteSilently);
         }
 
         // not an error test
-        [Test]
+        [Fact]
         public void Extract_ExistingFileWithOverwrite_DoNotOverwrite()
         {
             _Internal_ExtractExisting((int)ExtractExistingFileAction.DoNotOverwrite);
         }
 
-        [Test]
-        [ExpectedException(typeof(Ionic.Zip.ZipException))]
+        [ExpectedExceptionFact(typeof(Ionic.Zip.ZipException))]
         public void Error_Extract_ExistingFileWithoutOverwrite_InvokeProgress()
         {
             _Internal_ExtractExisting((int)ExtractExistingFileAction.InvokeExtractProgressEvent);
         }
 
-        [Test]
-        [ExpectedException(typeof(Ionic.Zip.ZipException))]
+        [ExpectedExceptionFact(typeof(Ionic.Zip.ZipException))]
         public void Error_Extract_ExistingFileWithoutOverwrite_InvokeProgress_2()
         {
             _Internal_ExtractExisting(10 + (int)ExtractExistingFileAction.InvokeExtractProgressEvent);
@@ -206,8 +198,7 @@ namespace Ionic.Zip.Tests.Error
 
 
 
-        [Test]
-        [ExpectedException(typeof(Ionic.Zip.ZipException))]
+        [ExpectedExceptionFact(typeof(Ionic.Zip.ZipException))]
         public void Error_Extract_ExistingFileWithoutOverwrite_7()
         {
             // this is a test of the test!
@@ -215,7 +206,7 @@ namespace Ionic.Zip.Tests.Error
         }
 
 
-        [Test]
+        [Fact]
         public void Error_EmptySplitZip()
         {
             string zipFileToCreate = "zftc.zip";
@@ -235,8 +226,7 @@ namespace Ionic.Zip.Tests.Error
 
 
 
-        [Test]
-        [ExpectedException(typeof(ZipException))]
+        [ExpectedExceptionFact(typeof(ZipException))]
         public void Error_Read_InvalidZip()
         {
             string filename = zipit;
@@ -253,8 +243,7 @@ namespace Ionic.Zip.Tests.Error
 
 
 
-        [Test]
-        [ExpectedException(typeof(ZipException))]
+        [ExpectedExceptionFact(typeof(ZipException))]
         public void Error_NonZipFile_wi11743()
         {
             // try reading an empty, extant file as a zip file
@@ -295,8 +284,7 @@ namespace Ionic.Zip.Tests.Error
                                  "Wrong number of entries.");
         }
 
-        [Test]
-        [ExpectedException(typeof(ZipException))]
+        [ExpectedExceptionFact(typeof(ZipException))]
         public void MalformedZip()
         {
             string filePath = Path.GetTempFileName();
@@ -311,8 +299,7 @@ namespace Ionic.Zip.Tests.Error
 
 
 
-        [Test]
-        [ExpectedException(typeof(InvalidOperationException))]
+        [ExpectedExceptionFact(typeof(InvalidOperationException))]
         public void Error_UseZipEntryExtractWith_ZIS_wi10355()
         {
             string zipFileToCreate = "UseOpenReaderWith_ZIS.zip";
@@ -338,8 +325,7 @@ namespace Ionic.Zip.Tests.Error
 
 
 
-        [Test]
-        [ExpectedException(typeof(InvalidOperationException))]
+        [ExpectedExceptionFact(typeof(InvalidOperationException))]
         public void Error_UseOpenReaderWith_ZIS_wi10923()
         {
             string zipFileToCreate = "UseOpenReaderWith_ZIS.zip";
@@ -369,8 +355,7 @@ namespace Ionic.Zip.Tests.Error
 
 
 
-        [Test]
-        [ExpectedException(typeof(ZipException))]
+        [ExpectedExceptionFact(typeof(ZipException))]
         public void Error_Save_InvalidLocation()
         {
             string badLocation = "c:\\Windows\\";
@@ -386,7 +371,7 @@ namespace Ionic.Zip.Tests.Error
         }
 
 
-        [Test]
+        [Fact]
         public void Error_Save_NonExistentFile()
         {
             int j;
@@ -464,8 +449,7 @@ namespace Ionic.Zip.Tests.Error
         }
 
 
-        [Test]
-        [ExpectedException(typeof(Ionic.Zip.BadStateException))]
+        [ExpectedExceptionFact(typeof(Ionic.Zip.BadStateException))]
         public void Error_Save_NoFilename()
         {
             string testBin = TestUtilities.GetTestBinDir(CurrentDir);
@@ -486,8 +470,7 @@ namespace Ionic.Zip.Tests.Error
         }
 
 
-        [Test]
-        [ExpectedException(typeof(Ionic.Zip.BadStateException))]
+        [ExpectedExceptionFact(typeof(Ionic.Zip.BadStateException))]
         public void Error_Extract_WithoutSave()
         {
             string testBin = TestUtilities.GetTestBinDir(CurrentDir);
@@ -507,8 +490,7 @@ namespace Ionic.Zip.Tests.Error
             Assert.IsTrue(false);
         }
 
-        [Test]
-        [ExpectedException(typeof(Ionic.Zip.BadStateException))]
+        [ExpectedExceptionFact(typeof(Ionic.Zip.BadStateException))]
         public void Error_Read_WithoutSave()
         {
             string testBin = TestUtilities.GetTestBinDir(CurrentDir);
@@ -535,8 +517,7 @@ namespace Ionic.Zip.Tests.Error
         }
 
 
-        [Test]
-        [ExpectedException(typeof(System.IO.IOException))]
+        [ExpectedExceptionFact(typeof(System.IO.IOException))]
         public void Error_AddDirectory_SpecifyingFile()
         {
             string zipFileToCreate = "AddDirectory_SpecifyingFile.zip";
@@ -551,8 +532,7 @@ namespace Ionic.Zip.Tests.Error
         }
 
 
-        [Test]
-        [ExpectedException(typeof(FileNotFoundException))]
+        [ExpectedExceptionFact(typeof(FileNotFoundException))]
         public void Error_AddFile_SpecifyingDirectory()
         {
             string zipFileToCreate = "AddFile_SpecifyingDirectory.zip";
@@ -589,8 +569,7 @@ namespace Ionic.Zip.Tests.Error
         }
 
 
-        [Test]
-        [ExpectedException(typeof(BadReadException))]
+        [ExpectedExceptionFact(typeof(BadReadException))]
         public void Error_TestCorruptedZipFile()
         {
             string filename = Path.Combine(CurrentDir, "zips\\wizzquiz.zip");
@@ -606,8 +585,7 @@ namespace Ionic.Zip.Tests.Error
         }
 
 
-        [Test]
-        [ExpectedException(typeof(ZipException))] // not sure which exception - could be one of several.
+        [ExpectedExceptionFact(typeof(ZipException))]
         public void Error_ReadCorruptedZipFile_Passwords()
         {
             string zipFileToCreate = Path.Combine(TopLevelDir, "Read_CorruptedZipFile_Passwords.zip");
@@ -666,8 +644,7 @@ namespace Ionic.Zip.Tests.Error
 
 
 
-        [Test]
-        [ExpectedException(typeof(ZipException))] // not sure which exception - could be one of several.
+        [ExpectedExceptionFact(typeof(ZipException))]
         public void Error_ReadCorruptedZipFile()
         {
             int i;
@@ -719,7 +696,7 @@ namespace Ionic.Zip.Tests.Error
         }
 
 
-        [Test]
+        [Fact]
         public void Error_LockedFile_wi13903()
         {
             TestContext.WriteLine("==Error_LockedFile_wi13903()");
@@ -763,8 +740,7 @@ namespace Ionic.Zip.Tests.Error
         }
 
 
-        [Test]
-        [ExpectedException(typeof(ZipException))]
+        [ExpectedExceptionFact(typeof(ZipException))]
         public void Error_Read_EmptyZipFile()
         {
             string zipFileToRead = Path.Combine(TopLevelDir, "Read_BadFile.zip");
@@ -793,8 +769,7 @@ namespace Ionic.Zip.Tests.Error
 
 
 
-        [Test]
-        [ExpectedException(typeof(System.ArgumentException))]
+        [ExpectedExceptionFact(typeof(System.ArgumentException))]
         public void Error_AddFile_Twice()
         {
             int i;
@@ -833,8 +808,7 @@ namespace Ionic.Zip.Tests.Error
         }
 
 
-        [Test]
-        [ExpectedException(typeof(Ionic.Zip.ZipException))]
+        [ExpectedExceptionFact(typeof(Ionic.Zip.ZipException))]
         public void Error_FileNotAvailableFails()
         {
             // verify the correct exception is being thrown
@@ -852,8 +826,7 @@ namespace Ionic.Zip.Tests.Error
 
 
 
-        [Test]
-        [ExpectedException(typeof(ZipException))]
+        [ExpectedExceptionFact(typeof(ZipException))]
         public void IncorrectZipContentTest1_wi10459()
         {
             byte[] content = Encoding.UTF8.GetBytes("wrong zipfile content");
@@ -863,8 +836,7 @@ namespace Ionic.Zip.Tests.Error
             }
         }
 
-        [Test]
-        [ExpectedException(typeof(ZipException))]
+        [ExpectedExceptionFact(typeof(ZipException))]
         public void IncorrectZipContentTest2_wi10459()
         {
             using (var ms = new MemoryStream())
@@ -873,8 +845,7 @@ namespace Ionic.Zip.Tests.Error
             }
         }
 
-        [Test]
-        [ExpectedException(typeof(ZipException))]
+        [ExpectedExceptionFact(typeof(ZipException))]
         public void IncorrectZipContentTest3_wi10459()
         {
             byte[] content = new byte[8192];

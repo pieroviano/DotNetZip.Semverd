@@ -3,7 +3,8 @@ using System.Linq;
 using System.Text;
 using System.Collections.Generic;
 
-using NUnit.Framework;
+using Xunit;
+using Assert = Ionic.Tests.Assert;
 using Ionic.Tests;
 using System.IO;
 
@@ -12,8 +13,7 @@ namespace Ionic.BZip2.Tests
     /// <summary>
     /// Summary description for UnitTest1
     /// </summary>
-    [TestFixture]
-    public class BZip2Tests
+    public class BZip2Tests : TestBase, IDisposable
     {
         private readonly System.Random rnd = new System.Random();
 
@@ -50,9 +50,10 @@ namespace Ionic.BZip2.Tests
         private string TopLevelDir = null;
         protected System.Collections.Generic.List<string> FilesToRemove = new System.Collections.Generic.List<string>();
 
-        // Use TestInitialize to run code before running each test
-        [SetUp]
-        public void MyTestInitialize()
+        // xUnit builds the class once per test, so the constructor is the
+        // per-test setup and Dispose is the per-test cleanup.
+        public BZip2Tests(Xunit.Abstractions.ITestOutputHelper output)
+            : base(output)
         {
             CurrentDir = System.IO.Directory.GetCurrentDirectory();
             Assert.AreNotEqual(System.IO.Path.GetFileName(CurrentDir), "Temp", "at start");
@@ -67,9 +68,7 @@ namespace Ionic.BZip2.Tests
         }
 
 
-        // Use TestCleanup to run code after each test has run
-        [TearDown]
-        public void MyTestCleanup()
+        public void Dispose()
         {
             Assert.AreNotEqual(Path.GetFileName(CurrentDir), "Temp", "at finish");
             Directory.SetCurrentDirectory(CurrentDir);
@@ -291,8 +290,7 @@ namespace Ionic.BZip2.Tests
         #endregion
 
 
-        [Test]
-        [Timeout(15 * 60 * 1000)] // 60*1000 = 1min
+        [Fact]
         public void BZ_LargeParallel()
         {
             string filename = "LargeFile.txt";
@@ -336,8 +334,7 @@ namespace Ionic.BZip2.Tests
 
 
 
-        [Test]
-        [Timeout(15 * 60 * 1000)] // 60*1000 = 1min
+        [Fact]
         public void BZ_Basic()
         {
             TestContext.WriteLine("Creating fodder file.");
@@ -420,8 +417,7 @@ namespace Ionic.BZip2.Tests
         }
 
 
-        [Test]
-        [ExpectedException(typeof(IOException))]
+        [ExpectedExceptionFact(typeof(IOException))]
         public void BZ_Error_1()
         {
             var bzbin = GetTestDependentDir(CurrentDir, "Tools\\BZip2\\bin\\Debug\\net40");
@@ -433,8 +429,7 @@ namespace Ionic.BZip2.Tests
                 CopyStream(decompressor, output);
         }
 
-        [Test]
-        [ExpectedException(typeof(IOException))]
+        [ExpectedExceptionFact(typeof(IOException))]
         public void BZ_Error_2()
         {
             string decompressedFname = "ThisWillNotWork.txt";
@@ -445,7 +440,7 @@ namespace Ionic.BZip2.Tests
         }
 
 
-        [Test]
+        [Fact]
         public void BZ_Utility()
         {
             var bzbin = GetTestDependentDir(CurrentDir, "Tools\\BZip2\\bin\\Debug\\net40");
@@ -496,7 +491,7 @@ namespace Ionic.BZip2.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void BZ_StreamCopy()
         {
             var src = new MemoryStream(Encoding.ASCII.GetBytes("Hello"));
@@ -528,7 +523,7 @@ namespace Ionic.BZip2.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void BZ_Samples()
         {
             string testBin = GetTestBinDir(CurrentDir);

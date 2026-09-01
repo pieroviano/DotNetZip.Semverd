@@ -1,4 +1,4 @@
-// NonSeekableOutputStream.cs
+﻿// NonSeekableOutputStream.cs
 // ------------------------------------------------------------------
 //
 // Need a non-seekable output stream to test ZIP construction.

@@ -1,4 +1,4 @@
-// LongRunning.cs
+﻿// LongRunning.cs
 // ------------------------------------------------------------------
 //
 // Copyright (c) 2011 Dino Chiesa
@@ -27,7 +27,8 @@
 using System;
 using System.Text;
 using System.Collections.Generic;
-using NUnit.Framework;
+using Xunit;
+using Assert = Ionic.Tests.Assert;
 using RE = System.Text.RegularExpressions;
 
 using Ionic.Zip;
@@ -39,9 +40,13 @@ namespace Ionic.Zip.Tests.LongRunning
     /// <summary>
     /// Summary description for LongRunning
     /// </summary>
-    [TestFixture]
     public class LongRunning : IonicTestClass
     {
+
+        public LongRunning(Xunit.Abstractions.ITestOutputHelper output)
+            : base(output)
+        {
+        }
         Int64 maxBytesXferred = 0;
         bool _pb1Set;
         bool _pb2Set;
@@ -129,7 +134,7 @@ namespace Ionic.Zip.Tests.LongRunning
 
 
 
-        [Test, Timeout(120 * 60 * 1000)]
+        [Fact]
         public void CreateZip_AddDirectory_LargeNumberOfSmallFiles()
         {
             // start the visible progress monitor
@@ -339,7 +344,7 @@ namespace Ionic.Zip.Tests.LongRunning
 
 
 
-        [Test, Timeout(60 * 60 * 1000)]
+        [Fact]
         public void LargeFile_WithProgress()
         {
             // This test checks the Int64 limits in progress events (Save + Extract)

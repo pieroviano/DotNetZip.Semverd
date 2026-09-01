@@ -29,7 +29,8 @@ using System;
 using System.Text;
 using System.Collections.Generic;
 using System.Linq;
-using NUnit.Framework;
+using Xunit;
+using Assert = Ionic.Tests.Assert;
 using Ionic.Tests;
 
 using Ionic.Zip;
@@ -42,13 +43,12 @@ namespace Ionic.Zip.Tests
     /// <summary>
     /// Summary description for Self extracting archives (SFX)
     /// </summary>
-    [TestFixture]
     public class SelfExtractor : IonicTestClass
     {
-        public SelfExtractor() : base() { }
+        public SelfExtractor(Xunit.Abstractions.ITestOutputHelper output) : base(output) { }
 
 
-        [Test]
+        [Fact]
         public void SFX_CanRead()
         {
             SelfExtractorFlavor[] flavors =
@@ -119,13 +119,13 @@ namespace Ionic.Zip.Tests
 
 
 
-        [Test]
+        [Fact]
         public void SFX_Update_Console()
         {
             SFX_Update(SelfExtractorFlavor.ConsoleApplication);
         }
 
-        [Test]
+        [Fact]
         public void SFX_Update_Winforms()
         {
             SFX_Update(SelfExtractorFlavor.WinFormsApplication);
@@ -261,7 +261,7 @@ namespace Ionic.Zip.Tests
 
 
 
-        [Test]
+        [Fact]
         public void SFX_Console()
         {
             string exeFileToCreate = Path.Combine(TopLevelDir, "SFX_Console.exe");
@@ -325,7 +325,7 @@ namespace Ionic.Zip.Tests
         }
 
 
-        [Test]
+        [Fact]
         public void SFX_WinForms()
         {
             string[] Passwords = { null, "12345" };
@@ -444,7 +444,7 @@ namespace Ionic.Zip.Tests
         //  - whether to append args or not
         //  - force noninteractive or not (only for Winforms flavor, to allow automated tests)
 
-        [Test]
+        [Fact]
         public void SFX_RunOnExit_Console()
         {
             _Internal_SelfExtractor_Command("post-extract-run-on-exit-{0:D4}.exe",
@@ -455,7 +455,7 @@ namespace Ionic.Zip.Tests
                                             false); // wantArgs
         }
 
-        [Test]
+        [Fact]
         public void SFX_RunOnExit_Console_Args()
         {
             _Internal_SelfExtractor_Command("post-extract-run-on-exit-{0:D4}.exe",
@@ -466,7 +466,7 @@ namespace Ionic.Zip.Tests
                                             true); // wantArgs
         }
 
-        [Test]
+        [Fact]
         public void SFX_RunOnExit_WinForms()
         {
             _Internal_SelfExtractor_Command("post-extract-run-on-exit-{0:D4}.exe",
@@ -477,7 +477,7 @@ namespace Ionic.Zip.Tests
                                             false); // wantArgs
         }
 
-        [Test]
+        [Fact]
         public void SFX_RunOnExit_WinForms_DontRun()
         {
             // This test case just tests the generation (compilation) of
@@ -491,7 +491,7 @@ namespace Ionic.Zip.Tests
                                             false); // wantArgs
         }
 
-        [Test]
+        [Fact]
         public void SFX_RunOnExit_WinForms_Interactive()
         {
             _Internal_SelfExtractor_Command("post-extract-run-on-exit-{0:D4}.exe",
@@ -502,7 +502,7 @@ namespace Ionic.Zip.Tests
                                             false); // wantArgs
         }
 
-        [Test]
+        [Fact]
         public void SFX_RunOnExit_WinForms_NonInteractive()
         {
             _Internal_SelfExtractor_Command("post-extract-run-on-exit-{0:D4}.exe",
@@ -513,7 +513,7 @@ namespace Ionic.Zip.Tests
                                             false); // wantArgs
         }
 
-        [Test]
+        [Fact]
         public void SFX_RunOnExit_WinForms_NonInteractive_Args()
         {
             _Internal_SelfExtractor_Command("post-extract-run-on-exit-{0:D4}.exe",
@@ -526,7 +526,7 @@ namespace Ionic.Zip.Tests
 
         // ------------------------------------------------------------------ //
 
-        [Test]
+        [Fact]
         public void SFX_RunOnExit_Console_withSpaces()
         {
             _Internal_SelfExtractor_Command("post extract run on exit {0:D4}.exe",
@@ -538,7 +538,7 @@ namespace Ionic.Zip.Tests
         }
 
 
-        [Test]
+        [Fact]
         public void SFX_RunOnExit_Console_withSpaces_Args()
         {
             _Internal_SelfExtractor_Command("post extract run on exit {0:D4}.exe",
@@ -549,7 +549,7 @@ namespace Ionic.Zip.Tests
                                             true);  // wantArgs
         }
 
-        [Test]
+        [Fact]
         public void SFX_RunOnExit_WinForms_withSpaces()
         {
             _Internal_SelfExtractor_Command("post extract run on exit {0:D4}.exe",
@@ -560,7 +560,7 @@ namespace Ionic.Zip.Tests
                                             false); // wantArgs
         }
 
-        [Test]
+        [Fact]
         public void SFX_RunOnExit_WinForms_withSpaces_DontRun()
         {
             // This test case just tests the generation (compilation) of
@@ -574,7 +574,7 @@ namespace Ionic.Zip.Tests
                                             false); // wantArgs
         }
 
-        [Test]
+        [Fact]
         public void SFX_RunOnExit_WinForms_withSpaces_Interactive()
         {
             _Internal_SelfExtractor_Command("post extract run on exit {0:D4}.exe",
@@ -585,7 +585,7 @@ namespace Ionic.Zip.Tests
                                             false); // wantArgs
         }
 
-        [Test]
+        [Fact]
         public void SFX_RunOnExit_WinForms_withSpaces_NonInteractive()
         {
             _Internal_SelfExtractor_Command("post extract run on exit {0:D4}.exe",
@@ -596,7 +596,7 @@ namespace Ionic.Zip.Tests
                                             false); // wantArgs
         }
 
-        [Test]
+        [Fact]
         public void SFX_RunOnExit_WinForms_withSpaces_NonInteractive_Args()
         {
             _Internal_SelfExtractor_Command("post extract run on exit {0:D4}.exe",
@@ -747,8 +747,7 @@ namespace Ionic.Zip.Tests
 
 
 
-        [Test]
-        [ExpectedException(typeof(Ionic.Zip.BadStateException))]
+        [ExpectedExceptionFact(typeof(Ionic.Zip.BadStateException))]
         public void SFX_Save_Zip_As_EXE()
         {
             string sfxFileToCreate = "SFX_Save_Zip_As_EXE.exe";
@@ -782,7 +781,7 @@ namespace Ionic.Zip.Tests
 
 
 
-        [Test]
+        [Fact]
         public void SFX_RemoveFilesAfterUnpack_wi10682()
         {
             string subdir = "files";

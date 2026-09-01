@@ -1,4 +1,4 @@
-// Progress.cs
+﻿// Progress.cs
 // ------------------------------------------------------------------
 //
 // Copyright (c) 2009 Dino Chiesa and Microsoft Corporation.
@@ -28,7 +28,8 @@ using System;
 using System.Text;
 using System.Collections.Generic;
 using System.Linq;
-using NUnit.Framework;
+using Xunit;
+using Assert = Ionic.Tests.Assert;
 
 using Ionic.Zip;
 using Ionic.Zip.Tests.Utilities;
@@ -40,10 +41,9 @@ namespace Ionic.Zip.Tests
     /// <summary>
     /// Summary description for Compatibility
     /// </summary>
-    [TestFixture]
     public class Progress : IonicTestClass
     {
-        public Progress() : base() { }
+        public Progress(Xunit.Abstractions.ITestOutputHelper output) : base(output) { }
 
         private System.Reflection.Assembly _myself;
         private System.Reflection.Assembly myself
@@ -83,7 +83,7 @@ namespace Ionic.Zip.Tests
 
 
 
-        [Test]
+        [Fact]
         public void Progress_ReadFile()
         {
             Directory.SetCurrentDirectory(TopLevelDir);
@@ -135,7 +135,7 @@ namespace Ionic.Zip.Tests
         }
 
 
-        [Test]
+        [Fact]
         public void Progress_AddFiles()
         {
             Directory.SetCurrentDirectory(TopLevelDir);

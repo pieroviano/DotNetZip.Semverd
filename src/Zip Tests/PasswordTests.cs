@@ -1,4 +1,4 @@
-// PasswordTests.cs
+﻿// PasswordTests.cs
 // ------------------------------------------------------------------
 //
 // Copyright (c) 2008-2011 Dino Chiesa .
@@ -24,7 +24,8 @@
 
 using System;
 using System.Collections.Generic;
-using NUnit.Framework;
+using Xunit;
+using Assert = Ionic.Tests.Assert;
 using Ionic.Tests;
 using System.IO;
 
@@ -32,12 +33,11 @@ using Ionic.Zip.Tests.Utilities;
 
 namespace Ionic.Zip.Tests.Password
 {
-    [TestFixture]
     public class PasswordTests : IonicTestClass
     {
-        public PasswordTests() : base() { }
+        public PasswordTests(Xunit.Abstractions.ITestOutputHelper output) : base(output) { }
 
-        [Test]
+        [Fact]
         public void Password_BasicAddAndExtract()
         {
             int i;
@@ -120,7 +120,7 @@ namespace Ionic.Zip.Tests.Password
 
 
 
-        [Test]
+        [Fact]
         public void Password_CheckZipPassword_wi13664()
         {
             string[] passwords = { null,
@@ -154,7 +154,7 @@ namespace Ionic.Zip.Tests.Password
         }
 
 
-        [Test]
+        [Fact]
         public void Password_UnsetEncryptionAfterSetPassword_wi13909_ZOS()
         {
             // Verify that unsetting the Encryption property after
@@ -202,7 +202,7 @@ namespace Ionic.Zip.Tests.Password
 
 
 
-        [Test]
+        [Fact]
         public void Password_UnsetEncryptionAfterSetPassword_wi13909_ZF()
         {
             // Verify that unsetting the Encryption property after
@@ -248,8 +248,7 @@ namespace Ionic.Zip.Tests.Password
         }
 
 
-        [Test]
-        [ExpectedException(typeof(Ionic.Zip.BadPasswordException))]
+        [ExpectedExceptionFact(typeof(Ionic.Zip.BadPasswordException))]
         public void Password_CheckBadPassword_wi13668()
         {
             TestContext.WriteLine("Password_CheckBadPassword_wi13668()");
@@ -284,7 +283,7 @@ namespace Ionic.Zip.Tests.Password
         }
 
 
-        [Test]
+        [Fact]
         public void Password_MultipleEntriesDifferentPasswords()
         {
             string ZipFileToCreate = Path.Combine(TopLevelDir, "Password_MultipleEntriesDifferentPasswords.zip");
@@ -341,8 +340,7 @@ namespace Ionic.Zip.Tests.Password
         }
 
 
-        [Test]
-        [ExpectedException(typeof(Ionic.Zip.BadPasswordException))]
+        [ExpectedExceptionFact(typeof(Ionic.Zip.BadPasswordException))]
         public void Password_Extract_WrongPassword()
         {
             string ZipFileToCreate = Path.Combine(TopLevelDir, "MultipleEntriesDifferentPasswords.zip");
@@ -386,7 +384,7 @@ namespace Ionic.Zip.Tests.Password
         }
 
 
-        [Test]
+        [Fact]
         public void Password_AddEntryWithPasswordToExistingZip()
         {
             string zipFileToCreate = "AddEntryWithPasswordToExistingZip.zip";
@@ -458,7 +456,7 @@ namespace Ionic.Zip.Tests.Password
 
 
 
-        [Test]
+        [Fact]
         public void SilentDeletion_wi10639()
         {
             string zipFileToCreate = "SilentDeletion.zip";

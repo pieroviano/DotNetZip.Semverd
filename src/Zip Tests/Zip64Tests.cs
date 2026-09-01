@@ -1,4 +1,4 @@
-// Zip64Tests.cs
+﻿// Zip64Tests.cs
 // ------------------------------------------------------------------
 //
 // Copyright (c) 2009-2011 Dino Chiesa
@@ -35,7 +35,8 @@ using System;
 using System.Linq;
 using System.IO;
 using System.Collections.Generic;
-using NUnit.Framework;
+using Xunit;
+using Assert = Ionic.Tests.Assert;
 using Ionic.Tests;
 using Ionic.Zip;
 using Ionic.Zip.Tests.Utilities;
@@ -43,13 +44,12 @@ using Ionic.Zip.Tests.Utilities;
 
 namespace Ionic.Zip.Tests.Zip64
 {
-    [TestFixture]
-    public class Zip64Tests : IonicTestClass
+    public class Zip64Tests : IonicTestClass, IClassFixture<Zip64Tests.HugeZipFileCleanup>
     {
         string fodderDir = "c:\\users\\dino\\Downloads";
         string homeDir = System.Environment.GetEnvironmentVariable("TEMP");
 
-        public Zip64Tests() : base() { }
+        public Zip64Tests(Xunit.Abstractions.ITestOutputHelper output) : base(output) { }
 
         private static string[] _HugeZipFiles;
         private string[] GetHugeZipFiles()
@@ -63,8 +63,20 @@ namespace Ionic.Zip.Tests.Zip64
 
 
 
-        [OneTimeTearDown]
-        public static void MyClassCleanup()
+        /// <summary>
+        ///   Runs once, after every test in the fixture, which is what
+        ///   [OneTimeTearDown] used to do. xUnit spells that as a class fixture
+        ///   whose disposal happens when the class is finished with.
+        /// </summary>
+        public class HugeZipFileCleanup : IDisposable
+        {
+            public void Dispose()
+            {
+                MyClassCleanup();
+            }
+        }
+
+        private static void MyClassCleanup()
         {
             if (_HugeZipFiles != null)
             {
@@ -444,7 +456,7 @@ namespace Ionic.Zip.Tests.Zip64
 
 
 
-        [Test]
+        [Fact]
         public void Zip64_Create()
         {
             Zip64Option[] Options = { Zip64Option.Always,
@@ -516,7 +528,7 @@ namespace Ionic.Zip.Tests.Zip64
 
 
 
-        [Test]
+        [Fact]
         public void Zip64_Convert()
         {
             string trialDescription = "Trial {0}/{1}:  create archive as 'zip64={2}', then open it and re-save with 'zip64={3}'";
@@ -820,7 +832,7 @@ namespace Ionic.Zip.Tests.Zip64
 
 
 
-        [Timeout(3 * 60 * 60 * 1000), Test] // 60*60*1000 = 1hr
+        [Fact]
         public void Zip64_Update_WZ()
         {
             // this should take about an hour
@@ -831,7 +843,7 @@ namespace Ionic.Zip.Tests.Zip64
         }
 
 
-        [Timeout(3 * 60 * 60 * 1000), Test] // 60*60*1000 = 1hr
+        [Fact]
         public void Zip64_Update_DNZ()
         {
             // this should take about an hour
@@ -947,7 +959,7 @@ namespace Ionic.Zip.Tests.Zip64
 
 
 
-        [Test]
+        [Fact]
         public void Zip64_Winzip_Unzip_OneFile()
         {
             string testBin = TestUtilities.GetTestBinDir(CurrentDir);
@@ -999,7 +1011,7 @@ namespace Ionic.Zip.Tests.Zip64
 
 
 
-        [Timeout((int)(1 * 60 * 60 * 1000)), Test] // in milliseconds.
+        [Fact]
         public void Zip64_Winzip_Unzip_Huge()
         {
             string[] zipFilesToExtract = GetHugeZipFiles(); // may take a long time
@@ -1158,7 +1170,7 @@ namespace Ionic.Zip.Tests.Zip64
 
 
 
-        [Timeout((int)(4 * 60 * 60 * 1000)), Test] // 60*60*1000 == 1 hr
+        [Fact]
         public void Zip64_Winzip_Zip_Huge()
         {
             // This TestMethod tests if DNZ can read a huge (>4.2gb) zip64 file
@@ -1251,7 +1263,7 @@ namespace Ionic.Zip.Tests.Zip64
             System.Threading.Thread.Sleep(120);
         }
 
-        [Test]
+        [Fact]
         public void Zip64_ExtractZip64Archives()
         {
             File.Delete(@"C:\tmp\test.zip");
@@ -1270,7 +1282,7 @@ namespace Ionic.Zip.Tests.Zip64
             extractedZipFile.ExtractAll(@"C:\tmp\extracted", ExtractExistingFileAction.OverwriteSilently);
         }
 
-        [Test, Timeout((int)(2 * 60 * 60 * 1000))] // 60*60*1000 = 1 hr
+        [Fact]
         public void Zip64_Winzip_Setup()
         {
             // Not really a test.  This thing just sets up the big zip file.
@@ -1290,7 +1302,7 @@ namespace Ionic.Zip.Tests.Zip64
         }
 
 
-        [Test, Timeout(1 * 60 * 60 * 1000)]
+        [Fact]
         public void Zip64_Over_4gb()
         {
             Int64 desiredSize = System.UInt32.MaxValue;
@@ -1400,38 +1412,38 @@ namespace Ionic.Zip.Tests.Zip64
         }
 
 
-        [Test, Timeout(1 * 60 * 60 * 1000)]
+        [Fact]
         public void Z64_ManyEntries_NoEncryption_DefaultCompression_AsNecessary()
         {
             _Zip64_Over65534Entries(Zip64Option.AsNecessary, EncryptionAlgorithm.None, Ionic.Zlib.CompressionLevel.Default);
         }
 
-        [Test, Timeout(1 * 60 * 60 * 1000)]
+        [Fact]
         public void Z64_ManyEntries_PkZipEncryption_DefaultCompression_AsNecessary()
         {
             _Zip64_Over65534Entries(Zip64Option.AsNecessary, EncryptionAlgorithm.PkzipWeak, Ionic.Zlib.CompressionLevel.Default);
         }
 
-        [Test, Timeout(2 * 60 * 60 * 1000)]
+        [Fact]
         public void Z64_ManyEntries_WinZipEncryption_DefaultCompression_AsNecessary()
         {
             _Zip64_Over65534Entries(Zip64Option.AsNecessary, EncryptionAlgorithm.WinZipAes256, Ionic.Zlib.CompressionLevel.Default);
         }
 
 
-        [Test, Timeout(1 * 60 * 60 * 1000)]
+        [Fact]
         public void Z64_ManyEntries_NoEncryption_DefaultCompression_Always()
         {
             _Zip64_Over65534Entries(Zip64Option.Always, EncryptionAlgorithm.None, Ionic.Zlib.CompressionLevel.Default);
         }
 
-        [Test, Timeout(1 * 60 * 60 * 1000)]
+        [Fact]
         public void Z64_ManyEntries_PkZipEncryption_DefaultCompression_Always()
         {
             _Zip64_Over65534Entries(Zip64Option.Always, EncryptionAlgorithm.PkzipWeak, Ionic.Zlib.CompressionLevel.Default);
         }
 
-        [Test, Timeout(2 * 60 * 60 * 1000)]
+        [Fact]
         public void Z64_ManyEntries_WinZipEncryption_DefaultCompression_Always()
         {
             _Zip64_Over65534Entries(Zip64Option.Always, EncryptionAlgorithm.WinZipAes256, Ionic.Zlib.CompressionLevel.Default);
@@ -1440,8 +1452,7 @@ namespace Ionic.Zip.Tests.Zip64
 
 
 
-        [Test, Timeout(30 * 60 * 1000)]
-        [ExpectedException(typeof(Ionic.Zip.ZipException))]
+        [ExpectedExceptionFact(typeof(Ionic.Zip.ZipException))]
         public void Z64_ManyEntries_NOZIP64()
         {
             _Zip64_Over65534Entries(Zip64Option.Never, EncryptionAlgorithm.None, Ionic.Zlib.CompressionLevel.Default);
@@ -1591,7 +1602,7 @@ namespace Ionic.Zip.Tests.Zip64
 
 
 
-        [Timeout(3 * 60 * 60 * 1000), Test]    // 60*60*1000 = 1 hr
+        [Fact]
         public void Zip64_UpdateEntryComment_wi9214_WZ()
         {
             // Should take 2.5 hrs when creating the huge files, about 1 hr when the
@@ -1603,7 +1614,7 @@ namespace Ionic.Zip.Tests.Zip64
             Z64UpdateHugeZipWithComment(zipFilesToUpdate[0], "WinZip");
         }
 
-        [Timeout(3 * 60 * 60 * 1000), Test]    // 60*60*1000 = 1 hr
+        [Fact]
         public void Zip64_UpdateEntryComment_wi9214_DNZ()
         {
             // Should take 2.5 hrs when creating the huge files, about 1 hr when the

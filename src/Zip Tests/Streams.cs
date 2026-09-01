@@ -1,4 +1,4 @@
-// Streams.cs
+﻿// Streams.cs
 // ------------------------------------------------------------------
 //
 // Copyright (c) 2009-2011 Dino Chiesa
@@ -28,7 +28,8 @@ using System;
 using System.IO;
 using System.Text;
 using System.Collections.Generic;
-using NUnit.Framework;
+using Xunit;
+using Assert = Ionic.Tests.Assert;
 using Ionic.Tests;
 
 using Ionic.Zip;
@@ -41,10 +42,9 @@ namespace Ionic.Zip.Tests.Streams
     /// <summary>
     /// Summary description for StreamsTests
     /// </summary>
-    [TestFixture]
     public class StreamsTests : IonicTestClass
     {
-        public StreamsTests() : base() { }
+        public StreamsTests(Xunit.Abstractions.ITestOutputHelper output) : base(output) { }
 
         EncryptionAlgorithm[] crypto =
         {
@@ -79,7 +79,7 @@ namespace Ionic.Zip.Tests.Streams
         };
 
 
-        [Test]
+        [Fact]
         public void ZOS_Create_Encrypt_wi12815()
         {
             string zipFileToCreate =
@@ -126,7 +126,7 @@ namespace Ionic.Zip.Tests.Streams
 
 
 
-        [Test]
+        [Fact]
         public void ReadZip_OpenReader()
         {
             string[] passwords = { null, Path.GetRandomFileName(), "EE", "***()" };
@@ -212,7 +212,7 @@ namespace Ionic.Zip.Tests.Streams
         }
 
 
-        [Test]
+        [Fact]
         public void ZOS_Create_WithComment_wi10339()
         {
             string zipFileToCreate = "ZOS_Create_WithComment_wi10339.zip";
@@ -232,8 +232,7 @@ namespace Ionic.Zip.Tests.Streams
         }
 
 
-        [Test]
-        [ExpectedException(typeof(System.ArgumentNullException))]
+        [ExpectedExceptionFact(typeof(System.ArgumentNullException))]
         public void ZOS_Create_NullBuffer_wi12964()
         {
             using (var zip = new Ionic.Zip.ZipOutputStream(new MemoryStream()))
@@ -244,7 +243,7 @@ namespace Ionic.Zip.Tests.Streams
             }
         }
 
-        [Test]
+        [Fact]
         public void ZOS_Create_ZeroByteEntry_wi12964()
         {
             using (var zip = new Ionic.Zip.ZipOutputStream(new MemoryStream()))
@@ -255,7 +254,7 @@ namespace Ionic.Zip.Tests.Streams
         }
 
 
-        [Test]
+        [Fact]
         public void AddEntry_JitProvided()
         {
             for (int i = 0; i < crypto.Length; i++)
@@ -415,21 +414,21 @@ namespace Ionic.Zip.Tests.Streams
 
 
 
-        [Test]
+        [Fact]
         public void WriteDelegate()
         {
             _TestDriver(new TestCompressionLevels(_Internal_AddEntry_WriteDelegate), "WriteDelegate", true, false);
         }
 
 
-        [Test]
+        [Fact]
         public void WriteDelegate_NonSeekable()
         {
             _TestDriver(new TestCompressionLevels(_Internal_AddEntry_WriteDelegate), "WriteDelegate", false, false);
         }
 
 
-        [Test]
+        [Fact]
         public void WriteDelegate_ZeroBytes_wi8931()
         {
             _TestDriver(new TestCompressionLevels(_Internal_AddEntry_WriteDelegate), "WriteDelegate", true, true);
@@ -437,7 +436,7 @@ namespace Ionic.Zip.Tests.Streams
 
 
 
-        [Test]
+        [Fact]
         public void ZOS_Create_ZeroBytes_Encrypt_NonSeekable()
         {
             // At one stage, using ZipOutputStream with Encryption and a
@@ -465,7 +464,7 @@ namespace Ionic.Zip.Tests.Streams
 
 
 
-        [Test, Timeout(45 * 60 * 1000)]
+        [Fact]
         public void ZOS_over65534_EncryptPkZip_CompressDefault_Z64AsNecessary()
         {
             _ZOS_z64Over65534Entries(Zip64Option.AsNecessary,
@@ -473,7 +472,7 @@ namespace Ionic.Zip.Tests.Streams
                                      Ionic.Zlib.CompressionLevel.Default);
         }
 
-        [Test, Timeout(2 * 60 * 60 * 1000)]
+        [Fact]
         public void ZOS_over65534_EncryptWinZip_CompressDefault_Z64AsNecessary()
         {
             _ZOS_z64Over65534Entries(Zip64Option.AsNecessary,
@@ -481,7 +480,7 @@ namespace Ionic.Zip.Tests.Streams
                                      Ionic.Zlib.CompressionLevel.Default);
         }
 
-        [Test, Timeout(45 * 60 * 1000)]
+        [Fact]
         public void ZOS_over65534_EncryptNo_CompressDefault_Z64AsNecessary()
         {
             _ZOS_z64Over65534Entries(Zip64Option.AsNecessary,
@@ -490,8 +489,7 @@ namespace Ionic.Zip.Tests.Streams
         }
 
 
-        [Test, Timeout(35 * 60 * 1000)]
-        [ExpectedException(typeof(System.InvalidOperationException))]
+        [ExpectedExceptionFact(typeof(System.InvalidOperationException))]
         public void ZOS_over65534_FAIL()
         {
             _ZOS_z64Over65534Entries(Zip64Option.Never,
@@ -646,8 +644,7 @@ namespace Ionic.Zip.Tests.Streams
 
 
 
-        [Test]
-        [ExpectedException(typeof(System.InvalidOperationException))]
+        [ExpectedExceptionFact(typeof(System.InvalidOperationException))]
         public void ZOS_Create_WriteBeforePutNextEntry()
         {
             string zipFileToCreate = "ZOS_Create_WriteBeforePutNextEntry.zip";
@@ -665,7 +662,7 @@ namespace Ionic.Zip.Tests.Streams
 
 
 
-        [Test]
+        [Fact]
         public void ZOS_Create_Directories()
         {
             for (int i = 0; i < crypto.Length; i++)
@@ -720,8 +717,7 @@ namespace Ionic.Zip.Tests.Streams
 
 
 
-        [Test]
-        [ExpectedException(typeof(System.InvalidOperationException))]
+        [ExpectedExceptionFact(typeof(System.InvalidOperationException))]
         public void ZOS_Create_Directories_Write()
         {
             for (int k = 0; k < 2; k++)
@@ -758,7 +754,7 @@ namespace Ionic.Zip.Tests.Streams
 
 
 
-        [Test]
+        [Fact]
         public void ZOS_Create_EmptyEntries()
         {
             for (int i = 0; i < crypto.Length; i++)
@@ -811,8 +807,7 @@ namespace Ionic.Zip.Tests.Streams
 
 
 
-        [Test]
-        [ExpectedException(typeof(System.ArgumentException))]
+        [ExpectedExceptionFact(typeof(System.ArgumentException))]
         public void ZOS_Create_DuplicateEntry()
         {
             string zipFileToCreate = "ZOS_Create_DuplicateEntry.zip";
@@ -831,7 +826,7 @@ namespace Ionic.Zip.Tests.Streams
 
 
 
-        [Test]
+        [Fact]
         public void ZOS_Create()
         {
             bool seekable = true;
@@ -839,7 +834,7 @@ namespace Ionic.Zip.Tests.Streams
             _TestDriver(new TestCompressionLevels(_Internal_ZOS_Create), "ZipOutputStream", seekable, zero);
         }
 
-        [Test]
+        [Fact]
         public void ZOS_Create_file()
         {
             bool seekable = true;
@@ -848,7 +843,7 @@ namespace Ionic.Zip.Tests.Streams
             _TestDriver(new TestCompressionLevels(_Internal_ZOS_Create), "ZipOutputStream", seekable, zero, fileOutputOption);
         }
 
-        [Test]
+        [Fact]
         public void ZOS_Create_NonSeekable()
         {
             bool seekable = false;
@@ -856,7 +851,7 @@ namespace Ionic.Zip.Tests.Streams
             _TestDriver(new TestCompressionLevels(_Internal_ZOS_Create), "ZipOutputStream", seekable, zero);
         }
 
-        [Test]
+        [Fact]
         public void ZOS_Create_ZeroLength_wi8933()
         {
             bool seekable = true;
@@ -864,7 +859,7 @@ namespace Ionic.Zip.Tests.Streams
             _TestDriver(new TestCompressionLevels(_Internal_ZOS_Create), "ZipOutputStream", seekable, zero);
         }
 
-        [Test]
+        [Fact]
         public void ZOS_Create_ZeroLength_wi8933_file()
         {
             bool seekable = true;
@@ -1013,7 +1008,7 @@ namespace Ionic.Zip.Tests.Streams
         }
 
 
-        [Test]
+        [Fact]
         public void ZipFile_JitStream_CloserTwice_wi10489()
         {
             int fileCount = 20 + _rnd.Next(20);
@@ -1051,7 +1046,7 @@ namespace Ionic.Zip.Tests.Streams
         }
 
 
-        [Test]
+        [Fact]
         public void JitStream_Update_wi13899()
         {
             int fileCount = 12 + _rnd.Next(16);
@@ -1113,7 +1108,7 @@ namespace Ionic.Zip.Tests.Streams
 
 
 
-        [Test, Timeout(30 * 60 * 1000)]  // in ms.  30*60*100 == 30min
+        [Fact]
         public void ZipFile_PDOS_LeakTest_wi10030()
         {
             // Test memory growth over many many cycles.
@@ -1210,7 +1205,7 @@ namespace Ionic.Zip.Tests.Streams
 
 
 
-        [Test]
+        [Fact]
         public void ZipOutputStream_Parallel()
         {
             int _sizeBase = 1024 * 1024;
@@ -1387,32 +1382,32 @@ namespace Ionic.Zip.Tests.Streams
 
 
 
-        [Test]
+        [Fact]
         public void Streams_7z_Zip_ZeroLength()
         {
             _Internal_Streams_7z_Zip(0, "zero");
         }
 
-        [Test]
+        [Fact]
         public void Streams_7z_Zip()
         {
             _Internal_Streams_7z_Zip(1, "nonzero");
         }
 
-        [Test]
+        [Fact]
         public void Streams_7z_Zip_Mixed()
         {
             _Internal_Streams_7z_Zip(2, "mixed");
         }
 
-        [Test]
+        [Fact]
         public void Streams_Winzip_Zip_Mixed_Password()
         {
             string password = Path.GetFileNameWithoutExtension(Path.GetRandomFileName());
             _Internal_Streams_WinZip_Zip(2, password, "mixed");
         }
 
-        [Test]
+        [Fact]
         public void Streams_Winzip_Zip()
         {
             _Internal_Streams_WinZip_Zip(1, null, "nonzero");
@@ -1624,40 +1619,40 @@ namespace Ionic.Zip.Tests.Streams
 
 
 
-        [Test]
+        [Fact]
         public void ZIS_Crypto_zero()
         {
             _Internal_Streams_ZipInput_Encryption(0);
         }
 
-        [Test]
+        [Fact]
         public void ZIS_Crypto_zero_subdir()
         {
             _Internal_Streams_ZipInput_Encryption(3);
         }
 
-        [Test]
+        [Fact]
         public void ZIS_Crypto_nonzero()
         {
             _Internal_Streams_ZipInput_Encryption(1);
         }
 
 
-        [Test]
+        [Fact]
         public void ZIS_Crypto_nonzero_subdir()
         {
             _Internal_Streams_ZipInput_Encryption(4);
         }
 
 
-        [Test]
+        [Fact]
         public void ZIS_Crypto_mixed()
         {
             _Internal_Streams_ZipInput_Encryption(2);
         }
 
 
-        [Test]
+        [Fact]
         public void ZIS_Crypto_mixed_subdir()
         {
             _Internal_Streams_ZipInput_Encryption(5);
@@ -1667,41 +1662,41 @@ namespace Ionic.Zip.Tests.Streams
 
 
 
-        [Test]
+        [Fact]
         public void ZIS_Crypto_zero_file()
         {
             _Internal_Streams_ZipInput_Encryption(0, 1);
         }
 
-        [Test]
+        [Fact]
         public void ZIS_Crypto_zero_subdir_file()
         {
 
             _Internal_Streams_ZipInput_Encryption(3, 1);
         }
 
-        [Test]
+        [Fact]
         public void ZIS_Crypto_nonzero_file()
         {
             _Internal_Streams_ZipInput_Encryption(1, 1);
         }
 
 
-        [Test]
+        [Fact]
         public void ZIS_Crypto_nonzero_subdir_file()
         {
             _Internal_Streams_ZipInput_Encryption(4, 1);
         }
 
 
-        [Test]
+        [Fact]
         public void ZIS_Crypto_mixed_file()
         {
             _Internal_Streams_ZipInput_Encryption(2, 1);
         }
 
 
-        [Test]
+        [Fact]
         public void ZIS_Crypto_mixed_subdir_file()
         {
             _Internal_Streams_ZipInput_Encryption(5, 1);
@@ -1858,7 +1853,7 @@ namespace Ionic.Zip.Tests.Streams
 
 
 
-        [Test]
+        [Fact]
         public void ASPNET_GenerateZip()
         {
             string testBin = TestUtilities.GetTestBinDir(CurrentDir);
@@ -1929,7 +1924,7 @@ namespace Ionic.Zip.Tests.Streams
         }
 
 
-        [Test]
+        [Fact]
         public void ZIS_ZOS_VaryCompression()
         {
             string testBin = TestUtilities.GetTestBinDir(CurrentDir);

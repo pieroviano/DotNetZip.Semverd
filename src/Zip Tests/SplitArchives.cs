@@ -1,4 +1,4 @@
-// SplitArchives.cs
+﻿// SplitArchives.cs
 // ------------------------------------------------------------------
 //
 // Copyright (c) 2009-2011 Dino Chiesa.
@@ -31,7 +31,8 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
-using NUnit.Framework;
+using Xunit;
+using Assert = Ionic.Tests.Assert;
 using Ionic.Tests;
 using Interop = System.Runtime.InteropServices;
 
@@ -44,9 +45,13 @@ namespace Ionic.Zip.Tests.Split
     /// <summary>
     /// Summary description for ErrorTests
     /// </summary>
-    [TestFixture]
     public class Split : IonicTestClass
     {
+
+        public Split(Xunit.Abstractions.ITestOutputHelper output)
+            : base(output)
+        {
+        }
         [Interop.DllImport("kernel32.dll",
                            EntryPoint = "CreateSymbolicLinkW",
                            CharSet = Interop.CharSet.Unicode)]
@@ -55,7 +60,7 @@ namespace Ionic.Zip.Tests.Split
                                                     int dwFlags);
 
 
-        [Test, Timeout(6 * 60 * 1000)]
+        [Fact]
         public void Spanned_Create()
         {
             string dirToZip = Path.GetFileNameWithoutExtension(Path.GetRandomFileName());
@@ -256,8 +261,7 @@ namespace Ionic.Zip.Tests.Split
 
 
 
-        [Test]
-        [Timeout(90 * 60 * 1000)]
+        [Fact]
         public void Create_LargeSegmentedArchive()
         {
             Test_LargeSegmentedArchive(
@@ -270,8 +274,7 @@ namespace Ionic.Zip.Tests.Split
 
 
 
-        [Test]
-        [Timeout(90 * 60 * 1000)]
+        [Fact]
         public void Create_LargeSegmentedArchiveWithOver32bitSegmentSize()
         {
             Test_LargeSegmentedArchive(
@@ -525,8 +528,7 @@ namespace Ionic.Zip.Tests.Split
 
 
 
-        [Test]
-        [ExpectedException(typeof(Ionic.Zip.ZipException))]
+        [ExpectedExceptionFact(typeof(Ionic.Zip.ZipException))]
         public void Spanned_InvalidSegmentSize()
         {
             string zipFileToCreate = "InvalidSegmentSize.zip";
@@ -609,8 +611,7 @@ namespace Ionic.Zip.Tests.Split
 
 
 
-        [Test]
-        [Timeout(5 * 60 * 1000)] // to protect against stuck file locks
+        [Fact]
         public void Spanned_Resave_wi13915()
         {
             TestContext.WriteLine("Creating fodder files... {0}",
@@ -679,8 +680,7 @@ namespace Ionic.Zip.Tests.Split
 
 
 
-        [Test]
-        [Timeout(5 * 60 * 1000)] // to protect against stuck file locks
+        [Fact]
         public void Spanned_WinZip_Unzip_wi13691()
         {
             if (!WinZipIsPresent)
@@ -741,8 +741,7 @@ namespace Ionic.Zip.Tests.Split
                 "Output contains errors: " + output);
         }
 
-        [Test]
-        [Timeout(15 * 60 * 1000)]
+        [Fact]
         public void Spanned_Zip64Always_HugeFiles_WinZip_Unzip()
         {
             if (!WinZipIsPresent)
@@ -757,8 +756,7 @@ namespace Ionic.Zip.Tests.Split
                 WinZip_Unzip);
         }
 
-        [Test]
-        [Timeout(15 * 60 * 1000)]
+        [Fact]
         public void Spanned_Zip64Always_SmallFiles_WinZip_Unzip()
         {
             if (!WinZipIsPresent)
@@ -773,8 +771,7 @@ namespace Ionic.Zip.Tests.Split
                 WinZip_Unzip);
         }
 
-        [Test]
-        [Timeout(15 * 60 * 1000)]
+        [Fact]
         public void Spanned_Zip64AsNecessary_SmallFiles_WinZip_Unzip()
         {
             if (!WinZipIsPresent)
@@ -789,8 +786,7 @@ namespace Ionic.Zip.Tests.Split
                 WinZip_Unzip);
         }
 
-        [Test]
-        [Timeout(15 * 60 * 1000)]
+        [Fact]
         public void Spanned_Zip64Never_SmallFiles_WinZip_Unzip()
         {
             if (!WinZipIsPresent)
@@ -805,8 +801,7 @@ namespace Ionic.Zip.Tests.Split
                 WinZip_Unzip);
         }
 
-        [Test]
-        [Timeout(15 * 60 * 1000)]
+        [Fact]
         public void Spanned_Zip64Always_HugeFiles_7Zip_Unzip()
         {
             if (!SevenZipIsPresent)
@@ -821,8 +816,7 @@ namespace Ionic.Zip.Tests.Split
                 SevenZip_Unzip);
         }
 
-        [Test]
-        [Timeout(15 * 60 * 1000)]
+        [Fact]
         public void Spanned_Zip64Always_SmallFiles_7Zip_Unzip()
         {
             if (!SevenZipIsPresent)
@@ -837,8 +831,7 @@ namespace Ionic.Zip.Tests.Split
                 SevenZip_Unzip);
         }
 
-        [Test]
-        [Timeout(15 * 60 * 1000)]
+        [Fact]
         public void Spanned_Zip64AsNecessary_SmallFiles_7Zip_Unzip()
         {
             if (!SevenZipIsPresent)
@@ -853,8 +846,7 @@ namespace Ionic.Zip.Tests.Split
                 SevenZip_Unzip);
         }
 
-        [Test]
-        [Timeout(15 * 60 * 1000)]
+        [Fact]
         public void Spanned_Zip64Never_SmallFiles_7Zip_Unzip()
         {
             if (!SevenZipIsPresent)
@@ -871,8 +863,7 @@ namespace Ionic.Zip.Tests.Split
 
 #if INFOZIP_UNZIP_SUPPORTS_SPLIT_ARCHIVES
 
-        [Test]
-        [Timeout(5 * 60*1000)] // to protect against stuck file locks
+        [Fact]
         public void Spanned_InfoZip_Unzip_wi13691()
         {
             if (!InfoZipIsPresent)
@@ -918,8 +909,7 @@ namespace Ionic.Zip.Tests.Split
 #endif
 
 
-        [Test]
-        [Timeout(5 * 60 * 1000)] // to protect against stuck file locks
+        [Fact]
         public void Spanned_WinZip_Zip_wi13691()
         {
             if (!WinZipIsPresent)
@@ -979,8 +969,7 @@ namespace Ionic.Zip.Tests.Split
 
 
 
-        [Test]
-        [Timeout(5 * 60 * 1000)] // to protect against stuck file locks
+        [Fact]
         public void Spanned_InfoZip_Zip_wi13691()
         {
             if (!InfoZipIsPresent)

@@ -1,4 +1,4 @@
-// RandomTextGenerator.cs
+﻿// RandomTextGenerator.cs
 // ------------------------------------------------------------------
 //
 // Copyright (c) 2009 Dino Chiesa
@@ -31,7 +31,8 @@ using System.Text.RegularExpressions;
 using System.Net;
 using System.IO;
 using Ionic.Zip;
-using NUnit.Framework;
+using Xunit;
+using Assert = Ionic.Tests.Assert;
 using System.Threading;
 
 namespace Ionic.Zip.Tests.Utilities

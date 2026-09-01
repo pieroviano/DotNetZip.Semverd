@@ -1,4 +1,4 @@
-// IonicTestClass.cs
+﻿// IonicTestClass.cs
 // ------------------------------------------------------------------
 //
 // Copyright (c) 2009 Dino Chiesa.
@@ -31,12 +31,12 @@ using System.Net;
 using System.Linq;
 using System.IO;
 using Ionic.Zip;
-using NUnit.Framework;
+using Xunit;
+using Assert = Ionic.Tests.Assert;
 
 namespace Ionic.Zip.Tests.Utilities
 {
-    [TestFixture]
-    public class IonicTestClass
+    public class IonicTestClass : Ionic.Tests.TestBase, IDisposable
     {
         protected System.Random _rnd;
         protected System.Collections.Generic.List<string> _FilesToRemove;
@@ -56,10 +56,26 @@ namespace Ionic.Zip.Tests.Utilities
         protected Ionic.CopyData.Transceiver _txrx;
 
 
-        public IonicTestClass()
+        // xUnit builds the fixture once per test, so the constructor is the
+        // per-test setup and Dispose is the per-test cleanup.
+        public IonicTestClass(Xunit.Abstractions.ITestOutputHelper output)
+            : base(output)
         {
             _rnd = new System.Random();
             _FilesToRemove = new System.Collections.Generic.List<string>();
+
+            // let the static helpers in TestUtilities narrate into this test
+            TestUtilities.TestContext = TestContext;
+
+            // was [OneTimeSetUp]. The current directory is process-wide and every
+            // test restores it on the way out, so capturing it once is enough.
+            if (CurrentDir == null)
+            {
+                CurrentDir = Directory.GetCurrentDirectory();
+                Assert.AreNotEqual(Path.GetFileName(CurrentDir), "Temp", "at startup");
+            }
+
+            MyTestInitialize();
         }
 
         #region Context
@@ -71,24 +87,8 @@ namespace Ionic.Zip.Tests.Utilities
         //
         // You can use the following additional attributes as you write your tests:
         //
-        // Use ClassInitialize to run code before running the first test in the class
-        [OneTimeSetUp]
-        public static void BaseClassInitialize()
-        {
-            CurrentDir = Directory.GetCurrentDirectory();
-            Assert.AreNotEqual(Path.GetFileName(CurrentDir), "Temp", "at startup");
-        }
-
-        //
-        // Use ClassCleanup to run code after all tests in a class have run
-        // [ClassCleanup()]
-        // public static void MyClassCleanup() { }
-        //
-
-
-        // Use TestInitialize to run code before running each test
-        [SetUp]
-        public void MyTestInitialize()
+        // Per-test setup, called from the constructor.
+        protected void MyTestInitialize()
         {
             if (CurrentDir == null) CurrentDir = Directory.GetCurrentDirectory();
             TestUtilities.Initialize(out TopLevelDir);
@@ -96,9 +96,9 @@ namespace Ionic.Zip.Tests.Utilities
             Directory.SetCurrentDirectory(TopLevelDir);
         }
 
-        // Use TestCleanup to run code after each test has run
-        [TearDown]
-        public void MyTestCleanup()
+        // Per-test cleanup. Virtual so a fixture with its own teardown can add
+        // to it rather than replace it.
+        public virtual void Dispose()
         {
             // The CWD of the monitoring process is the CurrentDir,
             // therefore this test must shut down the monitoring process

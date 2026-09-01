@@ -1,4 +1,4 @@
-// TestUtilities.cs
+﻿// TestUtilities.cs
 // ------------------------------------------------------------------
 //
 // Copyright (c) 2009-2011 Dino Chiesa.
@@ -31,12 +31,26 @@ using System.Text.RegularExpressions;
 using System.Net;
 using System.IO;
 using Ionic.Zip;
-using NUnit.Framework;
+using Xunit;
+using Assert = Ionic.Tests.Assert;
 
 namespace Ionic.Zip.Tests.Utilities
 {
     class TestUtilities
     {
+        /// <summary>
+        ///   Where the narration from these static helpers goes.
+        /// </summary>
+        /// <remarks>
+        ///   xUnit output belongs to one running test, but these helpers are
+        ///   static and are called from eight different fixtures. Test
+        ///   parallelization is disabled for the whole assembly (see
+        ///   TestAssemblyInfo.cs), so exactly one test is ever in flight and a
+        ///   static sink is unambiguous. IonicTestClass points this at the
+        ///   current test as it constructs; until then it discards.
+        /// </remarks>
+        internal static Ionic.Tests.TestOutput TestContext = new Ionic.Tests.TestOutput(null);
+
         static System.Random _rnd;
         static string cdir;
         static TestUtilities()

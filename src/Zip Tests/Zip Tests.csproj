@@ -101,11 +101,17 @@
 		</None>
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="Net4x.NUnitTests" Version="1.5.0.*" />
-		<PackageReference Include="Net4x.NuGetUtility" PrivateAssets="All" Version="$(NuGetUtilityVersion)" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+		<PackageReference Include="xunit" Version="2.9.2" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
+		<PackageReference Include="coverlet.collector" Version="6.0.2" />
+		<PackageReference Include="Xunit.SkippableFact" Version="1.4.13" />
 	</ItemGroup>
 	<ItemGroup>
-		<Compile Include="..\TestCommon\ExpectedExceptionAttribute.cs" Link="TestCommon\ExpectedExceptionAttribute.cs" />
+		<ProjectReference Include="..\TestCommon\Ionic.TestCommon.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+		<!-- assembly-level attributes have to be compiled into each test assembly -->
 		<Compile Include="..\TestCommon\TestAssemblyInfo.cs" Link="TestCommon\TestAssemblyInfo.cs" />
 	</ItemGroup>
 </Project>

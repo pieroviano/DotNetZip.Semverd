@@ -1,4 +1,4 @@
-// BasicTests.cs
+﻿// BasicTests.cs
 // ------------------------------------------------------------------
 //
 // Copyright (c) 2009-2011 Dino Chiesa
@@ -26,7 +26,8 @@
 using System;
 using System.Text;
 using System.Collections.Generic;
-using NUnit.Framework;
+using Xunit;
+using Assert = Ionic.Tests.Assert;
 using Ionic.Tests;
 using RE = System.Text.RegularExpressions;
 
@@ -40,7 +41,6 @@ namespace Ionic.Zip.Tests.Basic
     /// <summary>
     /// Summary description for UnitTest1
     /// </summary>
-    [TestFixture]
     public class BasicTests : IonicTestClass
     {
         EncryptionAlgorithm[] crypto =
@@ -52,10 +52,10 @@ namespace Ionic.Zip.Tests.Basic
         };
 
 
-        public BasicTests() : base() { }
+        public BasicTests(Xunit.Abstractions.ITestOutputHelper output) : base(output) { }
 
 
-        [Test]
+        [Fact]
         public void CreateZip_AddItem_WithDirectory()
         {
             // select the name of the zip file
@@ -79,7 +79,7 @@ namespace Ionic.Zip.Tests.Basic
                                  filesToZip.Length);
         }
 
-        [Test]
+        [Fact]
         public void CreateZip_AddItem_NoDirectory()
         {
             string zipFileToCreate = "CreateZip_AddItem.zip";
@@ -99,8 +99,7 @@ namespace Ionic.Zip.Tests.Basic
         }
 
 
-        [Test]
-        [ExpectedException(typeof(Ionic.Zip.ZipException))]
+        [ExpectedExceptionFact(typeof(Ionic.Zip.ZipException))]
         public void FileNotAvailableFails_wi10387()
         {
             string zipFileToCreate = Path.Combine(TopLevelDir, "FileNotAvailableFails.zip");
@@ -120,7 +119,7 @@ namespace Ionic.Zip.Tests.Basic
         }
 
 
-        [Test]
+        [Fact]
         public void CreateZip_AddFile()
         {
             int i;
@@ -138,7 +137,7 @@ namespace Ionic.Zip.Tests.Basic
                                  filesToZip.Length);
         }
 
-        [Test]
+        [Fact]
         public void CreateZip_AddFile_CharCase_wi13481()
         {
             string zipFileToCreate = "AddFile.zip";
@@ -175,7 +174,7 @@ namespace Ionic.Zip.Tests.Basic
         }
 
 
-        [Test]
+        [Fact]
         public void CreateZip_AddFileInDirectory()
         {
             string subdir = "fodder";
@@ -244,7 +243,7 @@ namespace Ionic.Zip.Tests.Basic
         }
 
 
-        [Test]
+        [Fact]
         public void CreateZip_AddFile_LeadingDot()
         {
             // select the name of the zip file
@@ -266,7 +265,7 @@ namespace Ionic.Zip.Tests.Basic
 
 
 
-        [Test]
+        [Fact]
         public void CreateZip_AddFiles_LeadingDot_Array()
         {
             // select the name of the zip file
@@ -287,7 +286,7 @@ namespace Ionic.Zip.Tests.Basic
 
 
 
-        [Test]
+        [Fact]
         public void CreateZip_AddFiles_PreserveDirHierarchy()
         {
             // select the name of the zip file
@@ -334,7 +333,7 @@ namespace Ionic.Zip.Tests.Basic
         }
 
 
-        [Test]
+        [Fact]
         public void CreateZip_AddEntry_ByteArray()
         {
             // select the name of the zip file
@@ -377,7 +376,7 @@ namespace Ionic.Zip.Tests.Basic
 
 
 
-        [Test]
+        [Fact]
         public void CreateZip_AddFile_AddItem()
         {
             string zipFileToCreate = "CreateZip_AddFile_AddItem.zip";
@@ -416,7 +415,7 @@ namespace Ionic.Zip.Tests.Basic
 
 
 
-        [Test]
+        [Fact]
         public void CreateZip_ZeroEntries()
         {
             // select the name of the zip file
@@ -445,7 +444,7 @@ namespace Ionic.Zip.Tests.Basic
 
 
 
-        [Test]
+        [Fact]
         public void CreateZip_Basic_ParameterizedSave()
         {
             string zipFileToCreate = "CreateZip_Basic_ParameterizedSave.zip";
@@ -472,33 +471,33 @@ namespace Ionic.Zip.Tests.Basic
         }
 
 
-        [Test]
+        [Fact]
         public void CreateZip_AddFile_OnlyZeroLengthFiles()
         {
             _Internal_ZeroLengthFiles(_rnd.Next(33) + 3, "CreateZip_AddFile_OnlyZeroLengthFiles", null);
         }
 
-        [Test]
+        [Fact]
         public void CreateZip_AddFile_OnlyZeroLengthFiles_Password()
         {
             _Internal_ZeroLengthFiles(_rnd.Next(33) + 3, "CreateZip_AddFile_OnlyZeroLengthFiles", Path.GetRandomFileName());
         }
 
-        [Test]
+        [Fact]
         public void CreateZip_AddFile_OneZeroLengthFile()
         {
             _Internal_ZeroLengthFiles(1, "CreateZip_AddFile_OneZeroLengthFile", null);
         }
 
 
-        [Test]
+        [Fact]
         public void CreateZip_AddFile_OneZeroLengthFile_Password()
         {
             _Internal_ZeroLengthFiles(1, "CreateZip_AddFile_OneZeroLengthFile_Password", Path.GetRandomFileName());
         }
 
 
-        [Test]
+        [Fact]
         public void CreateZip_KeepStreamOpen()
         {
             int i;
@@ -563,7 +562,7 @@ namespace Ionic.Zip.Tests.Basic
         }
 
 
-        [Test]
+        [Fact]
         public void CreateZip_UpdateDirectory()
         {
             int i, j;
@@ -732,7 +731,7 @@ namespace Ionic.Zip.Tests.Basic
 
 
 
-        [Test]
+        [Fact]
         public void CreateZip_AddDirectory_OnlyZeroLengthFiles()
         {
             string zipFileToCreate = "CreateZip_AddDirectory_OnlyZeroLengthFiles.zip";
@@ -764,7 +763,7 @@ namespace Ionic.Zip.Tests.Basic
 
 
 
-        [Test]
+        [Fact]
         public void CreateZip_AddDirectory_OneZeroLengthFile()
         {
             string zipFileToCreate = "CreateZip_AddDirectory_OneZeroLengthFile.zip";
@@ -784,7 +783,7 @@ namespace Ionic.Zip.Tests.Basic
         }
 
 
-        [Test]
+        [Fact]
         public void CreateZip_AddDirectory_OnlyEmptyDirectories()
         {
             string zipFileToCreate = "CreateZip_AddDirectory_OnlyEmptyDirectories.zip";
@@ -808,7 +807,7 @@ namespace Ionic.Zip.Tests.Basic
         }
 
 
-        [Test]
+        [Fact]
         public void CreateZip_AddDirectory_OneEmptyDirectory()
         {
             string zipFileToCreate = "CreateZip_AddDirectory_OneEmptyDirectory.zip";
@@ -826,7 +825,7 @@ namespace Ionic.Zip.Tests.Basic
         }
 
 
-        [Test]
+        [Fact]
         public void CreateZip_WithEmptyDirectory()
         {
             string zipFileToCreate = "Create_WithEmptyDirectory.zip";
@@ -843,7 +842,7 @@ namespace Ionic.Zip.Tests.Basic
 
 
 
-        [Test]
+        [Fact]
         public void CreateZip_AddDirectory_CheckStatusTextWriter()
         {
             string zipFileToCreate = "CreateZip_AddDirectory_CheckStatusTextWriter.zip";
@@ -895,7 +894,7 @@ namespace Ionic.Zip.Tests.Basic
         }
 
 
-        [Test]
+        [Fact]
         public void CreateZip_AddDirectory()
         {
             TestTrial[] trials = {
@@ -963,7 +962,7 @@ namespace Ionic.Zip.Tests.Basic
         }
 
 
-        [Test]
+        [Fact]
         public void CreateZip_AddDirectory_Nested()
         {
             // Each trial provides a directory name into which to add
@@ -1036,7 +1035,7 @@ namespace Ionic.Zip.Tests.Basic
         }
 
 
-        [Test]
+        [Fact]
         public void Basic_SaveToFileStream()
         {
             // from small numbers of files to larger numbers of files
@@ -1075,7 +1074,7 @@ namespace Ionic.Zip.Tests.Basic
 
 
 
-        [Test]
+        [Fact]
         public void Basic_IsText()
         {
             // from small numbers of files to larger numbers of files
@@ -1140,7 +1139,7 @@ namespace Ionic.Zip.Tests.Basic
         }
 
 
-        [Test]
+        [Fact]
         public void CreateZip_VerifyThatStreamRemainsOpenAfterSave()
         {
             Ionic.Zlib.CompressionLevel[] compressionLevelOptions = {
@@ -1208,7 +1207,7 @@ namespace Ionic.Zip.Tests.Basic
         }
 
 
-        [Test]
+        [Fact]
         public void CreateZip_AddFile_VerifyCrcAndContents()
         {
             string filename = null;
@@ -1264,7 +1263,7 @@ namespace Ionic.Zip.Tests.Basic
 
 
 
-        [Test]
+        [Fact]
         public void Extract_IntoMemoryStream()
         {
             string filename = null;
@@ -1319,7 +1318,7 @@ namespace Ionic.Zip.Tests.Basic
         }
 
 
-        [Test]
+        [Fact]
         public void ExtraField_TestNull()
         {
             string filename = Path.Combine(CurrentDir, "zips\\fireone.zip");
@@ -1334,7 +1333,7 @@ namespace Ionic.Zip.Tests.Basic
         }
 
 
-        [Test]
+        [Fact]
         public void Retrieve_ViaIndexer2_wi11056()
         {
             string fileName = "wi11056.dwf";
@@ -1358,7 +1357,7 @@ namespace Ionic.Zip.Tests.Basic
 
 
 
-        [Test]
+        [Fact]
         public void Retrieve_ViaIndexer()
         {
             // select the name of the zip file
@@ -1433,7 +1432,7 @@ namespace Ionic.Zip.Tests.Basic
 
 
 
-        [Test]
+        [Fact]
         public void CreateZip_SetFileComments()
         {
             string zipFileToCreate = "FileComments.zip";
@@ -1499,7 +1498,7 @@ Maecenas in venenatis justo. Pellentesque lobortis lorem a augue volutpat, aliqu
         }
 
 
-        [Test]
+        [Fact]
         public void CreateZip_SetFileLastModified()
         {
             //int fileCount = _rnd.Next(13) + 23;
@@ -1587,7 +1586,7 @@ Maecenas in venenatis justo. Pellentesque lobortis lorem a augue volutpat, aliqu
         }
 
 
-        [Test]
+        [Fact]
         public void CreateAndExtract_VerifyAttributes()
         {
 
@@ -1679,7 +1678,7 @@ Maecenas in venenatis justo. Pellentesque lobortis lorem a augue volutpat, aliqu
 
 
 
-        [Test]
+        [Fact]
         public void CreateAndExtract_SetAndVerifyAttributes()
         {
             string zipFileToCreate = "CreateAndExtract_SetAndVerifyAttributes.zip";
@@ -1756,8 +1755,7 @@ Maecenas in venenatis justo. Pellentesque lobortis lorem a augue volutpat, aliqu
         }
 
 
-        [Test]
-        [Timeout(1000 * 240)]  // timeout in ms.  240s = 4 mins
+        [Fact]
         public void CreateZip_VerifyFileLastModified()
         {
             string zipFileToCreate = "CreateZip_VerifyFileLastModified.zip";
@@ -1921,7 +1919,7 @@ Maecenas in venenatis justo. Pellentesque lobortis lorem a augue volutpat, aliqu
 
 
 
-        [Test]
+        [Fact]
         public void CreateZip_AddDirectory_NoFilesInRoot()
         {
             string zipFileToCreate = "CreateZip_AddDirectory_NoFilesInRoot.zip";
@@ -1956,7 +1954,7 @@ Maecenas in venenatis justo. Pellentesque lobortis lorem a augue volutpat, aliqu
         }
 
 
-        [Test]
+        [Fact]
         public void CreateZip_AddDirectory_OneCharOverrideName()
         {
             int entries = 0;
@@ -2020,7 +2018,7 @@ Maecenas in venenatis justo. Pellentesque lobortis lorem a augue volutpat, aliqu
 
 
 
-        [Test]
+        [Fact]
         public void CreateZip_CompressionLevelZero_AllEntries()
         {
             string zipFileToCreate = "CompressionLevelZero.zip";
@@ -2063,7 +2061,7 @@ Maecenas in venenatis justo. Pellentesque lobortis lorem a augue volutpat, aliqu
 
 
 
-        [Test]
+        [Fact]
         public void CreateZip_ForceNoCompressionSomeEntries()
         {
             string zipFileToCreate = "ForceNoCompression.zip";
@@ -2108,7 +2106,7 @@ Maecenas in venenatis justo. Pellentesque lobortis lorem a augue volutpat, aliqu
 
 
 
-        [Test]
+        [Fact]
         public void AddFile_CompressionMethod_None_wi9208()
         {
             string zipFileToCreate = "AddFile_CompressionMethod_None_wi9208.zip";
@@ -2138,7 +2136,7 @@ Maecenas in venenatis justo. Pellentesque lobortis lorem a augue volutpat, aliqu
 
 
 
-        [Test]
+        [Fact]
         public void GetInfo()
         {
             TestContext.WriteLine("GetInfo");
@@ -2195,7 +2193,7 @@ Maecenas in venenatis justo. Pellentesque lobortis lorem a augue volutpat, aliqu
 
 
 
-        [Test]
+        [Fact]
         public void Create_WithChangeDirectory()
         {
             string zipFileToCreate = "Create_WithChangeDirectory.zip";
@@ -2447,7 +2445,7 @@ Maecenas in venenatis justo. Pellentesque lobortis lorem a augue volutpat, aliqu
         }
 
 
-        [Test]
+        [Fact]
         public void Resave_CompressionMethod_0()
         {
             for (int i = 0; i < 8; i++)
@@ -2457,7 +2455,7 @@ Maecenas in venenatis justo. Pellentesque lobortis lorem a augue volutpat, aliqu
         }
 
 
-        [Test]
+        [Fact]
         public void Resave_CompressionMethod_1()
         {
             for (int i = 0; i < 8; i++)
@@ -2467,7 +2465,7 @@ Maecenas in venenatis justo. Pellentesque lobortis lorem a augue volutpat, aliqu
             }
         }
 
-        [Test]
+        [Fact]
         public void Resave_CompressionMethod_2()
         {
             for (int i = 0; i < 8; i++)
@@ -2476,7 +2474,7 @@ Maecenas in venenatis justo. Pellentesque lobortis lorem a augue volutpat, aliqu
             }
         }
 
-        [Test]
+        [Fact]
         public void Resave_CompressionMethod_3()
         {
             for (int i = 0; i < 8; i++)
@@ -2486,7 +2484,7 @@ Maecenas in venenatis justo. Pellentesque lobortis lorem a augue volutpat, aliqu
         }
 
 
-        [Test]
+        [Fact]
         public void Resave_CompressionLevel_0()
         {
             for (int i = 0; i < 8; i++)
@@ -2496,7 +2494,7 @@ Maecenas in venenatis justo. Pellentesque lobortis lorem a augue volutpat, aliqu
         }
 
 
-        [Test]
+        [Fact]
         public void Resave_CompressionLevel_1()
         {
             for (int i = 0; i < 8; i++)
@@ -2506,7 +2504,7 @@ Maecenas in venenatis justo. Pellentesque lobortis lorem a augue volutpat, aliqu
             }
         }
 
-        [Test]
+        [Fact]
         public void Resave_CompressionLevel_2()
         {
             for (int i = 0; i < 8; i++)
@@ -2515,7 +2513,7 @@ Maecenas in venenatis justo. Pellentesque lobortis lorem a augue volutpat, aliqu
             }
         }
 
-        [Test]
+        [Fact]
         public void Resave_CompressionLevel_3()
         {
             for (int i = 0; i < 8; i++)
