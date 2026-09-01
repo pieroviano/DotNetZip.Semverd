@@ -6,8 +6,15 @@
 		<LangVersion>latest</LangVersion>
 		<AssemblyName>AspNetHost</AssemblyName>
 		<RootNamespace>Ionic.ToolsAndTests</RootNamespace>
-		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+
+		<!-- assembly metadata, formerly Properties\AssemblyInfo.cs -->
+		<AssemblyTitle>AspNetHost.cs</AssemblyTitle>
+		<Description>custom host for ASPNET, to run ASPX and ASMX pages from command line.</Description>
+		<Company>Dino Chiesa</Company>
+		<Product>Tools</Product>
+		<Copyright>Copyright © Dino Chiesa 2010-2011</Copyright>
+		<Version>1.0.0.0</Version>
 	</PropertyGroup>
 
 	<!-- System.Web.Hosting.ApplicationHost / HttpRuntime: .NET Framework only, no .NET Core equivalent. -->

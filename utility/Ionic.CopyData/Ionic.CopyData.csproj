@@ -5,7 +5,13 @@
 		<LangVersion>latest</LangVersion>
 		<AssemblyName>Ionic.CopyData</AssemblyName>
 		<RootNamespace>Ionic.CopyData</RootNamespace>
-		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+
+		<!-- assembly metadata, formerly Properties\AssemblyInfo.cs -->
+		<AssemblyTitle>CopyDataTransceiver</AssemblyTitle>
+		<Company>Dino Chiesa</Company>
+		<Product>CopyData</Product>
+		<Copyright>Copyright © Dino Chiesa 2009</Copyright>
+		<Version>1.0.0.0</Version>
 	</PropertyGroup>
 
 	<!-- Backup\ holds an older copy of every source file in this project. -->
