@@ -1857,12 +1857,19 @@ namespace Ionic.Zip.Tests.Streams
         public void ASPNET_GenerateZip()
         {
             string testBin = TestUtilities.GetTestBinDir(CurrentDir);
-            string resourceDir = Path.Combine(testBin, "Resources");
+#if DEBUG
+            var configuration = "Debug";
+#else
+            var configuration = "Release";
+#endif
+            string resourceDir = Path.GetFullPath(Path.Combine(testBin, $"..\\..\\..\\..\\..\\utility\\AspNetHost\\bin\\{configuration}\\net48"));
+
             string aspnetHost = Path.Combine(resourceDir, "AspNetHost.exe");
             Assert.IsTrue(File.Exists(aspnetHost), "file {0} does not exit.", aspnetHost);
             string aspnetHostPdb = Path.Combine(resourceDir, "AspNetHost.pdb");
 
             // page that generates a zip file.
+            resourceDir = Path.Combine(testBin, "Resources");
             string aspxPage = Path.Combine(resourceDir, "GenerateZip-cs.aspx");
             Assert.IsTrue(File.Exists(aspxPage));
 
