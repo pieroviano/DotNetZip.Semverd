@@ -59,7 +59,7 @@ namespace Ionic.Zip.Tests
 
             for (int k = 0; k < flavors.Length; k++)
             {
-                string sfxFileToCreate = Path.Combine(TopLevelDir, String.Format("SFX_{0}.exe", flavors[k].ToString()));
+                string sfxFileToCreate = Path.Combine(TopLevelDir, $"SFX_{flavors[k].ToString()}.exe");
                 string unpackDir = Path.Combine(TopLevelDir, "unpack");
                 if (Directory.Exists(unpackDir))
                     Directory.Delete(unpackDir, true);
@@ -68,14 +68,14 @@ namespace Ionic.Zip.Tests
                 int entriesAdded = 0;
                 String filename = null;
 
-                string Subdir = Path.Combine(TopLevelDir, String.Format("A{0}", k));
+                string Subdir = Path.Combine(TopLevelDir, $"A{k}");
                 Directory.CreateDirectory(Subdir);
                 var checksums = new Dictionary<string, string>();
 
                 int fileCount = _rnd.Next(50) + 30;
                 for (int j = 0; j < fileCount; j++)
                 {
-                    filename = Path.Combine(Subdir, String.Format("file{0:D3}.txt", j));
+                    filename = Path.Combine(Subdir, $"file{j:D3}.txt");
                     TestUtilities.CreateAndFillFileText(filename, _rnd.Next(34000) + 5000);
                     entriesAdded++;
                     var chk = TestUtilities.ComputeChecksum(filename);
@@ -109,7 +109,7 @@ namespace Ionic.Zip.Tests
                             }
                             else
                             {
-                                Assert.AreEqual("Readme.txt", e.FileName, String.Format("trial {0}", k));
+                                Assert.AreEqual("Readme.txt", e.FileName, $"trial {k}");
                             }
                         }
                     }
@@ -134,8 +134,7 @@ namespace Ionic.Zip.Tests
         private void SFX_Update(SelfExtractorFlavor flavor)
         {
             string sfxFileToCreate = Path.Combine(TopLevelDir,
-                                                  String.Format("SFX_Update{0}.exe",
-                                                                flavor.ToString()));
+                $"SFX_Update{flavor.ToString()}.exe");
             string unpackDir = Path.Combine(TopLevelDir, "unpack");
             if (Directory.Exists(unpackDir))
                 Directory.Delete(unpackDir, true);
@@ -278,7 +277,7 @@ namespace Ionic.Zip.Tests
             int fileCount = _rnd.Next(10) + 10;
             for (int j = 0; j < fileCount; j++)
             {
-                filename = Path.Combine(Subdir, String.Format("file{0:D3}.txt", j));
+                filename = Path.Combine(Subdir, $"file{j:D3}.txt");
                 TestUtilities.CreateAndFillFileText(filename, _rnd.Next(34000) + 5000);
                 entriesAdded++;
                 var chk = TestUtilities.ComputeChecksum(filename);
@@ -331,19 +330,19 @@ namespace Ionic.Zip.Tests
             string[] Passwords = { null, "12345" };
             for (int k = 0; k < Passwords.Length; k++)
             {
-                string exeFileToCreate = Path.Combine(TopLevelDir, String.Format("SFX_WinForms-{0}.exe", k));
-                string DesiredunpackDir = Path.Combine(TopLevelDir, String.Format("unpack{0}", k));
+                string exeFileToCreate = Path.Combine(TopLevelDir, $"SFX_WinForms-{k}.exe");
+                string DesiredunpackDir = Path.Combine(TopLevelDir, $"unpack{k}");
 
                 String filename = null;
 
-                string Subdir = Path.Combine(TopLevelDir, String.Format("A{0}", k));
+                string Subdir = Path.Combine(TopLevelDir, $"A{k}");
                 Directory.CreateDirectory(Subdir);
                 var checksums = new Dictionary<string, string>();
 
                 int fileCount = _rnd.Next(10) + 10;
                 for (int j = 0; j < fileCount; j++)
                 {
-                    filename = Path.Combine(Subdir, String.Format("file{0:D3}.txt", j));
+                    filename = Path.Combine(Subdir, $"file{j:D3}.txt");
                     TestUtilities.CreateAndFillFileText(filename, _rnd.Next(34000) + 5000);
                     var chk = TestUtilities.ComputeChecksum(filename);
                     checksums.Add(filename, TestUtilities.CheckSumToString(chk));
@@ -354,7 +353,8 @@ namespace Ionic.Zip.Tests
                     zip.Password = Passwords[k];
                     zip.AddDirectory(Subdir, Path.GetFileName(Subdir));
                     zip.Comment = "For testing purposes, please extract to:  " + DesiredunpackDir;
-                    if (Passwords[k] != null) zip.Comment += String.Format("\r\n\r\nThe password for all entries is:  {0}\n", Passwords[k]);
+                    if (Passwords[k] != null) zip.Comment +=
+                        $"\r\n\r\nThe password for all entries is:  {Passwords[k]}\n";
                     var sfxOptions = new SelfExtractorSaveOptions
                     {
                         Flavor = Ionic.Zip.SelfExtractorFlavor.WinFormsApplication,
@@ -375,14 +375,14 @@ namespace Ionic.Zip.Tests
                 process.WaitForExit();
 
                 // now, compare the output in TargetDirectory with the original
-                string DirToCheck = Path.Combine(DesiredunpackDir, String.Format("A{0}", k));
+                string DirToCheck = Path.Combine(DesiredunpackDir, $"A{k}");
                 // verify the checksum of each file matches with its brother
                 var fileList = Directory.GetFiles(DirToCheck);
                 Assert.AreEqual(checksums.Keys.Count, fileList.Length, "Trial {0}: Inconsistent results.", k);
 
                 foreach (string fname in fileList)
                 {
-                    string expectedCheckString = checksums[fname.Replace(String.Format("\\unpack{0}", k), "")];
+                    string expectedCheckString = checksums[fname.Replace($"\\unpack{k}", "")];
                     string actualCheckString = TestUtilities.CheckSumToString(TestUtilities.ComputeChecksum(fname));
                     Assert.AreEqual(expectedCheckString, actualCheckString, "Trial {0}: Unexpected checksum on extracted filesystem file ({1}).", k, fname);
                 }
@@ -647,7 +647,7 @@ namespace Ionic.Zip.Tests
 
                 TestContext.WriteLine("----------------------");
                 TestContext.WriteLine("Trial {0}", k);
-                string unpackDir = String.Format("unpack.{0}", k);
+                string unpackDir = $"unpack.{k}";
 
                 var sw = new System.IO.StringWriter();
                 using (ZipFile zip = new ZipFile())
@@ -803,7 +803,7 @@ namespace Ionic.Zip.Tests
                 for (int k = 0; k < 2; k++)
                 {
                     string sfxFileToCreate =
-                        String.Format("SFX_RemoveFilesAfterUnpack.{0}.{1}.exe", j, k);
+                        $"SFX_RemoveFilesAfterUnpack.{j}.{k}.exe";
                     using (ZipFile zip = new ZipFile())
                     {
                         zip.Password = password;
@@ -823,9 +823,9 @@ namespace Ionic.Zip.Tests
                         zip.SaveSelfExtractor(sfxFileToCreate, sfxOptions);
                     }
 
-                    string extractDir = String.Format("extract.{0}.{1}", j, k);
+                    string extractDir = $"extract.{j}.{k}";
                     string sfxCmdLineArgs =
-                        String.Format("-p {0} -d {1}", password, extractDir);
+                        $"-p {password} -d {extractDir}";
 
                     if (j == 1)
                     {

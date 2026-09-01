@@ -282,7 +282,7 @@ namespace Ionic.Zip
                 if (_innerStream.Position != _innerStream.Length)
                 {
                     _exceptionPending = true;
-                    throw new ZipException(String.Format("Read error in file {0}", CurrentName));
+                    throw new ZipException($"Read error in file {CurrentName}");
 
                 }
 

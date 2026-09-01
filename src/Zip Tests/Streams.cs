@@ -135,10 +135,10 @@ namespace Ionic.Zip.Tests.Streams
             {
                 for (int k = 0; k < passwords.Length; k++)
                 {
-                    string zipFileToCreate = String.Format("ReadZip_OpenReader-{0}-{1}.zip", j, k);
+                    string zipFileToCreate = $"ReadZip_OpenReader-{j}-{k}.zip";
                     //int entriesAdded = 0;
                     //String filename = null;
-                    string dirToZip = String.Format("dirToZip.{0}.{1}", j, k);
+                    string dirToZip = $"dirToZip.{j}.{k}";
                     var files = TestUtilities.GenerateFilesFlat(dirToZip);
 
                     using (ZipFile zip1 = new ZipFile())
@@ -152,7 +152,7 @@ namespace Ionic.Zip.Tests.Streams
                     // Verify the files are in the zip
                     Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate),
                                          files.Length,
-                                         String.Format("Trial ({0},{1})", j, k));
+                                         $"Trial ({j},{k})");
 
                     int i = 0;
                     ZipEntry e1 = null;
@@ -184,7 +184,7 @@ namespace Ionic.Zip.Tests.Streams
 
                                 using (var s = opener())
                                 {
-                                    string outFile = String.Format("{0}.{1}.out", eName, i);
+                                    string outFile = $"{eName}.{i}.out";
                                     int totalBytesRead = 0;
                                     using (var output = File.Create(outFile))
                                     {
@@ -200,9 +200,9 @@ namespace Ionic.Zip.Tests.Streams
                                     TestContext.WriteLine("CRC expected({0:X8}) actual({1:X8})",
                                                           e1.Crc, s.Crc);
                                     Assert.AreEqual(s.Crc, e1.Crc,
-                                                           string.Format("{0} :: CRC Mismatch", eName));
+                                        $"{eName} :: CRC Mismatch");
                                     Assert.AreEqual(totalBytesRead, (int)e1.UncompressedSize,
-                                                           string.Format("We read an unexpected number of bytes. ({0})", eName));
+                                        $"We read an unexpected number of bytes. ({eName})");
                                 }
                             }
                         }
@@ -222,7 +222,7 @@ namespace Ionic.Zip.Tests.Streams
                 {
                     output.CompressionLevel = Ionic.Zlib.CompressionLevel.None;
                     output.Comment = "Cheeso is the man!";
-                    string entryName = String.Format("entry{0:D4}.txt", _rnd.Next(10000));
+                    string entryName = $"entry{_rnd.Next(10000):D4}.txt";
                     output.PutNextEntry(entryName);
                     string content = "This is the content for the entry.";
                     byte[] buffer = Encoding.ASCII.GetBytes(content);
@@ -261,7 +261,7 @@ namespace Ionic.Zip.Tests.Streams
             {
                 for (int k = 0; k < compLevels.Length; k++)
                 {
-                    string zipFileToCreate = String.Format("AddEntry_JitProvided.{0}.{1}.zip", i, k);
+                    string zipFileToCreate = $"AddEntry_JitProvided.{i}.{k}.zip";
                     string dirToZip = Path.GetFileNameWithoutExtension(Path.GetRandomFileName());
                     var files = TestUtilities.GenerateFilesFlat(dirToZip);
                     string password = Path.GetRandomFileName();
@@ -317,7 +317,7 @@ namespace Ionic.Zip.Tests.Streams
 
             for (int j = 0; j < fileCounts.Length; j++)
             {
-                string dirToZip = String.Format("subdir{0}", j);
+                string dirToZip = $"subdir{j}";
                 string[] files = null;
                 if (zero)
                 {
@@ -559,20 +559,20 @@ namespace Ionic.Zip.Tests.Streams
                         if (_rnd.Next(7) == 0)
                         {
                             // make it a directory
-                            string entryName = String.Format("{0:D4}/", k);
+                            string entryName = $"{k:D4}/";
                             output.PutNextEntry(entryName);
                             dirCount++;
                         }
                         else
                         {
-                            string entryName = String.Format("{0:D4}.txt", k);
+                            string entryName = $"{k:D4}.txt";
                             output.PutNextEntry(entryName);
 
                             // only a few entries are non-empty
                             if (_rnd.Next(18) == 0)
                             {
                                 var block = TestUtilities.GenerateRandomAsciiString();
-                                string content = String.Format("This is the content for entry #{0}.\n", k);
+                                string content = $"This is the content for entry #{k}.\n";
                                 int n = _rnd.Next(4) + 1;
                                 for (int j = 0; j < n; j++)
                                     content += block;
@@ -722,7 +722,7 @@ namespace Ionic.Zip.Tests.Streams
         {
             for (int k = 0; k < 2; k++)
             {
-                string zipFileToCreate = String.Format("ZOS_Create_Directories.{0}.zip", k);
+                string zipFileToCreate = $"ZOS_Create_Directories.{k}.zip";
                 using (var fs = File.Create(zipFileToCreate))
                 {
                     using (var output = new ZipOutputStream(fs))
@@ -968,7 +968,7 @@ namespace Ionic.Zip.Tests.Streams
                     //_txrx.Send(String.Format("status Compressing {0}", e.CurrentEntry.FileName));
                     if (!_pb1Set)
                     {
-                        _txrx.Send(String.Format("pb 1 max {0}", e.EntriesTotal));
+                        _txrx.Send($"pb 1 max {e.EntriesTotal}");
                         _pb1Set = true;
                     }
                     _totalToSave = e.EntriesTotal;
@@ -978,7 +978,7 @@ namespace Ionic.Zip.Tests.Streams
                 case ZipProgressEventType.Saving_EntryBytesRead:
                     if (!_pb2Set)
                     {
-                        _txrx.Send(String.Format("pb 2 max {0}", e.TotalBytesToTransfer));
+                        _txrx.Send($"pb 2 max {e.TotalBytesToTransfer}");
                         _pb2Set = true;
                     }
 
@@ -987,7 +987,7 @@ namespace Ionic.Zip.Tests.Streams
                     //                                              e.CurrentEntry.FileName,
                     //                                              e.BytesTransferred/(1024*1024), e.TotalBytesToTransfer/(1024*1024),
                     //                                              ((double)e.BytesTransferred) / (0.01 * e.TotalBytesToTransfer)));
-                    msg = String.Format("pb 2 value {0}", e.BytesTransferred);
+                    msg = $"pb 2 value {e.BytesTransferred}";
                     _txrx.Send(msg);
                     //System.Threading.Thread.Sleep(40);
                     break;
@@ -1069,7 +1069,7 @@ namespace Ionic.Zip.Tests.Streams
             // Second to call UpdateEntry when a prior entry exists.
             for (int j = 0; j < 2; j++)
             {
-                string zipFileToCreate = String.Format("wi13899-{0}.zip", j);
+                string zipFileToCreate = $"wi13899-{j}.zip";
 
                 TestContext.WriteLine("");
                 TestContext.WriteLine("Creating zipfile {0}", zipFileToCreate);
@@ -1165,7 +1165,7 @@ namespace Ionic.Zip.Tests.Streams
 
             TestContext.WriteLine("Testing for leaks....");
 
-            _txrx.Send(String.Format("pb 0 max {0}", nCycles));
+            _txrx.Send($"pb 0 max {nCycles}");
             _txrx.Send("pb 0 value 0");
 
             for (int x = 0; x < nCycles; x++)
@@ -1222,24 +1222,24 @@ namespace Ionic.Zip.Tests.Streams
             string dirToZip = Path.Combine(TopLevelDir, "dirToZip");
 
 
-            string channel = String.Format("ZOS_Parallel{0:000}", _rnd.Next(1000));
+            string channel = $"ZOS_Parallel{_rnd.Next(1000):000}";
             string txrxLabel = "ZipOutputStream Parallel";
             _txrx = TestUtilities.StartProgressMonitor(channel, txrxLabel, "starting up...");
 
             TestContext.WriteLine("Creating {0} fodder files...", nFiles);
             Directory.CreateDirectory(dirToZip);
 
-            _txrx.Send(String.Format("pb 0 max {0}", nFiles));
+            _txrx.Send($"pb 0 max {nFiles}");
             _txrx.Send("pb 0 value 0");
 
             sw.Start();
 
             for (int x = 0; x < nFiles; x++)
             {
-                string status = String.Format("status Creating file {0}/{1}", x + 1, nFiles);
+                string status = $"status Creating file {x + 1}/{nFiles}";
                 _txrx.Send(status);
 
-                filenames[x] = Path.Combine(dirToZip, String.Format("file{0:000}.txt", x));
+                filenames[x] = Path.Combine(dirToZip, $"file{x:000}.txt");
                 using (var output = File.Create(filenames[x]))
                 {
                     using (Stream input = new Ionic.Zip.Tests.Utilities.RandomTextInputStream(_sizeBase + _rnd.Next(_sizeRange)))
@@ -1255,7 +1255,7 @@ namespace Ionic.Zip.Tests.Streams
             sw.Stop();
             TestContext.WriteLine("file generation took {0}", sw.Elapsed);
 
-            _txrx.Send(String.Format("pb 0 max {0}", crypto.Length));
+            _txrx.Send($"pb 0 max {crypto.Length}");
             _txrx.Send("pb 0 value 0");
 
             for (int i = 0; i < crypto.Length; i++)
@@ -1263,7 +1263,7 @@ namespace Ionic.Zip.Tests.Streams
                 //int c = i;
                 int c = (i + 2) % crypto.Length;
 
-                _txrx.Send(String.Format("pb 1 max {0}", compLevels.Length));
+                _txrx.Send($"pb 1 max {compLevels.Length}");
                 _txrx.Send("pb 1 value 0");
 
                 for (int j = 0; j < compLevels.Length; j++)
@@ -1294,7 +1294,7 @@ namespace Ionic.Zip.Tests.Streams
 
                         if (k == 0)
                         {
-                            _txrx.Send(String.Format("pb 2 max {0}", kCycles * tCycles));
+                            _txrx.Send($"pb 2 max {kCycles * tCycles}");
                             _txrx.Send("pb 2 value 0");
                         }
 
@@ -1326,7 +1326,7 @@ namespace Ionic.Zip.Tests.Streams
                                 output.Encryption = crypto[c]; // maybe "None"
                                 output.CompressionLevel = compLevels[j];
 
-                                _txrx.Send(String.Format("pb 3 max {0}", nFiles));
+                                _txrx.Send($"pb 3 max {nFiles}");
                                 _txrx.Send("pb 3 value 0");
 
                                 for (int x = 0; x < nFiles; x++)
@@ -1415,7 +1415,7 @@ namespace Ionic.Zip.Tests.Streams
 
         private string CreateZeroLengthFile(int ix, string directory)
         {
-            string nameOfFileToCreate = Path.Combine(directory, String.Format("ZeroLength{0:D4}.txt", ix));
+            string nameOfFileToCreate = Path.Combine(directory, $"ZeroLength{ix:D4}.txt");
             using (var fs = File.Create(nameOfFileToCreate)) { }
             return nameOfFileToCreate;
         }
@@ -1433,12 +1433,12 @@ namespace Ionic.Zip.Tests.Streams
 
             for (int m = 0; m < fileCounts.Length; m++)
             {
-                string dirToZip = String.Format("trial{0:D2}", m);
+                string dirToZip = $"trial{m:D2}";
                 if (!Directory.Exists(dirToZip)) Directory.CreateDirectory(dirToZip);
 
                 int fileCount = fileCounts[m];
                 string zipFileToCreate = Path.Combine(TopLevelDir,
-                                                      String.Format("Streams_7z_Zip.{0}.{1}.{2}.zip", flavor, label, m));
+                    $"Streams_7z_Zip.{flavor}.{label}.{m}.zip");
 
                 string[] files = null;
                 if (flavor == 0)
@@ -1460,21 +1460,21 @@ namespace Ionic.Zip.Tests.Streams
                             files[i] = CreateZeroLengthFile(i, dirToZip);
                         else
                         {
-                            files[i] = Path.Combine(dirToZip, String.Format("nonzero{0:D4}.txt", i));
+                            files[i] = Path.Combine(dirToZip, $"nonzero{i:D4}.txt");
                             TestUtilities.CreateAndFillFileText(files[i], _rnd.Next(60000) + 100);
                         }
                     }
                 }
 
                 // Create the zip archive via 7z.exe
-                this.Exec(sevenZip, String.Format("a {0} {1}", zipFileToCreate, dirToZip));
+                this.Exec(sevenZip, $"a {zipFileToCreate} {dirToZip}");
 
                 // Verify the number of files in the zip
                 Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), files.Length,
                                      "Incorrect number of entries in the zip file.");
 
                 // extract the files
-                string extractDir = String.Format("extract{0:D2}", m);
+                string extractDir = $"extract{m:D2}";
                 byte[] buffer = new byte[2048];
                 int n;
                 using (var raw = File.OpenRead(zipFileToCreate))
@@ -1529,12 +1529,12 @@ namespace Ionic.Zip.Tests.Streams
 
             for (int m = 0; m < fileCounts.Length; m++)
             {
-                string dirToZip = String.Format("trial{0:D2}", m);
+                string dirToZip = $"trial{m:D2}";
                 if (!Directory.Exists(dirToZip)) Directory.CreateDirectory(dirToZip);
 
                 int fileCount = fileCounts[m];
                 string zipFileToCreate = Path.Combine(TopLevelDir,
-                                                      String.Format("Streams_Winzip_Zip.{0}.{1}.{2}.zip", fodderOption, label, m));
+                    $"Streams_Winzip_Zip.{fodderOption}.{label}.{m}.zip");
 
                 string[] files = null;
                 if (fodderOption == 0)
@@ -1556,7 +1556,7 @@ namespace Ionic.Zip.Tests.Streams
                             files[i] = CreateZeroLengthFile(i, dirToZip);
                         else
                         {
-                            files[i] = Path.Combine(dirToZip, String.Format("nonzero{0:D4}.txt", i));
+                            files[i] = Path.Combine(dirToZip, $"nonzero{i:D4}.txt");
                             TestUtilities.CreateAndFillFileText(files[i], _rnd.Next(60000) + 100);
                         }
                     }
@@ -1572,7 +1572,7 @@ namespace Ionic.Zip.Tests.Streams
                                      "Incorrect number of entries in the zip file.");
 
                 // extract the files
-                string extractDir = String.Format("extract{0:D2}", m);
+                string extractDir = $"extract{m:D2}";
                 Directory.CreateDirectory(extractDir);
                 byte[] buffer = new byte[2048];
                 int n;
@@ -1724,7 +1724,7 @@ namespace Ionic.Zip.Tests.Streams
             for (int m = 0; m < fileCounts.Length; m++)
             {
                 string password = TestUtilities.GenerateRandomPassword();
-                string dirToZip = String.Format("trial{0:D2}", m);
+                string dirToZip = $"trial{m:D2}";
                 if (!Directory.Exists(dirToZip)) Directory.CreateDirectory(dirToZip);
 
                 int fileCount = fileCounts[m];
@@ -1754,7 +1754,7 @@ namespace Ionic.Zip.Tests.Streams
                             b[i] = CreateZeroLengthFile(i, dirToZip);
                         else
                         {
-                            b[i] = Path.Combine(dirToZip, String.Format("nonzero{0:D4}.txt", i));
+                            b[i] = Path.Combine(dirToZip, $"nonzero{i:D4}.txt");
                             TestUtilities.CreateAndFillFileText(b[i], _rnd.Next(60000) + 100);
                         }
                     }
@@ -1793,7 +1793,7 @@ namespace Ionic.Zip.Tests.Streams
                                          "Incorrect number of entries in the zip file.");
 
                     // extract the files
-                    string extractDir = String.Format("extract{0:D2}.{1:D2}", m, i);
+                    string extractDir = $"extract{m:D2}.{i:D2}";
                     TestContext.WriteLine("Extract to: {0}", extractDir);
                     Directory.CreateDirectory(extractDir);
 
@@ -1951,7 +1951,7 @@ namespace Ionic.Zip.Tests.Streams
             // Three cycles - three different ways to vary compression
             for (int k = 0; k < 3; k++)
             {
-                string zipFileToCreate = String.Format("VaryCompression-{0}.zip", k);
+                string zipFileToCreate = $"VaryCompression-{k}.zip";
 
                 TestContext.WriteLine("");
                 TestContext.WriteLine("Creating zip, cycle {0}", k);

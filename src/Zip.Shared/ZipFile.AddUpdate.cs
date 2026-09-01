@@ -208,8 +208,7 @@ namespace Ionic.Zip
             if (Directory.Exists(fileOrDirectoryName))
                 return AddDirectory(fileOrDirectoryName, directoryPathInArchive);
 
-            throw new FileNotFoundException(String.Format("That file or directory ({0}) does not exist!",
-                                                          fileOrDirectoryName));
+            throw new FileNotFoundException($"That file or directory ({fileOrDirectoryName}) does not exist!");
         }
 
         /// <summary>
@@ -1077,7 +1076,7 @@ namespace Ionic.Zip
                 UpdateDirectory(itemName, directoryPathInArchive);
 
             else
-                throw new FileNotFoundException(String.Format("That file or directory ({0}) does not exist!", itemName));
+                throw new FileNotFoundException($"That file or directory ({itemName}) does not exist!");
         }
 
 
@@ -2189,8 +2188,7 @@ namespace Ionic.Zip
                     // path-too-long case in ZipEntry.Create.)
                     if (level == 0) throw;
 
-                    throw new ZipException(String.Format("Cannot read the contents of directory '{0}'.",
-                                                         directoryName),
+                    throw new ZipException($"Cannot read the contents of directory '{directoryName}'.",
                                            ioe);
                 }
             }

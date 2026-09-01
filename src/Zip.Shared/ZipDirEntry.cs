@@ -74,38 +74,38 @@ namespace Ionic.Zip
             {
                 var builder = new System.Text.StringBuilder();
                 builder
-                    .Append(string.Format("          ZipEntry: {0}\n", this.FileName))
-                    .Append(string.Format("   Version Made By: {0}\n", this._VersionMadeBy))
-                    .Append(string.Format(" Needed to extract: {0}\n", this.VersionNeeded));
+                    .Append($"          ZipEntry: {this.FileName}\n")
+                    .Append($"   Version Made By: {this._VersionMadeBy}\n")
+                    .Append($" Needed to extract: {this.VersionNeeded}\n");
 
                 if (this._IsDirectory)
                     builder.Append("        Entry type: directory\n");
                 else
                 {
-                    builder.Append(string.Format("         File type: {0}\n", this._IsText? "text":"binary"))
-                        .Append(string.Format("       Compression: {0}\n", this.CompressionMethod))
-                        .Append(string.Format("        Compressed: 0x{0:X}\n", this.CompressedSize))
-                        .Append(string.Format("      Uncompressed: 0x{0:X}\n", this.UncompressedSize))
-                        .Append(string.Format("             CRC32: 0x{0:X8}\n", this._Crc32));
+                    builder.Append($"         File type: {(this._IsText ? "text" : "binary")}\n")
+                        .Append($"       Compression: {this.CompressionMethod}\n")
+                        .Append($"        Compressed: 0x{this.CompressedSize:X}\n")
+                        .Append($"      Uncompressed: 0x{this.UncompressedSize:X}\n")
+                        .Append($"             CRC32: 0x{this._Crc32:X8}\n");
                 }
-                builder.Append(string.Format("       Disk Number: {0}\n", this._diskNumber));
+                builder.Append($"       Disk Number: {this._diskNumber}\n");
                 if (this._RelativeOffsetOfLocalHeader > 0xFFFFFFFF)
                     builder
-                        .Append(string.Format("   Relative Offset: 0x{0:X16}\n", this._RelativeOffsetOfLocalHeader));
+                        .Append($"   Relative Offset: 0x{this._RelativeOffsetOfLocalHeader:X16}\n");
                         else
                     builder
-                        .Append(string.Format("   Relative Offset: 0x{0:X8}\n", this._RelativeOffsetOfLocalHeader));
+                        .Append($"   Relative Offset: 0x{this._RelativeOffsetOfLocalHeader:X8}\n");
 
                     builder
-                    .Append(string.Format("         Bit Field: 0x{0:X4}\n", this._BitField))
-                    .Append(string.Format("        Encrypted?: {0}\n", this._sourceIsEncrypted))
-                    .Append(string.Format("          Timeblob: 0x{0:X8}\n", this._TimeBlob))
-                        .Append(string.Format("              Time: {0}\n", Ionic.Zip.SharedUtilities.PackedToDateTime(this._TimeBlob)));
+                    .Append($"         Bit Field: 0x{this._BitField:X4}\n")
+                    .Append($"        Encrypted?: {this._sourceIsEncrypted}\n")
+                    .Append($"          Timeblob: 0x{this._TimeBlob:X8}\n")
+                        .Append($"              Time: {Ionic.Zip.SharedUtilities.PackedToDateTime(this._TimeBlob)}\n");
 
-                builder.Append(string.Format("         Is Zip64?: {0}\n", this._InputUsesZip64));
+                builder.Append($"         Is Zip64?: {this._InputUsesZip64}\n");
                 if (!string.IsNullOrEmpty(this._Comment))
                 {
-                    builder.Append(string.Format("           Comment: {0}\n", this._Comment));
+                    builder.Append($"           Comment: {this._Comment}\n");
                 }
                 builder.Append("\n");
                 return builder.ToString();
@@ -142,12 +142,12 @@ namespace Ionic.Zip
                     if (m.Success)
                     {
                         n = Int32.Parse(m.Groups[1].Value) + 1;
-                        string copy = String.Format(" (copy {0})", n);
+                        string copy = $" (copy {n})";
                         f = f.Substring(0, m.Index) + copy;
                     }
                     else
                     {
-                        string copy = String.Format(" (copy {0})", n);
+                        string copy = $" (copy {n})";
                         f = f + copy;
                     }
                 }
@@ -158,12 +158,12 @@ namespace Ionic.Zip
                     if (m.Success)
                     {
                         n = Int32.Parse(m.Groups[1].Value) + 1;
-                        string copy = String.Format(" (copy {0})", n);
+                        string copy = $" (copy {n})";
                         f = f.Substring(0, m.Index) + copy + f.Substring(r);
                     }
                     else
                     {
-                        string copy = String.Format(" (copy {0})", n);
+                        string copy = $" (copy {n})";
                         f = f.Substring(0, r) + copy + f.Substring(r);
                     }
 
@@ -217,7 +217,7 @@ namespace Ionic.Zip
                         signature != ZipConstants.ZipEntrySignature  // workitem 8299
                         )
                     {
-                        throw new BadReadException(String.Format("  Bad signature (0x{0:X8}) at position 0x{1:X8}", signature, s.Position));
+                        throw new BadReadException($"  Bad signature (0x{signature:X8}) at position 0x{s.Position:X8}");
                     }
                     return null;
                 }

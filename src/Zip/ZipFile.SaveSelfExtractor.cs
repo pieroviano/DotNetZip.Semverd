@@ -729,7 +729,7 @@ namespace Ionic.Zip
             using (Stream instream = a.GetManifestResourceStream(resourceName))
             {
                 if (instream == null)
-                    throw new ZipException(String.Format("missing resource '{0}'", resourceName));
+                    throw new ZipException($"missing resource '{resourceName}'");
 
                 using (FileStream outstream = File.OpenWrite(filename))
                 {
@@ -782,7 +782,8 @@ namespace Ionic.Zip
 
                     // sanity check; should never happen
                     if (settings == null)
-                        throw new BadStateException(String.Format("While saving a Self-Extracting Zip, Cannot find that flavor ({0})?", options.Flavor));
+                        throw new BadStateException(
+                            $"While saving a Self-Extracting Zip, Cannot find that flavor ({options.Flavor})?");
 
                     // This is the list of referenced assemblies.  Ionic.Zip is
                     // needed here.  Also if it is the winforms (gui) extractor, we
@@ -852,10 +853,10 @@ namespace Ionic.Zip
                                 e.Attributes ^= FileAttributes.ReadOnly;
                             e.Extract(unpackedResourceDir);
                             nameOfIconFile = Path.Combine(unpackedResourceDir, "zippedFile.ico");
-                            cp.CompilerOptions += String.Format("/win32icon:\"{0}\"", nameOfIconFile);
+                            cp.CompilerOptions += $"/win32icon:\"{nameOfIconFile}\"";
                         }
                         else
-                            cp.CompilerOptions += String.Format("/win32icon:\"{0}\"", options.IconFile);
+                            cp.CompilerOptions += $"/win32icon:\"{options.IconFile}\"";
 
                         cp.OutputAssembly = stubExe;
 
@@ -921,10 +922,11 @@ namespace Ionic.Zip
 
 
                         sb.Append("[assembly: System.Reflection.AssemblyCopyright(\"" + copyright + "\")]\n")
-                            .Append(String.Format("[assembly: System.Reflection.AssemblyVersion(\"{0}\")]\n", ZipFile.LibraryVersion.ToString()));
+                            .Append(
+                                $"[assembly: System.Reflection.AssemblyVersion(\"{ZipFile.LibraryVersion.ToString()}\")]\n");
                         if (options.FileVersion != null)
-                            sb.Append(String.Format("[assembly: System.Reflection.AssemblyFileVersion(\"{0}\")]\n",
-                                                    options.FileVersion.ToString()));
+                            sb.Append(
+                                $"[assembly: System.Reflection.AssemblyFileVersion(\"{options.FileVersion.ToString()}\")]\n");
 
                         sb.Append("\n\n\n");
 
@@ -951,7 +953,7 @@ namespace Ionic.Zip
                             using (Stream s = zip[rc].OpenReader())
                             {
                                 if (s == null)
-                                    throw new ZipException(String.Format("missing resource '{0}'", rc));
+                                    throw new ZipException($"missing resource '{rc}'");
                                 using (StreamReader sr = new StreamReader(s))
                                 {
                                     while (sr.Peek() >= 0)
@@ -1024,7 +1026,7 @@ namespace Ionic.Zip
                                                        error.ErrorText));                  // 5
                             }
                         }
-                        throw new SfxGenerationException(String.Format("Errors compiling the extraction logic!  {0}", sourceFile));
+                        throw new SfxGenerationException($"Errors compiling the extraction logic!  {sourceFile}");
                     }
 
                     OnSaveEvent(ZipProgressEventType.Saving_AfterCompileSelfExtractor);

@@ -201,10 +201,10 @@ namespace Ionic.BZip2
         public override int Read(byte[] buffer, int offset, int count)
         {
             if (offset < 0)
-                throw new IndexOutOfRangeException(String.Format("offset ({0}) must be > 0", offset));
+                throw new IndexOutOfRangeException($"offset ({offset}) must be > 0");
 
             if (count < 0)
-                throw new IndexOutOfRangeException(String.Format("count ({0}) must be > 0", count));
+                throw new IndexOutOfRangeException($"count ({count}) must be > 0");
 
             if (offset + count > buffer.Length)
                 throw new IndexOutOfRangeException(String.Format("offset({0}) count({1}) bLength({2})",
@@ -481,8 +481,7 @@ namespace Ionic.BZip2
                      magic5 != 0x59)
             {
                 this.currentState = CState.EOF;
-                var msg = String.Format("bad block header at offset 0x{0:X}",
-                                      this.input.Position);
+                var msg = $"bad block header at offset 0x{this.input.Position:X}";
                 throw new IOException(msg);
             }
             else

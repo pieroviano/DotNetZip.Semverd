@@ -1294,7 +1294,7 @@ namespace Ionic.Zip
         private void PrepSourceStream()
         {
             if (_sourceStream == null)
-                throw new ZipException(String.Format("The input stream is null for entry '{0}'.", FileName));
+                throw new ZipException($"The input stream is null for entry '{FileName}'.");
 
             if (this._sourceStreamOriginalPosition != null)
             {

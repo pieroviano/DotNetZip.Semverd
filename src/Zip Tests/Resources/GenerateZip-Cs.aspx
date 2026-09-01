@@ -47,7 +47,7 @@ public void Page_Load (Object sender, EventArgs e)
                                              "by an ASP.NET Page running on the machine named '{1}'.\n",
                                              System.DateTime.Now.ToString("G"),
                                              System.Environment.MachineName );
-            string archiveName= String.Format("archive-{0}.zip", DateTime.Now.ToString("yyyy-MMM-dd-HHmmss"));
+            string archiveName= $"archive-{DateTime.Now.ToString("yyyy-MMM-dd-HHmmss")}.zip";
             Response.ContentType = "application/zip";
             Response.AddHeader("content-disposition", "inline; filename=\"" + archiveName + "\"");
 

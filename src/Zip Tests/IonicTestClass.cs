@@ -145,7 +145,7 @@ namespace Ionic.Zip.Tests.Utilities
             int rc = TestUtilities.Exec_NoContext(program, args, waitForExit, out output);
 
             if (rc != 0)
-                throw new Exception(String.Format("Non-zero RC {0}: {1}", program, output));
+                throw new Exception($"Non-zero RC {program}: {output}");
 
             if (emitOutput)
                 TestContext.WriteLine("output: {0}", output);
@@ -506,7 +506,7 @@ namespace Ionic.Zip.Tests.Utilities
                 var chk = TestUtilities.ComputeChecksum(extractedFile);
                 Assert.AreEqual(TestUtilities.CheckSumToString(checksums[f]),
                                         TestUtilities.CheckSumToString(chk),
-                                        String.Format("Checksums for file {0} do not match.", f));
+                                        $"Checksums for file {f} do not match.");
                 count++;
             }
 

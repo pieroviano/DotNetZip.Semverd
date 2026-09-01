@@ -360,7 +360,7 @@ namespace  Ionic.Zip
         /// <returns>a string representation of the instance.</returns>
         public override String ToString()
         {
-            return String.Format ("ZipInputStream::{0}(leaveOpen({1})))", _name, _leaveUnderlyingStreamOpen);
+            return $"ZipInputStream::{_name}(leaveOpen({_leaveUnderlyingStreamOpen})))";
         }
 
 

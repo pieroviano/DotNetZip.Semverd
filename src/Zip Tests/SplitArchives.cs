@@ -81,10 +81,10 @@ namespace Ionic.Zip.Tests.Split
                 switch (x)
                 {
                     case 0:
-                        _txrx.Send(String.Format("pb 2 max {0}", ((int)z)));
+                        _txrx.Send($"pb 2 max {((int)z)}");
                         break;
                     case 1:
-                        msg = String.Format("pb 2 value {0}", ((int)z));
+                        msg = $"pb 2 value {((int)z)}";
                         _txrx.Send(msg);
                         break;
                     case 2:
@@ -110,14 +110,14 @@ namespace Ionic.Zip.Tests.Split
                                    1024*1024*1024 };
 
             _txrx.Send("status zipping...");
-            _txrx.Send(String.Format("pb 1 max {0}", segmentSizes.Length));
+            _txrx.Send($"pb 1 max {segmentSizes.Length}");
 
             System.EventHandler<Ionic.Zip.SaveProgressEventArgs> sp = (sender1, e1) =>
                 {
                     switch (e1.EventType)
                     {
                         case ZipProgressEventType.Saving_Started:
-                            _txrx.Send(String.Format("pb 2 max {0}", filesToZip.Length));
+                            _txrx.Send($"pb 2 max {filesToZip.Length}");
                             _txrx.Send("pb 2 value 0");
                             break;
 
@@ -133,10 +133,10 @@ namespace Ionic.Zip.Tests.Split
 
             for (int m = 0; m < segmentSizes.Length; m++)
             {
-                string trialDir = String.Format("trial{0}", m);
+                string trialDir = $"trial{m}";
                 Directory.CreateDirectory(trialDir);
                 string zipFileToCreate = Path.Combine(trialDir,
-                                                      String.Format("Archive-{0}.zip", m));
+                    $"Archive-{m}.zip");
                 int maxSegSize = segmentSizes[m];
 
                 msg = String.Format("status trial {0}/{1}  (max seg size {2}k)",
@@ -223,7 +223,7 @@ namespace Ionic.Zip.Tests.Split
                 case ZipProgressEventType.Extracting_BeforeExtractEntry:
                     if (!_pb1Set)
                     {
-                        _txrx.Send(String.Format("pb 1 max {0}", _numFilesToExtract));
+                        _txrx.Send($"pb 1 max {_numFilesToExtract}");
                         _pb1Set = true;
                     }
                     _pb2Set = false;
@@ -233,7 +233,7 @@ namespace Ionic.Zip.Tests.Split
                 case ZipProgressEventType.Extracting_EntryBytesWritten:
                     if (!_pb2Set)
                     {
-                        _txrx.Send(String.Format("pb 2 max {0}", e.TotalBytesToTransfer));
+                        _txrx.Send($"pb 2 max {e.TotalBytesToTransfer}");
                         _pb2Set = true;
                     }
                     // for performance, don't update the progress monitor every time.
@@ -247,7 +247,7 @@ namespace Ionic.Zip.Tests.Split
                                                  e.TotalBytesToTransfer / (1024 * 1024),
                                                  ((double)e.BytesTransferred) / (0.01 * e.TotalBytesToTransfer)
                                                  ));
-                        string msg = String.Format("pb 2 value {0}", e.BytesTransferred);
+                        string msg = $"pb 2 value {e.BytesTransferred}";
                         _txrx.Send(msg);
                     }
                     break;
@@ -379,7 +379,7 @@ namespace Ionic.Zip.Tests.Split
                             input = new Ionic.Zip.Tests.Utilities.RandomBytesInputStream((int)sz);
                             // cache = File.Create(cacheFile);
                         }
-                        _txrx.Send(String.Format("pb 2 max {0}", sz));
+                        _txrx.Send($"pb 2 max {sz}");
                         _txrx.Send("pb 2 value 0");
                         var buffer = new byte[8192];
                         int n;
@@ -398,7 +398,7 @@ namespace Ionic.Zip.Tests.Split
                                 nCycles++;
                                 if (nCycles % 312 == 0)
                                 {
-                                    _txrx.Send(String.Format("pb 2 value {0}", totalWritten));
+                                    _txrx.Send($"pb 2 value {totalWritten}");
                                     _txrx.Send(String.Format("status Saving entry {0}/{1} {2} :: {3}/{4}mb {5:N0}%",
                                                              numSaving, totalToSave,
                                                              name,
@@ -424,7 +424,7 @@ namespace Ionic.Zip.Tests.Split
 
                         case ZipProgressEventType.Saving_BeforeWriteEntry:
                             _txrx.Send("test Large Segmented Zip");
-                            _txrx.Send(String.Format("status saving {0}", e1.CurrentEntry.FileName));
+                            _txrx.Send($"status saving {e1.CurrentEntry.FileName}");
                             totalToSave = e1.EntriesTotal;
                             numSaving++;
                             break;
@@ -457,7 +457,7 @@ namespace Ionic.Zip.Tests.Split
 
             _txrx.Send("bars 3");
             _txrx.Send("pb 0 max 2");
-            _txrx.Send(String.Format("pb 1 max {0}", numFiles));
+            _txrx.Send($"pb 1 max {numFiles}");
 
             // build a large zip file out of thin air
             var sw = new StringWriter();
@@ -601,7 +601,7 @@ namespace Ionic.Zip.Tests.Split
             for (int i = 0; i < numFilesToAdd; i++)
             {
                 int fileSize = baseSize + _rnd.Next(baseSize / 2);
-                string fileName = Path.Combine(fodderDir, string.Format("Pippo{0}.txt", i));
+                string fileName = Path.Combine(fodderDir, $"Pippo{i}.txt");
                 TestUtilities.CreateAndFillFileText(fileName, fileSize);
             }
             _fodderDir = fodderDir;
@@ -629,7 +629,7 @@ namespace Ionic.Zip.Tests.Split
                 // for various segment sizes
                 for (int k = 0; k < segSizes.Length; k++)
                 {
-                    string trialDir = String.Format("trial.{0}.{1}", m, k);
+                    string trialDir = $"trial.{m}.{k}";
                     Directory.CreateDirectory(trialDir);
                     string zipFile1 = Path.Combine(trialDir, "InitialSave." + m + "." + k + ".zip");
                     string zipFile2 = Path.Combine(trialDir, "Updated." + m + "." + k + ".zip");
@@ -696,7 +696,7 @@ namespace Ionic.Zip.Tests.Split
             // for various segment sizes.
             for (int k = 0; k < segSizes.Length; k++)
             {
-                string trialDir = String.Format("trial.{0}", k);
+                string trialDir = $"trial.{k}";
                 Directory.CreateDirectory(trialDir);
                 string zipFile1 = Path.Combine(trialDir, "InitialSave." + k + ".zip");
                 TestContext.WriteLine("");
@@ -925,7 +925,7 @@ namespace Ionic.Zip.Tests.Split
             // for various segment sizes.
             for (int k = 0; k < segSizes.Length; k++)
             {
-                string trialDir = String.Format("trial.{0}", k);
+                string trialDir = $"trial.{k}";
                 Directory.CreateDirectory(trialDir);
                 string nameOfParts = Path.Combine(trialDir, "InitialSave." + k);
                 string zipFile1 = nameOfParts + ".zip";
@@ -937,7 +937,7 @@ namespace Ionic.Zip.Tests.Split
                 // steps: first create the regular zip, then split it.
 
                 // step 1: create the regular zip
-                string args = String.Format("-a -p -r -yx step1.zip \"{0}\"", contentDir);
+                string args = $"-a -p -r -yx step1.zip \"{contentDir}\"";
                 string wzzipOut = this.Exec(wzzip, args);
 
                 // step 2: split the existing zip
@@ -985,7 +985,7 @@ namespace Ionic.Zip.Tests.Split
             // for various segment sizes.
             for (int k = 0; k < segSizes.Length; k++)
             {
-                string trialDir = String.Format("trial.{0}", k);
+                string trialDir = $"trial.{k}";
                 Directory.CreateDirectory(trialDir);
                 string zipFile1 = Path.Combine(trialDir, "InitialSave." + k + ".zip");
                 TestContext.WriteLine("");

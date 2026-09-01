@@ -379,37 +379,37 @@ namespace Ionic
                     {
                         case 'H':
                             if ((_Attributes & FileAttributes.Hidden) != 0)
-                                throw new ArgumentException(String.Format("Repeated flag. ({0})", c), "value");
+                                throw new ArgumentException($"Repeated flag. ({c})", "value");
                             _Attributes |= FileAttributes.Hidden;
                             break;
 
                         case 'R':
                             if ((_Attributes & FileAttributes.ReadOnly) != 0)
-                                throw new ArgumentException(String.Format("Repeated flag. ({0})", c), "value");
+                                throw new ArgumentException($"Repeated flag. ({c})", "value");
                             _Attributes |= FileAttributes.ReadOnly;
                             break;
 
                         case 'S':
                             if ((_Attributes & FileAttributes.System) != 0)
-                                throw new ArgumentException(String.Format("Repeated flag. ({0})", c), "value");
+                                throw new ArgumentException($"Repeated flag. ({c})", "value");
                             _Attributes |= FileAttributes.System;
                             break;
 
                         case 'A':
                             if ((_Attributes & FileAttributes.Archive) != 0)
-                                throw new ArgumentException(String.Format("Repeated flag. ({0})", c), "value");
+                                throw new ArgumentException($"Repeated flag. ({c})", "value");
                             _Attributes |= FileAttributes.Archive;
                             break;
 
                         case 'I':
                             if ((_Attributes & FileAttributes.NotContentIndexed) != 0)
-                                throw new ArgumentException(String.Format("Repeated flag. ({0})", c), "value");
+                                throw new ArgumentException($"Repeated flag. ({c})", "value");
                             _Attributes |= FileAttributes.NotContentIndexed;
                             break;
 
                         case 'L':
                             if ((_Attributes & FileAttributes.ReparsePoint) != 0)
-                                throw new ArgumentException(String.Format("Repeated flag. ({0})", c), "value");
+                                throw new ArgumentException($"Repeated flag. ({c})", "value");
                             _Attributes |= FileAttributes.ReparsePoint;
                             break;
 

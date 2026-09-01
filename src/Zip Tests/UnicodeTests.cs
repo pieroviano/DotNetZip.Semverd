@@ -76,11 +76,11 @@ namespace Ionic.Zip.Tests.Unicode
                 for (int j = 0; j < 2; j++)
                 {
                     // select the name of the zip file
-                    string zipFileToCreate = Path.Combine(TopLevelDir, String.Format("Create_UnicodeEntries_{0}_{1}.zip", k, j));
+                    string zipFileToCreate = Path.Combine(TopLevelDir, $"Create_UnicodeEntries_{k}_{j}.zip");
                     Assert.IsFalse(File.Exists(zipFileToCreate), "The zip file '{0}' already exists.", zipFileToCreate);
 
                     TestContext.WriteLine("\n\nFormat {0}, trial {1}.  filename: {2}...", k, j, zipFileToCreate);
-                    string dirInArchive = String.Format("{0}-{1}", Path.GetFileName(subdir), j);
+                    string dirInArchive = $"{Path.GetFileName(subdir)}-{j}";
 
                     using (ZipFile zip1 = new ZipFile())
                     {
@@ -91,7 +91,7 @@ namespace Ionic.Zip.Tests.Unicode
                         {
                             // use the local filename (not fully qualified)
                             ZipEntry e = zip1.AddFile(filesToZip[i], dirInArchive);
-                            e.Comment = String.Format("This entry encoded with {0}", (j == 0) ? "unicode" : "the default code page.");
+                            e.Comment = $"This entry encoded with {((j == 0) ? "unicode" : "the default code page.")}";
                         }
                         zip1.Comment = origComment;
                         zip1.Save(zipFileToCreate);
@@ -182,7 +182,7 @@ namespace Ionic.Zip.Tests.Unicode
             // cycle 3 - AlternateEncoding = UTF8, AlternateEncodingUsage = AsNecessary
             for (int j = 0; j < 4; j++)
             {
-                string zipFileToCreate = Path.Combine(TopLevelDir, String.Format("Archive-{0}.zip", j));
+                string zipFileToCreate = Path.Combine(TopLevelDir, $"Archive-{j}.zip");
                 Assert.IsFalse(File.Exists(zipFileToCreate), "The file already exists ({0}).", zipFileToCreate);
 
                 using (ZipFile zip1 = new ZipFile(zipFileToCreate))
@@ -237,7 +237,7 @@ namespace Ionic.Zip.Tests.Unicode
             for (int j = 0; j < 2; j++)
             {
                 // select the name of the zip file
-                var bpath = String.Format("wi12634-{0}.zip", j);
+                var bpath = $"wi12634-{j}.zip";
                 string zipFileToCreate = Path.Combine(TopLevelDir, bpath);
                 TestContext.WriteLine("========");
                 TestContext.WriteLine("Trial {0}", j);
@@ -339,7 +339,7 @@ namespace Ionic.Zip.Tests.Unicode
             for (int k = 0; k < 2; k++)
             {
 
-                string zipFileToCreate = String.Format("UnicodeUpdate_wi12744-{0}.zip", k);
+                string zipFileToCreate = $"UnicodeUpdate_wi12744-{k}.zip";
 
                 TestContext.WriteLine("{0}", zipFileToCreate);
                 TestContext.WriteLine("==== creating zip, trial {0}", k);
@@ -450,7 +450,7 @@ namespace Ionic.Zip.Tests.Unicode
                 TestContext.WriteLine("---------------------Trial {0}....", k);
                 TestContext.WriteLine("---------------------codepage: {0}....", trials[k].codepage);
                 // create the subdirectory
-                string subdir = Path.Combine(TopLevelDir, String.Format("trial{0}-files", k));
+                string subdir = Path.Combine(TopLevelDir, $"trial{k}-files");
                 Directory.CreateDirectory(subdir);
 
                 // create a bunch of files
@@ -501,7 +501,7 @@ namespace Ionic.Zip.Tests.Unicode
                             TestContext.WriteLine("adding entry {0}", filesToZip[i]);
                             // use the local filename (not fully qualified)
                             ZipEntry e = zip1.AddFile(filesToZip[i], "");
-                            e.Comment = String.Format("This entry was encoded in the {0} codepage", trials[k].codepage);
+                            e.Comment = $"This entry was encoded in the {trials[k].codepage} codepage";
                         }
                         zip1.Save();
                     }
@@ -521,7 +521,7 @@ namespace Ionic.Zip.Tests.Unicode
                             foreach (ZipEntry e in zip2)
                             {
                                 TestContext.WriteLine("found entry {0}", e.FileName);
-                                e.Extract(String.Format("trial{0}-{1}-{2}-extract", k, j, trials[k].codepage));
+                                e.Extract($"trial{k}-{j}-{trials[k].codepage}-extract");
                             }
                         }
                     }
@@ -557,7 +557,7 @@ namespace Ionic.Zip.Tests.Unicode
             // and one for "Always"
             for (int j = 0; j < 3; j++)
             {
-                string zipFileToCreate = String.Format("wi10180-{0}.zip", j);
+                string zipFileToCreate = $"wi10180-{j}.zip";
 
                 // pass 1 - create it
                 TestContext.WriteLine("Create zip, cycle {0}...", j);
@@ -632,7 +632,7 @@ namespace Ionic.Zip.Tests.Unicode
                 {
                     TestContext.WriteLine("nEntries {0}", n);
                     var dirsAdded = new System.Collections.Generic.List<String>();
-                    var zipFileToCreate = String.Format("wi8984-{0}-{1:N2}.zip", j, n);
+                    var zipFileToCreate = $"wi8984-{j}-{n:N2}.zip";
                     using (ZipFile zip1 = new ZipFile(zipFileToCreate))
                     {
                         switch (j)
@@ -662,7 +662,7 @@ namespace Ionic.Zip.Tests.Unicode
                     }
 
 
-                    string extractDir = String.Format("extract-{0}-{1:D3}", j, n);
+                    string extractDir = $"extract-{j}-{n:D3}";
                     int dirCount = 0;
                     using (ZipFile zip2 = ZipFile.Read(zipFileToCreate))
                     {

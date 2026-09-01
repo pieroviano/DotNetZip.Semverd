@@ -962,7 +962,7 @@ namespace Ionic.Zip
                          encryptionAlgorithm != EncryptionAlgorithm.WinZipAes256)
                         || _WinZipAesMethod != 0x02)
                         throw new BadCrcException("CRC error: the file being extracted appears to be corrupted. " +
-                                                  String.Format("Expected 0x{0:X8}, Actual 0x{1:X8}", expectedCrc32, calculatedCrc32));
+                                                  $"Expected 0x{expectedCrc32:X8}, Actual 0x{calculatedCrc32:X8}");
                 }
 
                 // ignore MAC if the size of the file is zero
@@ -1012,7 +1012,7 @@ namespace Ionic.Zip
 
                     case ExtractExistingFileAction.InvokeExtractProgressEvent:
                         if (loop>0)
-                            throw new ZipException(String.Format("The file {0} already exists.", targetFileName));
+                            throw new ZipException($"The file {targetFileName} already exists.");
                         OnExtractExisting(baseDir);
                         if (_ioOperationCanceled)
                             return 2;
@@ -1022,7 +1022,7 @@ namespace Ionic.Zip
 
                     case ExtractExistingFileAction.Throw:
                     default:
-                        throw new ZipException(String.Format("The file {0} already exists.", targetFileName));
+                        throw new ZipException($"The file {targetFileName} already exists.");
                 }
                 loop++;
             }
@@ -1032,8 +1032,7 @@ namespace Ionic.Zip
         void _CheckRead(int nbytes)
         {
             if (nbytes == 0)
-                throw new BadReadException(String.Format("bad read of entry {0} from compressed archive.",
-                             FileName));
+                throw new BadReadException($"bad read of entry {FileName} from compressed archive.");
         }
 
         Stream _inputDecryptorStream;
@@ -1119,8 +1118,7 @@ namespace Ionic.Zip
 #endif
             }
 
-            throw new Exception(string.Format("Failed to find decompressor matching {0}",
-                _CompressionMethod_FromZipFile));
+            throw new Exception($"Failed to find decompressor matching {_CompressionMethod_FromZipFile}");
         }
 
         Stream GetExtractDecryptor(Stream input)
@@ -1246,7 +1244,7 @@ namespace Ionic.Zip
                     break;
                 case 0xFFFF: // - Unknown algorithm
                 default:
-                    alg = String.Format("Unknown (0x{0:X4})", unsupportedAlgorithmId);
+                    alg = $"Unknown (0x{unsupportedAlgorithmId:X4})";
                     break;
             }
             return alg;
@@ -1284,7 +1282,7 @@ namespace Ionic.Zip
                     meth = "PPMd";
                     break;
                 default:
-                    meth = String.Format("Unknown (0x{0:X4})", compressionMethod);
+                    meth = $"Unknown (0x{compressionMethod:X4})";
                     break;
             }
             return meth;

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.IO;
 using System.Windows.Forms;
 using Ionic.CopyData;
 using UnitTestProgressMonitor.Properties;
@@ -27,6 +28,7 @@ public class UnitTestProgressForm : Form
     public UnitTestProgressForm(string[] args)
     {
         InitializeComponent();
+        Icon = new Icon(new MemoryStream(Resources.folder_archive_zip_22613));
         _cmdLineArgs = args;
         pb = new List<ProgressBar>();
         _maxFactor = new List<int>();

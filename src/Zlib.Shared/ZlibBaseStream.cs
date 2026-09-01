@@ -190,7 +190,7 @@ namespace Ionic.Zlib
                     {
                         string verb = (_wantCompress ? "de" : "in") + "flating";
                         if (_z.Message == null)
-                            throw new ZlibException(String.Format("{0}: (rc = {1})", verb, rc));
+                            throw new ZlibException($"{verb}: (rc = {rc})");
                         else
                             throw new ZlibException(verb + ": " + _z.Message);
                     }
@@ -253,8 +253,8 @@ namespace Ionic.Zlib
                                                          bytesNeeded);
                             if (bytesNeeded != bytesRead)
                             {
-                                throw new ZlibException(String.Format("Missing or incomplete GZIP trailer. Expected 8 bytes, got {0}.",
-                                                                      _z.AvailableBytesIn + bytesRead));
+                                throw new ZlibException(
+                                    $"Missing or incomplete GZIP trailer. Expected 8 bytes, got {_z.AvailableBytesIn + bytesRead}.");
                             }
                         }
                         else
@@ -268,10 +268,12 @@ namespace Ionic.Zlib
                         Int32 isize_actual = (Int32)(_z.TotalBytesOut & 0x00000000FFFFFFFF);
 
                         if (crc32_actual != crc32_expected)
-                            throw new ZlibException(String.Format("Bad CRC32 in GZIP trailer. (actual({0:X8})!=expected({1:X8}))", crc32_actual, crc32_expected));
+                            throw new ZlibException(
+                                $"Bad CRC32 in GZIP trailer. (actual({crc32_actual:X8})!=expected({crc32_expected:X8}))");
 
                         if (isize_actual != isize_expected)
-                            throw new ZlibException(String.Format("Bad size in GZIP trailer. (actual({0})!=expected({1}))", isize_actual, isize_expected));
+                            throw new ZlibException(
+                                $"Bad size in GZIP trailer. (actual({isize_actual})!=expected({isize_expected}))");
 
                     }
                     else
@@ -487,7 +489,7 @@ namespace Ionic.Zlib
                     return 0;
 
                 if (rc != ZlibConstants.Z_OK && rc != ZlibConstants.Z_STREAM_END)
-                    throw new ZlibException(String.Format("{0}flating:  rc={1}  msg={2}", (_wantCompress ? "de" : "in"), rc, _z.Message));
+                    throw new ZlibException($"{(_wantCompress ? "de" : "in")}flating:  rc={rc}  msg={_z.Message}");
 
                 if ((nomoreinput || rc == ZlibConstants.Z_STREAM_END) && (_z.AvailableBytesOut == count))
                     break; // nothing more to read
@@ -516,7 +518,7 @@ namespace Ionic.Zlib
                         rc = _z.Deflate(FlushType.Finish);
 
                         if (rc != ZlibConstants.Z_OK && rc != ZlibConstants.Z_STREAM_END)
-                            throw new ZlibException(String.Format("Deflating:  rc={0}  msg={1}", rc, _z.Message));
+                            throw new ZlibException($"Deflating:  rc={rc}  msg={_z.Message}");
                     }
                 }
             }

@@ -55,11 +55,11 @@ namespace Ionic.Zip.Tests.Password
                 for (int j = 0; j < Passwords.Length; j++)
                 {
                     TestContext.WriteLine("\n\n===================\nTrial ({0}) pw({1})", j, Passwords[j]);
-                    string ZipFileToCreate = Path.Combine(TopLevelDir, String.Format("Password_BasicAddAndExtract-{0}-{1}.zip", k, j));
+                    string ZipFileToCreate = Path.Combine(TopLevelDir, $"Password_BasicAddAndExtract-{k}-{j}.zip");
                     Assert.IsFalse(File.Exists(ZipFileToCreate), "The temporary zip file '{0}' already exists.", ZipFileToCreate);
 
                     Directory.SetCurrentDirectory(TopLevelDir);
-                    string DirToZip = String.Format("zipthis-{0}-{1}", k, j);
+                    string DirToZip = $"zipthis-{k}-{j}";
                     Directory.CreateDirectory(DirToZip);
 
                     TestContext.WriteLine("\n---------------------creating files and computing checksums...");
@@ -68,10 +68,10 @@ namespace Ionic.Zip.Tests.Password
                     var checksums = new Dictionary<string, string>();
                     for (i = 0; i < NumFilesToCreate; i++)
                     {
-                        filenames[i] = Path.Combine(DirToZip, String.Format("file{0:D3}.txt", i));
+                        filenames[i] = Path.Combine(DirToZip, $"file{i:D3}.txt");
                         int sz = _rnd.Next(22000) + 3000;
                         //int sz = 1000;
-                        var repeatedLine = String.Format("Line to Repeat... {0} {1} {2} filename: {3}", i, k, j, filenames[i]);
+                        var repeatedLine = $"Line to Repeat... {i} {k} {j} filename: {filenames[i]}";
                         TestUtilities.CreateAndFillFileText(filenames[i], repeatedLine, sz);
                         string key = Path.GetFileName(filenames[i]);
                         checksums.Add(key, TestUtilities.GetCheckSumString(filenames[i]));
@@ -100,7 +100,7 @@ namespace Ionic.Zip.Tests.Password
                         foreach (ZipEntry e in zip)
                             TestContext.WriteLine("found entry: {0}", e.FileName);
 
-                        var extractDir = String.Format("extract-{0}-{1}", k, j);
+                        var extractDir = $"extract-{k}-{j}";
                         TestContext.WriteLine("  Extract with pw({0})", Passwords[j]);
                         foreach (ZipEntry e in zip)
                         {
@@ -138,7 +138,7 @@ namespace Ionic.Zip.Tests.Password
 
             for (int j = 0; j < passwords.Length; j++)
             {
-                string zipFileToCreate = Path.Combine(TopLevelDir, String.Format("Password_CheckZipPassword_wi13664-{0}.zip", j));
+                string zipFileToCreate = Path.Combine(TopLevelDir, $"Password_CheckZipPassword_wi13664-{j}.zip");
 
                 // Create the zip archive
                 using (ZipFile zip1 = new ZipFile())
@@ -175,17 +175,17 @@ namespace Ionic.Zip.Tests.Password
                     {
                         if (_rnd.Next(7) == 0)
                         {
-                            string entryName = String.Format("{0:D5}/", i);
+                            string entryName = $"{i:D5}/";
                             zos.PutNextEntry(entryName);
                         }
                         else
                         {
-                            string entryName = String.Format("{0:D5}.txt", i);
+                            string entryName = $"{i:D5}.txt";
                             zos.PutNextEntry(entryName);
                             if (_rnd.Next(12) == 0)
                             {
                                 var block = TestUtilities.GenerateRandomAsciiString() + " ";
-                                string contentBuffer = String.Format("This is the content for entry {0}", i);
+                                string contentBuffer = $"This is the content for entry {i}";
                                 int n = _rnd.Next(6) + 2;
                                 for (int j = 0; j < n; j++)
                                     contentBuffer += block;
@@ -221,16 +221,16 @@ namespace Ionic.Zip.Tests.Password
                 {
                     if (_rnd.Next(7) == 0)
                     {
-                        string entryName = String.Format("{0:D5}", i);
+                        string entryName = $"{i:D5}";
                         zip.AddDirectoryByName(entryName);
                     }
                     else
                     {
-                        string entryName = String.Format("{0:D5}.txt", i);
+                        string entryName = $"{i:D5}.txt";
                         if (_rnd.Next(12) == 0)
                         {
                             var block = TestUtilities.GenerateRandomAsciiString() + " ";
-                            string contentBuffer = String.Format("This is the content for entry {0}", i);
+                            string contentBuffer = $"This is the content for entry {i}";
                             int n = _rnd.Next(6) + 2;
                             for (int j = 0; j < n; j++)
                                 contentBuffer += block;

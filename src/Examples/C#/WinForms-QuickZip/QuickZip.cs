@@ -98,7 +98,7 @@ namespace Ionic.Zip.Examples.CS
 
         private void FixTitle()
         {
-            this.Text = String.Format("Quick Zip {0}", this.zipfileName);
+            this.Text = $"Quick Zip {this.zipfileName}";
         }
 
         private void InitializeComponent()

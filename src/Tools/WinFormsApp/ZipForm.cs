@@ -128,8 +128,8 @@ namespace Ionic.Zip.Forms
 
         private void FixTitle()
         {
-            this.Text = String.Format("DotNetZip Tool v{0}",
-                                      System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString());
+            this.Text =
+                $"DotNetZip Tool v{System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString()}";
         }
 
         private void InitializeListboxes()
@@ -287,7 +287,8 @@ namespace Ionic.Zip.Forms
             if (String.IsNullOrEmpty(this.tbDirectoryToZip.Text)) return;
             if (!System.IO.Directory.Exists(this.tbDirectoryToZip.Text))
             {
-                var dlgResult = MessageBox.Show(String.Format("The directory you have specified ({0}) does not exist.", this.tbZipToCreate.Text),
+                var dlgResult = MessageBox.Show(
+                    $"The directory you have specified ({this.tbZipToCreate.Text}) does not exist.",
                                                 "Not gonna happen", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return;
             }
@@ -297,7 +298,8 @@ namespace Ionic.Zip.Forms
             // check for existence of the zip file:
             if (System.IO.File.Exists(this.tbZipToCreate.Text))
             {
-                var dlgResult = MessageBox.Show(String.Format("The file you have specified ({0}) already exists.  Do you want to overwrite this file?", this.tbZipToCreate.Text), "Confirmation is Required", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                var dlgResult = MessageBox.Show(
+                    $"The file you have specified ({this.tbZipToCreate.Text}) already exists.  Do you want to overwrite this file?", "Confirmation is Required", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (dlgResult != DialogResult.Yes) return;
                 System.IO.File.Delete(this.tbZipToCreate.Text);
             }
@@ -656,7 +658,7 @@ namespace Ionic.Zip.Forms
             }
             catch (System.Exception exc1)
             {
-                MessageBox.Show(String.Format("Exception while zipping:\n{0}\n\n{1}", exc1.Message, exc1.StackTrace.ToString()));
+                MessageBox.Show($"Exception while zipping:\n{exc1.Message}\n\n{exc1.StackTrace.ToString()}");
                 btnCancel_Click(null, null);
             }
         }
@@ -1105,10 +1107,11 @@ namespace Ionic.Zip.Forms
                             entry.FileName.Replace("/","\\"),
                             entry.LastModified.ToString("yyyy-MM-dd HH:mm:ss"),
                             entry.UncompressedSize.ToString(),
-                            String.Format("{0,5:F0}%", entry.CompressionRatio),
+                            $"{entry.CompressionRatio,5:F0}%",
                             entry.CompressedSize.ToString(),
                             (entry.UsesEncryption) ? "Y" : "N",
-                            String.Format("{0:X8}", entry.Crc)};
+                            $"{entry.Crc:X8}"
+                        };
 
                         foreach (String s in subitems)
                         {
@@ -1305,7 +1308,7 @@ namespace Ionic.Zip.Forms
                                                ex1.Message.ToString());
                                 DialogResult result =
                                     MessageBox.Show(msg,
-                                            String.Format("Error Extracting {0}", entry.FileName),
+                                        $"Error Extracting {entry.FileName}",
                                             MessageBoxButtons.OKCancel,
                                             MessageBoxIcon.Exclamation,
                                             MessageBoxDefaultButton.Button1);
@@ -1361,8 +1364,7 @@ namespace Ionic.Zip.Forms
                                                   entry.FileName, ex2.Message.ToString());
                                         DialogResult result =
                                             MessageBox.Show(msg,
-                                                    String.Format("Error Extracting {0}",
-                                                          entry.FileName),
+                                                $"Error Extracting {entry.FileName}",
                                                     MessageBoxButtons.OKCancel,
                                                     MessageBoxIcon.Exclamation,
                                                     MessageBoxDefaultButton.Button1);
@@ -1385,7 +1387,7 @@ namespace Ionic.Zip.Forms
             }
             catch (Exception ex1)
             {
-                MessageBox.Show(String.Format("There's been a problem extracting that zip file.  {0}", ex1.Message),
+                MessageBox.Show($"There's been a problem extracting that zip file.  {ex1.Message}",
                 "Error Extracting", MessageBoxButtons.OK, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1);
                 Application.Exit();
             }
@@ -1807,7 +1809,7 @@ namespace Ionic.Zip.Forms
 
                 this.listView2.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
                 this.listView2.EndUpdate();
-                this.lblStatus.Text = String.Format("Added {0} entries;  {1} total entries to save.", nAdded, this.listView2.Items.Count);
+                this.lblStatus.Text = $"Added {nAdded} entries;  {this.listView2.Items.Count} total entries to save.";
 
 
                 // remember the successful selection strings
@@ -1846,7 +1848,7 @@ namespace Ionic.Zip.Forms
             _disableMasterChecking = false;
             this.lblStatus.Text = (rCount == 1)
                 ? String.Format("Cleared 1 entry.  {1} remaining entries to save.", rCount, this.listView2.Items.Count)
-                : String.Format("Cleared {0} entries.  {1} remaining entries to save.", rCount, this.listView2.Items.Count);
+                : $"Cleared {rCount} entries.  {this.listView2.Items.Count} remaining entries to save.";
         }
 
 

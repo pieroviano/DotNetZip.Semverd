@@ -409,7 +409,7 @@ namespace Ionic.Zip.Tests.Utilities
         internal static string CreateUniqueFile(string extension, string ContainingDirectory)
         {
             //string nameOfFileToCreate = GenerateUniquePathname(extension, ContainingDirectory);
-            string nameOfFileToCreate = Path.Combine(ContainingDirectory, String.Format("{0}.{1}", Path.GetRandomFileName(), extension));
+            string nameOfFileToCreate = Path.Combine(ContainingDirectory, $"{Path.GetRandomFileName()}.{extension}");
             // create an empty file
             using (var fs = File.Create(nameOfFileToCreate)) { }
             return nameOfFileToCreate;
@@ -428,7 +428,7 @@ namespace Ionic.Zip.Tests.Utilities
         internal static string CreateUniqueFile(string extension, string ContainingDirectory, Int64 size)
         {
             //string fileToCreate = GenerateUniquePathname(extension, ContainingDirectory);
-            string nameOfFileToCreate = Path.Combine(ContainingDirectory, String.Format("{0}.{1}", Path.GetRandomFileName(), extension));
+            string nameOfFileToCreate = Path.Combine(ContainingDirectory, $"{Path.GetRandomFileName()}.{extension}");
             CreateAndFillFile(nameOfFileToCreate, size);
             return nameOfFileToCreate;
         }
@@ -658,7 +658,7 @@ namespace Ionic.Zip.Tests.Utilities
             TestContext.WriteLine("{0}: Creating {1} subdirs.", testName, subdirCount);
             for (int i = 0; i < subdirCount; i++)
             {
-                string subdir = Path.Combine(dirToZip, String.Format("dir{0:D4}", i));
+                string subdir = Path.Combine(dirToZip, $"dir{i:D4}");
                 Directory.CreateDirectory(subdir);
 
                 int filecount = _rnd.Next(settings[2]) + settings[3];
@@ -668,7 +668,7 @@ namespace Ionic.Zip.Tests.Utilities
                 for (int j = 0; j < filecount; j++)
                 {
                     int n = _rnd.Next(2);
-                    filename = String.Format("file{0:D4}.{1}", j, (n == 0) ? "txt" : "bin");
+                    filename = $"file{j:D4}.{((n == 0) ? "txt" : "bin")}";
                     TestUtilities.CreateAndFillFile(Path.Combine(subdir, filename),
                                                     _rnd.Next(settings[4]) + settings[5],
                                                     (FileFlavor)n);
@@ -738,7 +738,7 @@ namespace Ionic.Zip.Tests.Utilities
             string[] filesToZip = new string[numFilesToCreate];
             for (i = 0; i < numFilesToCreate; i++)
             {
-                filesToZip[i] = Path.Combine(subdir, String.Format("testfile{0:D3}.txt", i));
+                filesToZip[i] = Path.Combine(subdir, $"testfile{i:D3}.txt");
                 var sz = _rnd.Next(highSize - lowSize) + lowSize;
                 if (update != null)
                     update(0, i, sz);
@@ -776,14 +776,19 @@ namespace Ionic.Zip.Tests.Utilities
             StartProgressMonitor(string progressChannel, string title, string initialStatus)
         {
             string testBin = TestUtilities.GetTestBinDir(cdir);
-            string progressMonitorTool = Path.Combine(testBin, "Resources\\UnitTestProgressMonitor.exe");
-            string requiredDll = Path.Combine(testBin, "Resources\\Ionic.CopyData.dll");
+#if DEBUG
+            var configuration = "Debug";
+#else
+            var configuration = "Release";
+#endif
+            string progressMonitorTool = Path.GetFullPath(Path.Combine(testBin, $"..\\..\\..\\..\\..\\utility\\UnitTestProgressMonitor\\bin\\{configuration}\\net48\\UnitTestProgressMonitor.exe"));
+            string requiredDll = Path.GetFullPath(Path.Combine(testBin, $"..\\..\\..\\..\\..\\utility\\Ionic.CopyData\\bin\\{configuration}\\net48\\Ionic.CopyData.dll"));
             Assert.IsTrue(File.Exists(progressMonitorTool), "progress monitor tool does not exist ({0})", progressMonitorTool);
             Assert.IsTrue(File.Exists(requiredDll), "required DLL does not exist ({0})", requiredDll);
 
             // start the progress monitor
             //this.Exec(progressMonitorTool, String.Format("-channel {0}", progressChannel), false);
-            TestUtilities.Exec_NoContext(progressMonitorTool, String.Format("-channel {0}", progressChannel), false, out _);
+            TestUtilities.Exec_NoContext(progressMonitorTool, $"-channel {progressChannel}", false, out _);
 
             var txrx = new Ionic.CopyData.Transceiver();
             System.Threading.Thread.Sleep(1000);
@@ -871,7 +876,7 @@ namespace Ionic.Zip.Tests.Utilities
             return txt;
         }
 
-        #endregion
+#endregion
 
         internal static string LoremIpsum =
             "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Integer " +

@@ -684,7 +684,8 @@ namespace Ionic.Zip
 
             uint datum = (uint)Ionic.Zip.SharedUtilities.ReadInt(s);
             if (datum != ZipConstants.Zip64EndOfCentralDirectoryRecordSignature)
-                throw new BadReadException(String.Format("  Bad signature (0x{0:X8}) looking for ZIP64 EoCD Record at position 0x{1:X8}", datum, s.Position));
+                throw new BadReadException(
+                    $"  Bad signature (0x{datum:X8}) looking for ZIP64 EoCD Record at position 0x{s.Position:X8}");
 
             s.Read(block, 0, 8);
             Int64 Size = BitConverter.ToInt64(block, 0);

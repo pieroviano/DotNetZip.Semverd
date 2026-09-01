@@ -2414,8 +2414,7 @@ namespace Ionic.Zip
                 catch (System.IO.PathTooLongException ptle)
                 {
                     // workitem 14035
-                    var msg = String.Format("The path is too long, filename={0}",
-                                            filename);
+                    var msg = $"The path is too long, filename={filename}";
                     throw new ZipException(msg, ptle);
                 }
 
@@ -2608,7 +2607,7 @@ namespace Ionic.Zip
         /// <returns>a string representation of the instance.</returns>
         public override String ToString()
         {
-            return String.Format("ZipEntry::{0}", FileName);
+            return $"ZipEntry::{FileName}";
         }
 
 

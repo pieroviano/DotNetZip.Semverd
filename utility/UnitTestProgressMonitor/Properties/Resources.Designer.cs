@@ -61,6 +61,16 @@ namespace UnitTestProgressMonitor.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] folder_archive_zip_22613 {
+            get {
+                object obj = ResourceManager.GetObject("folder_archive_zip_22613", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This is a simple progress bar displayer.  It displays progress based
         ///on messages sent via WM_COPYDATA. Useful for visually tracking the 
         ///progress of individual Visual Studio Unit Tests.

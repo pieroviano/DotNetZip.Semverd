@@ -60,7 +60,8 @@ namespace Ionic.BZip2.Tests
 
             string parentDir = System.Environment.GetEnvironmentVariable("TEMP");
 
-            TopLevelDir = System.IO.Path.Combine(parentDir, String.Format("Ionic.ZlibTest-{0}.tmp", System.DateTime.Now.ToString("yyyyMMMdd-HHmmss")));
+            TopLevelDir = System.IO.Path.Combine(parentDir,
+                $"Ionic.ZlibTest-{System.DateTime.Now.ToString("yyyyMMMdd-HHmmss")}.tmp");
             System.IO.Directory.CreateDirectory(TopLevelDir);
             System.IO.Directory.SetCurrentDirectory(TopLevelDir);
 
@@ -166,7 +167,7 @@ namespace Ionic.BZip2.Tests
         private string GetContentFile(string fileName)
         {
             string testBin = GetTestBinDir(CurrentDir);
-            string path = Path.Combine(testBin, String.Format("Resources\\{0}", fileName));
+            string path = Path.Combine(testBin, $"Resources\\{fileName}");
             Assert.IsTrue(File.Exists(path), "file ({0}) does not exist", path);
             return path;
         }
@@ -205,7 +206,7 @@ namespace Ionic.BZip2.Tests
             int rc = Exec_NoContext(program, args, waitForExit, out output);
 
             if (rc != 0)
-                throw new Exception(String.Format("Non-zero RC {0}: {1}", program, output));
+                throw new Exception($"Non-zero RC {program}: {output}");
 
             if (emitOutput)
                 TestContext.WriteLine("output: {0}", output);
@@ -453,7 +454,7 @@ namespace Ionic.BZip2.Tests
                 int count = this.rnd.Next(18) + 4;
                 TestContext.WriteLine("Doing string {0}", key);
                 var s = TestStrings[key];
-                var fname = String.Format("Pippo-{0}.txt", key);
+                var fname = $"Pippo-{key}.txt";
                 using (var sw = new StreamWriter(File.Create(fname)))
                 {
                     for (int k = 0; k < count; k++)

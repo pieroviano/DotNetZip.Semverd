@@ -253,7 +253,7 @@ namespace Ionic.Zip.Tests
                 if (txrx != null)
                 {
                     txrx.Send("status deleting old directories...");
-                    txrx.Send(String.Format("pb 0 max {0}", oldDirs.Length));
+                    txrx.Send($"pb 0 max {oldDirs.Length}");
                 }
 
                 foreach (var dir in oldDirs)
@@ -278,7 +278,7 @@ namespace Ionic.Zip.Tests
             if (txrx != null)
             {
                 txrx.Send("status creating files...");
-                txrx.Send(String.Format("pb 0 max {0}", fileCount));
+                txrx.Send($"pb 0 max {fileCount}");
             }
 
             fodderDirectory = TestUtilities.GenerateUniquePathname("SelectorTests");
@@ -403,7 +403,7 @@ namespace Ionic.Zip.Tests
                 {
                     txrx.Send("pb 0 step");
                     if (entriesAdded % 8 == 0)
-                        txrx.Send(String.Format("status creating files ({0}/{1})", entriesAdded, fileCount));
+                        txrx.Send($"status creating files ({entriesAdded}/{fileCount})");
                 }
             }
             // restore the cwd
@@ -450,20 +450,20 @@ namespace Ionic.Zip.Tests
                     new Trial
                     {
                         Label = "mtime",
-                        C1 = String.Format("mtime < {0}", twentyDaysAgo.ToString("yyyy-MM-dd")),
-                        C2 = String.Format("mtime >= {0}", twentyDaysAgo.ToString("yyyy-MM-dd")),
+                        C1 = $"mtime < {twentyDaysAgo.ToString("yyyy-MM-dd")}",
+                        C2 = $"mtime >= {twentyDaysAgo.ToString("yyyy-MM-dd")}",
                     },
                     new Trial
                     {
                         Label = "ctime",
-                        C1 = String.Format("mtime < {0}", threeDaysAgo.ToString("yyyy-MM-dd")),
-                        C2 = String.Format("mtime >= {0}", threeDaysAgo.ToString("yyyy-MM-dd")),
+                        C1 = $"mtime < {threeDaysAgo.ToString("yyyy-MM-dd")}",
+                        C2 = $"mtime >= {threeDaysAgo.ToString("yyyy-MM-dd")}",
                     },
                     new Trial
                     {
                         Label = "atime",
-                        C1 = String.Format("mtime < {0}", yesterdayAtMidnight.ToString("yyyy-MM-dd")),
-                        C2 = String.Format("mtime >= {0}", yesterdayAtMidnight.ToString("yyyy-MM-dd")),
+                        C1 = $"mtime < {yesterdayAtMidnight.ToString("yyyy-MM-dd")}",
+                        C2 = $"mtime >= {yesterdayAtMidnight.ToString("yyyy-MM-dd")}",
                     },
                     new Trial { Label = "size (100k)", C1="size > 100k", C2="size <= 100kb", },
                     new Trial { Label = "size (1mb)", C1="size > 1m", C2="size <= 1mb", },
@@ -608,7 +608,7 @@ namespace Ionic.Zip.Tests
             var topLevelFiles = Directory.GetFiles(fodderDirectory, "*.*", SearchOption.TopDirectoryOnly);
 
             string currentDir = Directory.GetCurrentDirectory();
-            _txrx.Send(String.Format("pb 0 max {0}", 2 * (trials.Length + 1)));
+            _txrx.Send($"pb 0 max {2 * (trials.Length + 1)}");
 
             _txrx.Send("pb 0 step");
 
@@ -792,7 +792,7 @@ namespace Ionic.Zip.Tests
                 int k = 2;
                 Array.ForEach(f2, x =>
                 {
-                    File.Move(x, String.Format("{0}.{1:D5}.txt", keyword.ToUpper(), k++));
+                    File.Move(x, $"{keyword.ToUpper()}.{k++:D5}.txt");
                 });
             }
 
@@ -951,10 +951,10 @@ namespace Ionic.Zip.Tests
 
                 // all of the files should have been modified either
                 // after midnight today, or before.
-                string crit = String.Format("mtime >= {0}", todayAtMidnight.ToString("yyyy-MM-dd"));
+                string crit = $"mtime >= {todayAtMidnight.ToString("yyyy-MM-dd")}";
                 var selected1 = zip1.SelectEntries(crit);
                 TestContext.WriteLine("Case A({0}) count({1})", crit, selected1.Count);
-                crit = String.Format("mtime < {0}", todayAtMidnight.ToString("yyyy-MM-dd"));
+                crit = $"mtime < {todayAtMidnight.ToString("yyyy-MM-dd")}";
                 var selected2 = zip1.SelectEntries(crit);
                 TestContext.WriteLine("Case B({0})  count({1})", crit, selected2.Count);
                 Assert.AreEqual(totalEntries,
@@ -963,7 +963,7 @@ namespace Ionic.Zip.Tests
 
                 // some nonzero (high) number of files should have been
                 // created in the past twenty days.
-                crit = String.Format("ctime >= {0}", twentyDaysAgo.ToString("yyyy-MM-dd"));
+                crit = $"ctime >= {twentyDaysAgo.ToString("yyyy-MM-dd")}";
                 var selected3 = zip1.SelectEntries(crit);
                 TestContext.WriteLine("Case C({0}) count({1})", crit, selected3.Count);
                 Assert.IsTrue(selected3.Count > 0, "C");
@@ -971,8 +971,7 @@ namespace Ionic.Zip.Tests
 
                 // a nonzero number should be marked as having been
                 // created more than 3 years ago.
-                crit = String.Format("ctime < {0}",
-                                     threeYearsAgo.ToString("yyyy-MM-dd"));
+                crit = $"ctime < {threeYearsAgo.ToString("yyyy-MM-dd")}";
                 var selected4 = zip1.SelectEntries(crit);
                 TestContext.WriteLine("Case D({0})  count({1})", crit, selected4.Count);
                 Assert.IsTrue(selected4.Count > 0, "D");
@@ -980,23 +979,21 @@ namespace Ionic.Zip.Tests
                 // None of the files should have been created
                 // more than 20 years ago
                 var twentyYearsAgo = todayAtMidnight.AddYears(-20);
-                crit = String.Format("ctime < {0}",
-                                     twentyYearsAgo.ToString("yyyy-MM-dd"));
+                crit = $"ctime < {twentyYearsAgo.ToString("yyyy-MM-dd")}";
                 var selected5 = zip1.SelectEntries(crit);
                 TestContext.WriteLine("Case F({0})  count({1})", crit, selected5.Count);
                 Assert.IsTrue(selected5.Count == 0, "F");
 
                 // Some number of the files should have been created
                 // more than three days ago
-                crit = String.Format("ctime < {0}",
-                                     threeDaysAgo.ToString("yyyy-MM-dd"));
+                crit = $"ctime < {threeDaysAgo.ToString("yyyy-MM-dd")}";
                 selected5 = zip1.SelectEntries(crit);
                 TestContext.WriteLine("Case E({0})  count({1})", crit, selected5.Count);
                 Assert.IsTrue(selected5.Count > 0, "E");
 
                 // summing all those created more than three days ago,
                 // with those created in the last three days, should be all entries.
-                crit = String.Format("ctime >= {0}", threeDaysAgo.ToString("yyyy-MM-dd"));
+                crit = $"ctime >= {threeDaysAgo.ToString("yyyy-MM-dd")}";
                 var selected6 = zip1.SelectEntries(crit);
                 TestContext.WriteLine("Case G({0})  count({1})", crit, selected6.Count);
                 Assert.IsTrue(selected6.Count > 0, "G");
@@ -1013,20 +1010,17 @@ namespace Ionic.Zip.Tests
 
                 // those accessed *exactly* at midnight yesterday, plus
                 // those NOT = all entries
-                crit = String.Format("atime = {0}",
-                                     yesterdayAtMidnight.ToString("yyyy-MM-dd"));
+                crit = $"atime = {yesterdayAtMidnight.ToString("yyyy-MM-dd")}";
                 selected5 = zip1.SelectEntries(crit);
                 TestContext.WriteLine("Case I({0})  count({1})", crit, selected5.Count);
 
-                crit = String.Format("atime != {0}",
-                                     yesterdayAtMidnight.ToString("yyyy-MM-dd"));
+                crit = $"atime != {yesterdayAtMidnight.ToString("yyyy-MM-dd")}";
                 selected6 = zip1.SelectEntries(crit);
                 TestContext.WriteLine("Case J({0})  count({1})", crit, selected6.Count);
                 Assert.AreEqual(totalEntries, selected5.Count + selected6.Count, "J");
 
                 // those marked as last accessed more than 20 days ago == empty set
-                crit = String.Format("atime <= {0}",
-                                     twentyDaysAgo.ToString("yyyy-MM-dd"));
+                crit = $"atime <= {twentyDaysAgo.ToString("yyyy-MM-dd")}";
                 selected5 = zip1.SelectEntries(crit);
                 TestContext.WriteLine("Case K({0})  count({1})", crit, selected5.Count);
                 Assert.AreEqual(0, selected5.Count, "K");
@@ -1059,7 +1053,7 @@ namespace Ionic.Zip.Tests
             TestContext.WriteLine("Reading zip, ExtractSelectedEntries() by date...");
             using (ZipFile zip1 = ZipFile.Read(zipFileToCreate))
             {
-                string crit = String.Format("mtime >= {0}", todayAtMidnight.ToString("yyyy-MM-dd"));
+                string crit = $"mtime >= {todayAtMidnight.ToString("yyyy-MM-dd")}";
                 TestContext.WriteLine("Criteria({0})", crit);
                 zip1.ExtractSelectedEntries(crit, null, extractDir);
             }
@@ -1068,7 +1062,7 @@ namespace Ionic.Zip.Tests
             TestContext.WriteLine("Reading zip, ExtractSelectedEntries() by date, with overwrite...");
             using (ZipFile zip1 = ZipFile.Read(zipFileToCreate))
             {
-                string crit = String.Format("mtime >= {0}", todayAtMidnight.ToString("yyyy-MM-dd"));
+                string crit = $"mtime >= {todayAtMidnight.ToString("yyyy-MM-dd")}";
                 TestContext.WriteLine("Criteria({0})", crit);
                 zip1.ExtractSelectedEntries(crit, null, extractDir, ExtractExistingFileAction.OverwriteSilently);
             }
@@ -1092,7 +1086,7 @@ namespace Ionic.Zip.Tests
             for (int i = 0; i < 2; i++)
             {
                 int grandTotal = 0;
-                extractDir = String.Format("extract.{0}", i);
+                extractDir = $"extract.{i}";
                 for (int j = 0; j < dirs.Count; j++)
                 {
                     string d = dirs[j];
@@ -1145,12 +1139,12 @@ namespace Ionic.Zip.Tests
                 // select binary or text
                 if (_rnd.Next(2) == 0)
                 {
-                    filename = Path.Combine(subDir, String.Format("file{0:D3}.txt", j));
+                    filename = Path.Combine(subDir, $"file{j:D3}.txt");
                     TestUtilities.CreateAndFillFileText(filename, _rnd.Next(5000) + 5000);
                 }
                 else
                 {
-                    filename = Path.Combine(subDir, String.Format("file{0:D3}.bin", j));
+                    filename = Path.Combine(subDir, $"file{j:D3}.bin");
                     TestUtilities.CreateAndFillFileBinary(filename, _rnd.Next(5000) + 5000);
                 }
                 TestContext.WriteLine(Path.GetFileName(filename));
@@ -1506,7 +1500,7 @@ namespace Ionic.Zip.Tests
                 FileCount[subDirShort] = filecount;
                 for (int j = 0; j < filecount; j++)
                 {
-                    string filename = String.Format("file{0:D4}.x", j);
+                    string filename = $"file{j:D4}.x";
                     string fqFilename = Path.Combine(subDir, filename);
                     TestUtilities.CreateAndFillFile(fqFilename, _rnd.Next(1000) + 1000);
 
@@ -1624,7 +1618,7 @@ namespace Ionic.Zip.Tests
                 FileCount[subDirShort] = filecount;
                 for (int j = 0; j < filecount; j++)
                 {
-                    string filename = String.Format("file{0:D4}.x", j);
+                    string filename = $"file{j:D4}.x";
                     string fqFilename = Path.Combine(subDir, filename);
                     TestUtilities.CreateAndFillFile(fqFilename, _rnd.Next(1000) + 1000);
 
@@ -1682,9 +1676,8 @@ namespace Ionic.Zip.Tests
                 for (i = 0; i < subdirCount; i++)
                 {
                     string dirInArchive = new System.String(new char[] { (char)(i + 65) });
-                    string pathCriterion = String.Format("name = {0}",
-                                                         Path.Combine(dirInArchive, "*.*"));
-                    string combinedCriterion = String.Format("size > 1500  AND {0}", pathCriterion);
+                    string pathCriterion = $"name = {Path.Combine(dirInArchive, "*.*")}";
+                    string combinedCriterion = $"size > 1500  AND {pathCriterion}";
 
                     var selected1 = zip1.SelectEntries(combinedCriterion, dirInArchive);
                     count1 += selected1.Count;
@@ -1813,7 +1806,7 @@ namespace Ionic.Zip.Tests
             for (int i = 0; i < 2; i++)
             {
                 string zipFileToCreate = Path.Combine(TopLevelDir,
-                                                      String.Format("Selector_SelectFiles_DirName_wi9176-{0}.zip", i));
+                    $"Selector_SelectFiles_DirName_wi9176-{i}.zip");
                 _txrx.Send("pb 1 max 4");
                 _txrx.Send("pb 1 value 0");
                 string d = fodderDirectory;
@@ -1898,7 +1891,7 @@ namespace Ionic.Zip.Tests
             Array.ForEach(files, x =>
             {
                 File.Move(Path.GetFileName(x),
-                          String.Format("~{0}.{1:D5}.txt", keyword, k++));
+                    $"~{keyword}.{k++:D5}.txt");
             });
             Directory.SetCurrentDirectory(TopLevelDir);
 
@@ -2215,8 +2208,7 @@ namespace Ionic.Zip.Tests
             using (var zip = new ZipFile(zipFileToCreate))
             {
                 string selectCriteria =
-                    String.Format("name = '{0}'",
-                                  Path.Combine(childFolders[m], "*.*"));
+                    $"name = '{Path.Combine(childFolders[m], "*.*")}'";
                 TestContext.WriteLine("select:  {0}", selectCriteria);
                 var selection1 = zip.SelectEntries(selectCriteria);
                 Assert.IsTrue(selection1.Count > 0, "first selection failed.");

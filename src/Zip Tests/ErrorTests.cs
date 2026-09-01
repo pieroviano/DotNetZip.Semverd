@@ -113,7 +113,8 @@ namespace Ionic.Zip.Tests.Error
 
         private void _Internal_ExtractExisting(int flavor)
         {
-            string zipFileToCreate = Path.Combine(TopLevelDir, String.Format("Error-Extract-ExistingFileWithoutOverwrite-{0}.zip", flavor));
+            string zipFileToCreate = Path.Combine(TopLevelDir,
+                $"Error-Extract-ExistingFileWithoutOverwrite-{flavor}.zip");
 
             string testBin = TestUtilities.GetTestBinDir(CurrentDir);
             string resourceDir = Path.Combine(testBin, "Resources");
@@ -388,9 +389,8 @@ namespace Ionic.Zip.Tests.Error
             int numFilesToCreate = _rnd.Next(20) + 18;
             for (j = 0; j < numFilesToCreate; j++)
             {
-                filename = Path.Combine(Subdir, String.Format("file{0:D3}.txt", j));
-                repeatedLine = String.Format("This line is repeated over and over and over in file {0}",
-                    Path.GetFileName(filename));
+                filename = Path.Combine(Subdir, $"file{j:D3}.txt");
+                repeatedLine = $"This line is repeated over and over and over in file {Path.GetFileName(filename)}";
                 TestUtilities.CreateAndFillFileText(filename, repeatedLine, _rnd.Next(1800) + 1500);
                 entriesAdded++;
             }
@@ -456,7 +456,7 @@ namespace Ionic.Zip.Tests.Error
             string resourceDir = Path.Combine(testBin, "Resources");
             Directory.SetCurrentDirectory(TopLevelDir);
             string filename = Path.Combine(resourceDir, "TestStrings.txt");
-            Assert.IsTrue(File.Exists(filename), String.Format("The file '{0}' doesnot exist.", filename));
+            Assert.IsTrue(File.Exists(filename), $"The file '{filename}' doesnot exist.");
 
             // add an entry to the zipfile, then try saving, never having specified a filename. This should fail.
             using (ZipFile zip = new ZipFile())

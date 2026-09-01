@@ -112,11 +112,11 @@ namespace Ionic.Zip.Tests
                 // register it for COM interop
                 string output;
 
-                int rc = TestUtilities.Exec_NoContext(RegAsm, String.Format("\"{0}\" /codebase /verbose", IonicZipDll), out output);
+                int rc = TestUtilities.Exec_NoContext(RegAsm, $"\"{IonicZipDll}\" /codebase /verbose", out output);
                 if (rc != 0)
                 {
-                    string cmd = String.Format("{0} \"{1}\" /codebase /verbose", RegAsm, IonicZipDll);
-                    throw new Exception(String.Format("Failed to register DotNetZip with COM rc({0}) cmd({1}) out({2})", rc, cmd, output));
+                    string cmd = $"{RegAsm} \"{IonicZipDll}\" /codebase /verbose";
+                    throw new Exception($"Failed to register DotNetZip with COM rc({rc}) cmd({cmd}) out({output})");
                 }
 
                 Registered = true;
@@ -132,9 +132,9 @@ namespace Ionic.Zip.Tests
 
                 string output;
                 // unregister the DLL for COM interop
-                int rc = TestUtilities.Exec_NoContext(RegAsm, String.Format("\"{0}\" /unregister /verbose", IonicZipDll), out output);
+                int rc = TestUtilities.Exec_NoContext(RegAsm, $"\"{IonicZipDll}\" /unregister /verbose", out output);
                 if (rc != 0)
-                    throw new Exception(String.Format("Failed to unregister DotNetZip with COM  rc({0}) ({1})", rc, output));
+                    throw new Exception($"Failed to unregister DotNetZip with COM  rc({rc}) ({output})");
             }
         }
 
@@ -356,8 +356,8 @@ namespace Ionic.Zip.Tests
             foreach (var compLevel in compLevels)
             {
                 // create and fill the directories
-                string zipFileToCreate = Path.Combine(TopLevelDir, String.Format("ShellApplication_Unzip.{0}.zip", i));
-                string extractDir = Path.Combine(TopLevelDir, String.Format("extract.{0}", i));
+                string zipFileToCreate = Path.Combine(TopLevelDir, $"ShellApplication_Unzip.{i}.zip");
+                string extractDir = Path.Combine(TopLevelDir, $"extract.{i}");
 
                 // Create the zip archive
                 //Directory.SetCurrentDirectory(TopLevelDir);
@@ -376,7 +376,7 @@ namespace Ionic.Zip.Tests
 
                 // run the unzip script
                 this.Exec(cscriptExe,
-                          String.Format("\"{0}\" {1} {2}", script, zipFileToCreate, extractDir));
+                    $"\"{script}\" {zipFileToCreate} {extractDir}");
 
                 // check the files in the extract dir
                 VerifyChecksums(Path.Combine(extractDir, "files"), filesToZip, checksums);
@@ -403,8 +403,8 @@ namespace Ionic.Zip.Tests
             foreach (var compLevel in compLevels)
             {
                 // create and fill the directories
-                string zipFileToCreate = Path.Combine(TopLevelDir, String.Format("ShellApplication_Unzip_NonSeekableOutput.{0}.zip", i));
-                string extractDir = Path.Combine(TopLevelDir, String.Format("extract.{0}", i));
+                string zipFileToCreate = Path.Combine(TopLevelDir, $"ShellApplication_Unzip_NonSeekableOutput.{i}.zip");
+                string extractDir = Path.Combine(TopLevelDir, $"extract.{i}");
 
                 // Create the zip archive
                 //Directory.SetCurrentDirectory(TopLevelDir);
@@ -519,7 +519,7 @@ namespace Ionic.Zip.Tests
             string script = GetScript("VbsUnzip-ShellApp.vbs");
 
             this.Exec(cscriptExe,
-                      String.Format("\"{0}\" {1} {2}", script, zipFileToCreate, extractDir));
+                $"\"{script}\" {zipFileToCreate} {extractDir}");
 
             // check the files in the extract dir
             VerifyChecksums(Path.Combine(extractDir, "files"), filesToZip, checksums);
@@ -557,13 +557,13 @@ namespace Ionic.Zip.Tests
             var flist = new List<string>();
             for (int i = 0; i < numFilesToAdd && nFilesInSubfolders < 2; i++)
             {
-                string fileName = string.Format("Test{0}.txt", i);
+                string fileName = $"Test{i}.txt";
                 if (i != 0)
                 {
                     int x = _rnd.Next(4);
                     if (x != 0)
                     {
-                        string folderName = string.Format("folder{0}", x);
+                        string folderName = $"folder{x}";
                         fileName = Path.Combine(folderName, fileName);
                         if (!Directory.Exists(Path.Combine(dirToZip, folderName)))
                             Directory.CreateDirectory(Path.Combine(dirToZip, folderName));
@@ -599,7 +599,7 @@ namespace Ionic.Zip.Tests
             string script = GetScript("VbsUnzip-ShellApp.vbs");
 
             this.Exec(cscriptExe,
-                      String.Format("\"{0}\" {1} {2}", script, zipFileToCreate, Path.Combine(TopLevelDir, extractDir)));
+                $"\"{script}\" {zipFileToCreate} {Path.Combine(TopLevelDir, extractDir)}");
 
             // check the files in the extract dir
             foreach (var fqPath in flist)
@@ -610,7 +610,7 @@ namespace Ionic.Zip.Tests
                 var chk = TestUtilities.ComputeChecksum(extractedFile);
                 Assert.AreEqual(TestUtilities.CheckSumToString(checksums[f]),
                                         TestUtilities.CheckSumToString(chk),
-                                        String.Format("Checksums for file {0} do not match.", f));
+                                        $"Checksums for file {f} do not match.");
                 checksums.Remove(f);
             }
 
@@ -637,7 +637,7 @@ namespace Ionic.Zip.Tests
             string script = GetScript("VbsCreateZip-ShellApp.vbs");
 
             this.Exec(cscriptExe,
-                      String.Format("\"{0}\" {1} {2}", script, zipFileToCreate, subdir));
+                $"\"{script}\" {zipFileToCreate} {subdir}");
 
             // Verify the number of files in the zip
             Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), filesToZip.Length,
@@ -698,7 +698,7 @@ namespace Ionic.Zip.Tests
             {
                 string shortfile = Path.GetFileName(f);
                 Assert.IsTrue(File.Exists(f));
-                string cmd = String.Format("hardlink create \"{0}\" \"{1}\"", shortfile, f);
+                string cmd = $"hardlink create \"{shortfile}\" \"{f}\"";
                 TestUtilities.Exec_NoContext(fsutil, cmd, out _);
             }
 
@@ -708,7 +708,7 @@ namespace Ionic.Zip.Tests
             string script = GetScript("VbsCreateZip-ShellApp.vbs");
 
             this.Exec(cscriptExe,
-                      String.Format("\"{0}\" {1} {2}", script, zipFileToCreate, subdir));
+                $"\"{script}\" {zipFileToCreate} {subdir}");
 
             // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
             // DEBUGGING!
@@ -858,7 +858,7 @@ namespace Ionic.Zip.Tests
             string script = GetScript("VbsCreateZip-DotNetZip.vbs");
 
             this.Exec(cscriptExe,
-                      String.Format("\"{0}\" {1} {2}", script, zipFileToCreate, subdir));
+                $"\"{script}\" {zipFileToCreate} {subdir}");
 
             // Verify the number of files in the zip
             Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), filesToZip.Length,
@@ -911,7 +911,7 @@ namespace Ionic.Zip.Tests
             // run the COM script to unzip the ZIP archive
             string script = GetScript("VbsUnzip-DotNetZip.vbs");
             this.Exec(cscriptExe,
-                      String.Format("\"{0}\" {1} {2}", script, zipFileToCreate, extractDir));
+                $"\"{script}\" {zipFileToCreate} {extractDir}");
 
             // check the files in the extract dir
             VerifyChecksums(Path.Combine(extractDir, shortDir), filesToZip, checksums);
@@ -947,7 +947,7 @@ namespace Ionic.Zip.Tests
             string script = GetScript("TestCheckZip.js");
 
             string testOut = this.Exec(cscriptExe,
-                                      String.Format("\"{0}\" {1}", script, zipFileToCreate));
+                $"\"{script}\" {zipFileToCreate}");
 
             Assert.IsTrue(testOut.StartsWith("That zip is OK"));
         }
@@ -980,7 +980,7 @@ namespace Ionic.Zip.Tests
             string script = GetScript("TestCheckZip.js");
 
             string testOut = this.Exec(cscriptExe,
-                                      String.Format("\"{0}\" -x {1}", script, zipFileToCreate));
+                $"\"{script}\" -x {zipFileToCreate}");
 
             Assert.IsTrue(testOut.StartsWith("That zip is OK"), "output: {0}", testOut);
         }
@@ -995,7 +995,7 @@ namespace Ionic.Zip.Tests
             string script = GetScript("TestCheckZip.js");
 
             string testOut = this.Exec(cscriptExe,
-                                      String.Format("\"{0}\" {1}", script, cscriptExe));
+                $"\"{script}\" {cscriptExe}");
 
             Assert.IsTrue(testOut.StartsWith("That zip is not OK"));
         }
@@ -1013,7 +1013,7 @@ namespace Ionic.Zip.Tests
             for (int k = 0; k < 2; k++)
             {
                 string password = GeneratePassword(11);
-                string zipFileToCreate = String.Format("COM_CheckPass-{0}.zip", k);
+                string zipFileToCreate = $"COM_CheckPass-{k}.zip";
                 zipFileToCreate = Path.Combine(TopLevelDir, zipFileToCreate);
                 // Create the zip archive
                 using (ZipFile zip1 = new ZipFile())
@@ -1079,7 +1079,7 @@ namespace Ionic.Zip.Tests
                 foreach (var compLevel in compLevels)
                 {
                     string zipFileToCreate =
-                                     String.Format("InfoZip_Unzip.{0}.{1}.zip", i, j);
+                        $"InfoZip_Unzip.{i}.{j}.zip";
 
                     string password = GeneratePassword(9);
                     // Create the zip archive
@@ -1101,7 +1101,7 @@ namespace Ionic.Zip.Tests
                                          "Incorrect number of entries in the zip file" +
                                          " (i,j)=({0},{1}).", i, j);
 
-                    string extractDir = String.Format("extract.{0}.{1}", i, j);
+                    string extractDir = $"extract.{i}.{j}";
 
                     if (j == 0)
                     {
@@ -1153,7 +1153,7 @@ namespace Ionic.Zip.Tests
 
             for (int k = 0; k < 2; k++)
             {
-                string zipFileToCreate = String.Format("InfoZip_Zip-{0}.zip", k);
+                string zipFileToCreate = $"InfoZip_Zip-{k}.zip";
                 string extractDir = "extractDir-" + k;
 
                 var relativePath = Path.GetFileName(subdir);
@@ -1579,7 +1579,7 @@ namespace Ionic.Zip.Tests
             CreateFilesAndChecksums(subdir, out filesToZip, out checksums);
 
             // Create the zip archive via 7z.exe
-            this.Exec(sevenZip, String.Format("a {0} {1}", zipFileToCreate, subdir));
+            this.Exec(sevenZip, $"a {zipFileToCreate} {subdir}");
 
             // Verify the number of files in the zip
             Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), filesToZip.Length,
@@ -1589,7 +1589,7 @@ namespace Ionic.Zip.Tests
             string script = GetScript("VbsUnZip-DotNetZip.vbs");
 
             this.Exec(cscriptExe,
-                      String.Format("\"{0}\" {1} {2}", script, zipFileToCreate, extractDir));
+                $"\"{script}\" {zipFileToCreate} {extractDir}");
 
             // check the files in the extract dir
             VerifyChecksums(Path.Combine(extractDir, "files"), filesToZip, checksums);
@@ -1617,7 +1617,7 @@ namespace Ionic.Zip.Tests
             // Create the zip archive via 7z.exe
             //Directory.SetCurrentDirectory(TopLevelDir);
 
-            this.Exec(sevenZip, String.Format("a {0} {1}", zipFileToCreate, subdir));
+            this.Exec(sevenZip, $"a {zipFileToCreate} {subdir}");
 
             // Verify the number of files in the zip
             Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), filesToZip.Length,
@@ -1669,7 +1669,7 @@ namespace Ionic.Zip.Tests
             // unpack the zip archive via 7z.exe
             Directory.CreateDirectory("extract");
             Directory.SetCurrentDirectory("extract");
-            this.Exec(sevenZip, String.Format("x {0}", zipFileToCreate));
+            this.Exec(sevenZip, $"x {zipFileToCreate}");
 
             // check the files in the extract dir
             Directory.SetCurrentDirectory(TopLevelDir);
@@ -1708,7 +1708,7 @@ namespace Ionic.Zip.Tests
             // unpack the zip archive via 7z.exe
             Directory.CreateDirectory("extract");
             Directory.SetCurrentDirectory("extract");
-            this.Exec(sevenZip, String.Format("x -p{0} {1}", password, zipFileToCreate));
+            this.Exec(sevenZip, $"x -p{password} {zipFileToCreate}");
 
             // check the files in the extract dir
             Directory.SetCurrentDirectory(TopLevelDir);
@@ -1762,10 +1762,10 @@ namespace Ionic.Zip.Tests
                 TestContext.WriteLine("---------------------------------");
                 TestContext.WriteLine("Trial {0}", i);
                 TestContext.WriteLine("CompressionLevel = {0}", compLevel);
-                string zipFileToCreate = Path.Combine(TopLevelDir, String.Format("7z_Unzip_Password_NonSeekableOutput.{0}.zip", i));
+                string zipFileToCreate = Path.Combine(TopLevelDir, $"7z_Unzip_Password_NonSeekableOutput.{i}.zip");
                 string password = Path.GetRandomFileName();
                 //string password = "0123456789ABCDEF";
-                string extractDir = Path.Combine(TopLevelDir, String.Format("extract.{0}", i));
+                string extractDir = Path.Combine(TopLevelDir, $"extract.{i}");
 
                 TestContext.WriteLine("Password = {0}", password);
 
@@ -1841,7 +1841,7 @@ namespace Ionic.Zip.Tests
             // unpack the zip archive via 7z.exe
             Directory.CreateDirectory("extract");
             Directory.SetCurrentDirectory("extract");
-            this.Exec(sevenZip, String.Format("x {0}", zipFileToCreate));
+            this.Exec(sevenZip, $"x {zipFileToCreate}");
 
             // check the files in the extract dir
             Directory.SetCurrentDirectory(TopLevelDir);
@@ -1947,7 +1947,7 @@ namespace Ionic.Zip.Tests
         public string Winzip_Zip_Variable(string options, bool wantVerify)
         {
             if (!WinZipIsPresent)
-                throw new Exception(String.Format("[options({0})] : winzip is not present", options));
+                throw new Exception($"[options({options})] : winzip is not present");
 
             // options:
             // -sPassword
@@ -2122,7 +2122,7 @@ namespace Ionic.Zip.Tests
 
             // now, test the zip
             // eg, wzunzip.exe -t test.zip  <extractdir>
-            string args = String.Format("-t -s{0} {1}", password, zipFileToCreate);
+            string args = $"-t -s{password} {zipFileToCreate}";
             string wzunzipOut = this.Exec(wzunzip, args);
             TestContext.WriteLine("{0}", wzunzipOut);
 
@@ -2161,8 +2161,7 @@ namespace Ionic.Zip.Tests
             {
                 string zipFileToCreate =
                     Path.Combine(TopLevelDir,
-                                 String.Format("Winzip_Unzip_Pwd_NonSeek.{0}.zip",
-                                               i));
+                        $"Winzip_Unzip_Pwd_NonSeek.{i}.zip");
                 string extractDir = "extract" + i.ToString();
                 string password = Path.GetRandomFileName();
 
@@ -2320,8 +2319,7 @@ namespace Ionic.Zip.Tests
             // eg, wzunzip.exe -d test.zip  <extractdir>
             Directory.CreateDirectory(extractDir);
             Directory.SetCurrentDirectory(extractDir);
-            this.Exec(wzunzip, String.Format("-d -yx \"{0}\"",
-                                             Path.Combine(TopLevelDir, zipFileToCreate)));
+            this.Exec(wzunzip, $"-d -yx \"{Path.Combine(TopLevelDir, zipFileToCreate)}\"");
 
             // check the files in the extract dir
             Directory.SetCurrentDirectory(TopLevelDir);
@@ -2388,8 +2386,7 @@ namespace Ionic.Zip.Tests
             TestContext.WriteLine("Extracting...");
             Directory.CreateDirectory(extractDir);
             Directory.SetCurrentDirectory(extractDir);
-            this.Exec(wzunzip, String.Format("-d -yx \"{0}\"",
-                                             Path.Combine("..", zipFileToCreate)));
+            this.Exec(wzunzip, $"-d -yx \"{Path.Combine("..", zipFileToCreate)}\"");
         }
 
 
@@ -2448,7 +2445,7 @@ namespace Ionic.Zip.Tests
             {
                 var f = Path.GetFileName(filesToZip[i]);
                 var fileInZip = Path.Combine(dirInZip, f);
-                string textToLookFor = String.Format("Filename: {0}", fileInZip.Replace("/", "\\"));
+                string textToLookFor = $"Filename: {fileInZip.Replace("/", "\\")}";
                 int x = wzzipOut.IndexOf(textToLookFor);
                 Assert.IsTrue(x > 0, "Could not find expected text ({0}) in WZZIP output.", textToLookFor);
                 textToLookFor = "Attributes: ";
@@ -2461,7 +2458,7 @@ namespace Ionic.Zip.Tests
             // eg, wzunzip.exe -d test.zip  <extractdir>
             Directory.CreateDirectory(extractDir);
             Directory.SetCurrentDirectory(extractDir);
-            this.Exec(wzunzip, String.Format("-d -yx ..\\{0}", zipFileToCreate));
+            this.Exec(wzunzip, $"-d -yx ..\\{zipFileToCreate}");
 
             // check the files in the extract dir
             Directory.SetCurrentDirectory(TopLevelDir);

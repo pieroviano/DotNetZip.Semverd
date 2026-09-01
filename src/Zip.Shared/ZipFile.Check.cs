@@ -185,7 +185,7 @@ namespace Ionic.Zip
                 if (!isOk && fixIfNecessary)
                 {
                     string newFileName = Path.GetFileNameWithoutExtension(zipFileName);
-                    newFileName = System.String.Format("{0}_fixed.zip", newFileName);
+                    newFileName = $"{newFileName}_fixed.zip";
                     zip1.Save(newFileName);
                 }
             }
@@ -314,27 +314,27 @@ namespace Ionic.Zip
             get
             {
                 var builder = new System.Text.StringBuilder();
-                builder.Append(string.Format("          ZipFile: {0}\n", this.Name));
+                builder.Append($"          ZipFile: {this.Name}\n");
                 if (!string.IsNullOrEmpty(this._Comment))
                 {
-                    builder.Append(string.Format("          Comment: {0}\n", this._Comment));
+                    builder.Append($"          Comment: {this._Comment}\n");
                 }
                 if (this._versionMadeBy != 0)
                 {
-                    builder.Append(string.Format("  version made by: 0x{0:X4}\n", this._versionMadeBy));
+                    builder.Append($"  version made by: 0x{this._versionMadeBy:X4}\n");
                 }
                 if (this._versionNeededToExtract != 0)
                 {
-                    builder.Append(string.Format("needed to extract: 0x{0:X4}\n", this._versionNeededToExtract));
+                    builder.Append($"needed to extract: 0x{this._versionNeededToExtract:X4}\n");
                 }
 
-                builder.Append(string.Format("       uses ZIP64: {0}\n", this.InputUsesZip64));
+                builder.Append($"       uses ZIP64: {this.InputUsesZip64}\n");
 
-                builder.Append(string.Format("     disk with CD: {0}\n", this._diskNumberWithCd));
+                builder.Append($"     disk with CD: {this._diskNumberWithCd}\n");
                 if (this._OffsetOfCentralDirectory == 0xFFFFFFFF)
-                    builder.Append(string.Format("      CD64 offset: 0x{0:X16}\n", this._OffsetOfCentralDirectory64));
+                    builder.Append($"      CD64 offset: 0x{this._OffsetOfCentralDirectory64:X16}\n");
                 else
-                    builder.Append(string.Format("        CD offset: 0x{0:X8}\n", this._OffsetOfCentralDirectory));
+                    builder.Append($"        CD offset: 0x{this._OffsetOfCentralDirectory:X8}\n");
                 builder.Append("\n");
                 foreach (ZipEntry entry in this._entries.Values)
                 {

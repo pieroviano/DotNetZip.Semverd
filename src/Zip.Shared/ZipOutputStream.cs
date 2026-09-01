@@ -366,7 +366,7 @@ namespace Ionic.Zip
         /// <returns>a string representation of the instance.</returns>
         public override String ToString()
         {
-            return String.Format ("ZipOutputStream::{0}(leaveOpen({1})))", _name, _leaveUnderlyingStreamOpen);
+            return $"ZipOutputStream::{_name}(leaveOpen({_leaveUnderlyingStreamOpen})))";
         }
 
 
@@ -1199,7 +1199,7 @@ namespace Ionic.Zip
             if (_entriesWritten.ContainsKey(ze1.FileName))
             {
                 _exceptionPending = true;
-                throw new ArgumentException(String.Format("The entry '{0}' already exists in the zip archive.", ze1.FileName));
+                throw new ArgumentException($"The entry '{ze1.FileName}' already exists in the zip archive.");
             }
         }
 

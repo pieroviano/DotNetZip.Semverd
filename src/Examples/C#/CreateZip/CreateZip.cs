@@ -72,8 +72,8 @@ namespace Ionic.Zip.Examples
                         e.Comment = "Added by Cheeso's CreateZip utility."; 
                     }
 
-                    zip.Comment= String.Format("This zip archive was created by the CreateZip example application on machine '{0}'",
-                       System.Net.Dns.GetHostName());
+                    zip.Comment=
+                        $"This zip archive was created by the CreateZip example application on machine '{System.Net.Dns.GetHostName()}'";
 
                     zip.Save(ZipFileToCreate);
                 }

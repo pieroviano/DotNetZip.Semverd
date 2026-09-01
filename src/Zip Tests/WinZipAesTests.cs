@@ -72,12 +72,12 @@ namespace Ionic.Zip.Tests.WinZipAes
                 int filesize = _rnd.Next(size1) + size2;
                 if (_rnd.Next(2) == 1)
                 {
-                    filename = Path.Combine(TopLevelDir, String.Format("Data{0}.bin", i));
+                    filename = Path.Combine(TopLevelDir, $"Data{i}.bin");
                     TestUtilities.CreateAndFillFileBinary(filename, filesize);
                 }
                 else
                 {
-                    filename = Path.Combine(TopLevelDir, String.Format("Data{0}.txt", i));
+                    filename = Path.Combine(TopLevelDir, $"Data{i}.txt");
                     TestUtilities.CreateAndFillFileText(filename, filesize);
                 }
 
@@ -103,7 +103,7 @@ namespace Ionic.Zip.Tests.WinZipAes
                     string password = Path.GetRandomFileName().Replace(".", "-");
                     Directory.SetCurrentDirectory(TopLevelDir);
                     TestContext.WriteLine("\n\n==================Trial {0}.{1}..", k, m);
-                    string zipFileToCreate = Path.Combine(TopLevelDir, String.Format("{0}-{1}-{2}.zip", name, k, m));
+                    string zipFileToCreate = Path.Combine(TopLevelDir, $"{name}-{k}-{m}.zip");
 
                     TestContext.WriteLine("Creating file {0}", zipFileToCreate);
                     TestContext.WriteLine("  Password:   {0}", password);
@@ -126,7 +126,7 @@ namespace Ionic.Zip.Tests.WinZipAes
                     System.Threading.Thread.Sleep(1200); // seems to be a race condition?  sometimes?
                     using (ZipFile zip2 = ZipFile.Read(zipFileToCreate))
                     {
-                        string extractDir = String.Format("extract-{0}.{1}", k, m);
+                        string extractDir = $"extract-{k}.{m}";
                         foreach (var e in zip2)
                         {
                             TestContext.WriteLine(" Entry: {0}  c({1})  unc({2})", e.FileName, e.CompressedSize, e.UncompressedSize);
@@ -202,13 +202,13 @@ namespace Ionic.Zip.Tests.WinZipAes
                 {
                     if (_rnd.Next(2) == 1)
                     {
-                        filename = Path.Combine(TopLevelDir, String.Format("Data{0}.bin", i));
+                        filename = Path.Combine(TopLevelDir, $"Data{i}.bin");
                         int filesize = _rnd.Next(144000) + 5000;
                         TestUtilities.CreateAndFillFileBinary(filename, filesize);
                     }
                     else
                     {
-                        filename = Path.Combine(TopLevelDir, String.Format("Data{0}.txt", i));
+                        filename = Path.Combine(TopLevelDir, $"Data{i}.txt");
                         int filesize = _rnd.Next(144000) + 5000;
                         TestUtilities.CreateAndFillFileText(filename, filesize);
                     }
@@ -218,7 +218,7 @@ namespace Ionic.Zip.Tests.WinZipAes
                     checksums.Add(Path.GetFileName(filename), TestUtilities.CheckSumToString(chk));
                 }
 
-                zip1.Comment = String.Format("This archive uses Encryption: {0}, no password!", zip1.Encryption);
+                zip1.Comment = $"This archive uses Encryption: {zip1.Encryption}, no password!";
                 // With no password, we expect no encryption in the output.
                 zip1.Save(zipFileToCreate);
             }
@@ -362,11 +362,11 @@ namespace Ionic.Zip.Tests.WinZipAes
             string args = null;
             if (password == null)
             {
-                args = String.Format("-a -whs {0}", zipfile);
+                args = $"-a -whs {zipfile}";
             }
             else
             {
-                args = String.Format("-a -whs -s\"{0}\"  {1}  {2}", password, encryptionArg, zipfile);
+                args = $"-a -whs -s\"{password}\"  {encryptionArg}  {zipfile}";
             }
 
             // This had better not be too long a list, otherwise the cmd
@@ -415,7 +415,7 @@ namespace Ionic.Zip.Tests.WinZipAes
                     {
                         subdir + "\\*.*",
                     };
-                string zipFileToCreate = String.Format("WZA_ReadZips-{0}.zip", m);
+                string zipFileToCreate = $"WZA_ReadZips-{m}.zip";
                 WinzipCreate(zipFileToCreate, dirsToZip, cryptoArg[m], password);
 
                 _Internal_ReadZip(zipFileToCreate, (correctPw) ? password : null, filesToZip.Length);
@@ -494,7 +494,7 @@ namespace Ionic.Zip.Tests.WinZipAes
 
             // extract all the files
             int actualFilesExtracted = 0;
-            string extractDir = String.Format("Extract{0}", zipCount++);
+            string extractDir = $"Extract{zipCount++}";
 
             using (ZipFile zip2 = ZipFile.Read(zipFileToRead))
             {
@@ -562,13 +562,13 @@ namespace Ionic.Zip.Tests.WinZipAes
                 {
                     if (_rnd.Next(2) == 1)
                     {
-                        filename = Path.Combine(TopLevelDir, String.Format("Data{0}.bin", i));
+                        filename = Path.Combine(TopLevelDir, $"Data{i}.bin");
                         int filesize = _rnd.Next(144000) + 5000;
                         TestUtilities.CreateAndFillFileBinary(filename, filesize);
                     }
                     else
                     {
-                        filename = Path.Combine(TopLevelDir, String.Format("Data{0}.txt", i));
+                        filename = Path.Combine(TopLevelDir, $"Data{i}.txt");
                         int filesize = _rnd.Next(144000) + 5000;
                         TestUtilities.CreateAndFillFileText(filename, filesize);
                     }
@@ -578,7 +578,7 @@ namespace Ionic.Zip.Tests.WinZipAes
                     checksums.Add(Path.GetFileName(filename), TestUtilities.CheckSumToString(chk));
                 }
 
-                zip1.Comment = String.Format("This archive uses Encryption({0}) password({1}) no compression.", zip1.Encryption, password);
+                zip1.Comment = $"This archive uses Encryption({zip1.Encryption}) password({password}) no compression.";
                 zip1.Save(zipFileToCreate);
             }
 
@@ -659,13 +659,13 @@ namespace Ionic.Zip.Tests.WinZipAes
                 {
                     if (_rnd.Next(2) == 1)
                     {
-                        filename = Path.Combine(TopLevelDir, String.Format("Data{0}.bin", i));
+                        filename = Path.Combine(TopLevelDir, $"Data{i}.bin");
                         int filesize = _rnd.Next(144000) + 5000;
                         TestUtilities.CreateAndFillFileBinary(filename, filesize);
                     }
                     else
                     {
-                        filename = Path.Combine(TopLevelDir, String.Format("Data{0}.txt", i));
+                        filename = Path.Combine(TopLevelDir, $"Data{i}.txt");
                         int filesize = _rnd.Next(144000) + 5000;
                         TestUtilities.CreateAndFillFileText(filename, filesize);
                     }
@@ -675,7 +675,7 @@ namespace Ionic.Zip.Tests.WinZipAes
                     checksums.Add(Path.GetFileName(filename), TestUtilities.CheckSumToString(chk));
                 }
 
-                zip1.Comment = String.Format("This archive uses Encryption({0}) password({1}) no compression.", zip1.Encryption, password);
+                zip1.Comment = $"This archive uses Encryption({zip1.Encryption}) password({password}) no compression.";
                 zip1.Save(zipFileToCreate);
             }
 
@@ -712,7 +712,7 @@ namespace Ionic.Zip.Tests.WinZipAes
             string[] TextFiles = new string[5];
             for (int i = 0; i < TextFiles.Length; i++)
             {
-                TextFiles[i] = Path.Combine(TopLevelDir, String.Format("TextFile{0}.txt", i));
+                TextFiles[i] = Path.Combine(TopLevelDir, $"TextFile{i}.txt");
                 TestUtilities.CreateAndFillFileText(TextFiles[i], _rnd.Next(4000) + 5000);
             }
             TestContext.WriteLine(new String('=', 66));
@@ -722,7 +722,7 @@ namespace Ionic.Zip.Tests.WinZipAes
             {
                 TestContext.WriteLine(new String('-', 55));
                 TestContext.WriteLine("Trial {0}", k);
-                string zipFileToCreate = Path.Combine(TopLevelDir, String.Format("RemoveEntryAndSave-{0}.zip", k));
+                string zipFileToCreate = Path.Combine(TopLevelDir, $"RemoveEntryAndSave-{k}.zip");
 
                 // create the zip: add some files, and Save() it
                 using (ZipFile zip = new ZipFile())
@@ -755,7 +755,7 @@ namespace Ionic.Zip.Tests.WinZipAes
 
                 // Verify the files are in the zip
                 Assert.AreEqual(TestUtilities.CountEntries(zipFileToCreate), TextFiles.Length,
-                                     String.Format("Trial {0}: The Zip file has the wrong number of entries.", k));
+                    $"Trial {k}: The Zip file has the wrong number of entries.");
 
                 if (k == 1)
                     BasicVerifyZip(zipFileToCreate, password);
@@ -776,7 +776,7 @@ namespace Ionic.Zip.Tests.WinZipAes
             int[] sizes = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 21, 35, 93 };
             for (int i = 0; i < sizes.Length; i++)
             {
-                string zipFileToCreate = Path.Combine(TopLevelDir, String.Format("WZA_SmallBuffers_wi7967-{0}.zip", i));
+                string zipFileToCreate = Path.Combine(TopLevelDir, $"WZA_SmallBuffers_wi7967-{i}.zip");
                 //MemoryStream zippedStream = new MemoryStream();
                 byte[] buffer = new byte[sizes[i]];
                 _rnd.NextBytes(buffer);
@@ -810,7 +810,7 @@ namespace Ionic.Zip.Tests.WinZipAes
                 for (int m = 0; m < 2; m++)
                 {
                     string zipFileToCreate =
-                        String.Format("WZA_InMemory_wi8493-{0}.zip", m);
+                        $"WZA_InMemory_wi8493-{m}.zip";
 
                     using (var zip = new ZipFile())
                     {
@@ -844,7 +844,7 @@ namespace Ionic.Zip.Tests.WinZipAes
             string[] TextFiles = new string[25 + _rnd.Next(8)];
             for (int i = 0; i < TextFiles.Length; i++)
             {
-                TextFiles[i] = Path.Combine(TopLevelDir, String.Format("TextFile{0}.txt", i));
+                TextFiles[i] = Path.Combine(TopLevelDir, $"TextFile{i}.txt");
                 TestUtilities.CreateAndFillFileText(TextFiles[i], _rnd.Next(14000) + 13000);
             }
 
@@ -936,13 +936,13 @@ namespace Ionic.Zip.Tests.WinZipAes
                 {
                     if (_rnd.Next(2) == 1)
                     {
-                        filename = Path.Combine(TopLevelDir, String.Format("Data{0}.bin", i));
+                        filename = Path.Combine(TopLevelDir, $"Data{i}.bin");
                         int filesize = _rnd.Next(144000) + 5000;
                         TestUtilities.CreateAndFillFileBinary(filename, filesize);
                     }
                     else
                     {
-                        filename = Path.Combine(TopLevelDir, String.Format("Data{0}.txt", i));
+                        filename = Path.Combine(TopLevelDir, $"Data{i}.txt");
                         int filesize = _rnd.Next(144000) + 5000;
                         TestUtilities.CreateAndFillFileText(filename, filesize);
                     }
@@ -952,7 +952,7 @@ namespace Ionic.Zip.Tests.WinZipAes
                     checksums.Add(Path.GetFileName(filename), TestUtilities.CheckSumToString(chk));
                 }
 
-                zip1.Comment = String.Format("This archive uses Encryption({0}) password({1}) no compression.", zip1.Encryption, password);
+                zip1.Comment = $"This archive uses Encryption({zip1.Encryption}) password({password}) no compression.";
                 TestContext.WriteLine("{0}", zip1.Comment);
                 TestContext.WriteLine("Saving the zip...");
                 zip1.Save(zipFileToCreate);
